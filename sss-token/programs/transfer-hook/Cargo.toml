@@ -16,5 +16,6 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = "0.32.1"
+anchor-lang = "0.31.1"
 spl-token-2022 = { version = "5.0.2", features = ["no-entrypoint"] }
+solana-sdk-ids = "=2.2.0"

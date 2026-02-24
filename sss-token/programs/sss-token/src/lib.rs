@@ -1,5 +1,8 @@
 use anchor_lang::prelude::*;
 
+// Program ID
+declare_id!("Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw");
+
 // ============================================
 // ERROR DEFINITIONS
 // ============================================

@@ -1,4 +1,8 @@
 use anchor_lang::prelude::*;
+use spl_token_2022::{self, state::{Mint, TokenAccount}};
+
+// Program ID
+declare_id!("az3oVrACpVrCJbgGhKueYhTWobmte2AwYgMp1cAzdKD");
 
 // ============================================
 // ERROR DEFINITIONS
@@ -159,7 +163,7 @@ pub struct InitializeTransferHook<'info> {
     )]
     pub hook_data: Account<'info, TransferHookData>,
     
-    pub mint: Account<'info, token_2022::Mint>,
+    pub mint: Account<'info, Mint>,
     
     /// CHECK: The stablecoin program ID
     pub stablecoin_program: UncheckedAccount<'info>,
@@ -180,7 +184,7 @@ pub struct Pause<'info> {
     )]
     pub hook_data: Account<'info, TransferHookData>,
     
-    pub mint: Account<'info, token_2022::Mint>,
+    pub mint: Account<'info, Mint>,
     
     pub authority: Signer<'info>,
 }
@@ -195,7 +199,7 @@ pub struct Unpause<'info> {
     )]
     pub hook_data: Account<'info, TransferHookData>,
     
-    pub mint: Account<'info, token_2022::Mint>,
+    pub mint: Account<'info, Mint>,
     
     pub authority: Signer<'info>,
 }
@@ -208,7 +212,7 @@ pub struct ExtraAccountMetas<'info> {
     )]
     pub hook_data: Account<'info, TransferHookData>,
     
-    pub mint: Account<'info, token_2022::Mint>,
+    pub mint: Account<'info, Mint>,
 }
 
 #[derive(Accounts)]
@@ -225,12 +229,12 @@ pub struct ExecuteTransferHook<'info> {
     #[account(
         constraint = source_token.mint == hook_data.mint @ TransferHookError::InvalidMintAccount
     )]
-    pub source_token: Account<'info, token_2022::TokenAccount>,
+    pub source_token: Account<'info, TokenAccount>,
     
     #[account(
         constraint = dest_token.mint == hook_data.mint @ TransferHookError::InvalidMintAccount
     )]
-    pub dest_token: Account<'info, token_2022::TokenAccount>,
+    pub dest_token: Account<'info, TokenAccount>,
     
     /// CHECK: Optional account for sender blacklist check
     /// If this account exists and has data, the sender is blacklisted
@@ -248,7 +252,7 @@ pub struct ExecuteTransferHook<'info> {
     )]
     pub recipient_blacklist: UncheckedAccount<'info>,
     
-    pub mint: Account<'info, token_2022::Mint>,
+    pub mint: Account<'info, Mint>,
 }
 
 #[derive(Accounts)]
@@ -261,7 +265,7 @@ pub struct UpdateAuthority<'info> {
     )]
     pub hook_data: Account<'info, TransferHookData>,
     
-    pub mint: Account<'info, token_2022::Mint>,
+    pub mint: Account<'info, Mint>,
     
     #[account(mut)]
     pub authority: Signer<'info>,

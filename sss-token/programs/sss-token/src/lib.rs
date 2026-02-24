@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use spl_token_2022 as token_2022;
 
 // Program ID
 declare_id!("Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw");
@@ -120,7 +121,7 @@ impl BlacklistEntry {
 #[program]
 pub mod sss_token {
     use super::*;
-
+    use spl_token_2022::instruction::TokenInstruction::MintTo as TokenMintTo;
     /// Initialize a new stablecoin with specified configuration
     /// Creates the mint account with Token-2022 extensions
     pub fn initialize(
@@ -183,7 +184,7 @@ pub mod sss_token {
         minter_info.minted += amount;
 
         // Mint tokens
-        let cpi_accounts = token_2022::MintTo {
+        let cpi_accounts = TokenMintTo {amount} {
             mint: ctx.accounts.mint.to_account_info(),
             to: ctx.accounts.token_account.to_account_info(),
             authority: ctx.accounts.minter.to_account_info(),
@@ -460,9 +461,6 @@ pub struct Initialize<'info> {
         mint::decimals = decimals,
         mint::authority = authority,
         mint::freeze_authority = authority,
-        extensions::metadata::name = name,
-        extensions::metadata::symbol = symbol,
-        extensions::metadata::uri = uri,
     )]
     pub mint: Account<'info, token_2022::Mint>,
     

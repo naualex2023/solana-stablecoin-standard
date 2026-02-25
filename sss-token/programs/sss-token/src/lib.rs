@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
-use spl_token_2022 as token_2022;
+use anchor_spl::token_2022::{self, MintTo, Burn as BurnCpi, FreezeAccount as FreezeAccountCpi, ThawAccount as ThawAccountCpi, TransferChecked};
+use anchor_spl::token_interface::{Mint as TokenMint, TokenAccount, Token2022};
 
 // Program ID
 declare_id!("Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw");
@@ -48,12 +49,12 @@ pub struct StablecoinConfig {
     pub decimals: u8,
     pub paused: bool,
     pub bump: u8,
-    
+
     // Module flags
     pub enable_permanent_delegate: bool,
     pub enable_transfer_hook: bool,
     pub default_account_frozen: bool,
-    
+
     // Roles (RBAC)
     pub blacklister: Pubkey,
     pub pauser: Pubkey,
@@ -61,21 +62,21 @@ pub struct StablecoinConfig {
 }
 
 impl StablecoinConfig {
-    pub const LEN: usize = 8 + // discriminator
-        32 + // master_authority
-        32 + // mint
-        4 + 100 + // name (max 100 chars)
-        4 + 10 +  // symbol (max 10 chars)
-        4 + 200 + // uri (max 200 chars)
-        1 +  // decimals
-        1 +  // paused
-        1 +  // bump
-        1 +  // enable_permanent_delegate
-        1 +  // enable_transfer_hook
-        1 +  // default_account_frozen
-        32 + // blacklister
-        32 + // pauser
-        32;  // seizer
+    pub const LEN: usize = 8  // discriminator
+        + 32 // master_authority
+        + 32 // mint
+        + 4 + 100 // name (max 100 chars)
+        + 4 + 10  // symbol (max 10 chars)
+        + 4 + 200 // uri (max 200 chars)
+        + 1  // decimals
+        + 1  // paused
+        + 1  // bump
+        + 1  // enable_permanent_delegate
+        + 1  // enable_transfer_hook
+        + 1  // default_account_frozen
+        + 32 // blacklister
+        + 32 // pauser
+        + 32; // seizer
 }
 
 /// Minter information with quota tracking
@@ -89,11 +90,11 @@ pub struct MinterInfo {
 }
 
 impl MinterInfo {
-    pub const LEN: usize = 8 + // discriminator
-        32 + // authority
-        8 +  // quota
-        8 +  // minted
-        1;   // bump
+    pub const LEN: usize = 8  // discriminator
+        + 32 // authority
+        + 8  // quota
+        + 8  // minted
+        + 1; // bump
 }
 
 /// Blacklist entry for SSS-2 compliance
@@ -107,11 +108,11 @@ pub struct BlacklistEntry {
 }
 
 impl BlacklistEntry {
-    pub const LEN: usize = 8 + // discriminator
-        32 + // user
-        4 + 100 + // reason (max 100 chars)
-        8 +  // timestamp
-        1;   // bump
+    pub const LEN: usize = 8  // discriminator
+        + 32 // user
+        + 4 + 100 // reason (max 100 chars)
+        + 8  // timestamp
+        + 1; // bump
 }
 
 // ============================================
@@ -121,9 +122,8 @@ impl BlacklistEntry {
 #[program]
 pub mod sss_token {
     use super::*;
-    use spl_token_2022::instruction::TokenInstruction::MintTo as TokenMintTo;
+
     /// Initialize a new stablecoin with specified configuration
-    /// Creates the mint account with Token-2022 extensions
     pub fn initialize(
         ctx: Context<Initialize>,
         name: String,
@@ -135,9 +135,8 @@ pub mod sss_token {
         default_account_frozen: bool,
     ) -> Result<()> {
         let config = &mut ctx.accounts.config;
-        let clock = Clock::get()?;
+        let _clock = Clock::get()?;
 
-        // Validate string lengths
         require!(name.len() <= 100, StablecoinError::InvalidAccount);
         require!(symbol.len() <= 10, StablecoinError::InvalidAccount);
         require!(uri.len() <= 200, StablecoinError::InvalidAccount);
@@ -150,13 +149,11 @@ pub mod sss_token {
         config.decimals = decimals;
         config.paused = false;
         config.bump = ctx.bumps.config;
-        
-        // Set module flags
+
         config.enable_permanent_delegate = enable_permanent_delegate;
         config.enable_transfer_hook = enable_transfer_hook;
         config.default_account_frozen = default_account_frozen;
-        
-        // Initialize roles with master authority as default
+
         config.blacklister = ctx.accounts.authority.key();
         config.pauser = ctx.accounts.authority.key();
         config.seizer = ctx.accounts.authority.key();
@@ -166,25 +163,19 @@ pub mod sss_token {
     }
 
     /// Mint tokens to a recipient account
-    /// Requires minter authority and respects quota limits
-    pub fn mint(ctx: Context<Mint>, amount: u64) -> Result<()> {
+    pub fn mint_tokens(ctx: Context<MintTokens>, amount: u64) -> Result<()> {
         let config = &ctx.accounts.config;
         let minter_info = &mut ctx.accounts.minter_info;
 
-        // Check if paused
         require!(!config.paused, StablecoinError::TokenPaused);
-
-        // Check quota
         require!(
             minter_info.minted + amount <= minter_info.quota,
             StablecoinError::QuotaExceeded
         );
 
-        // Update minter stats
         minter_info.minted += amount;
 
-        // Mint tokens
-        let cpi_accounts = TokenMintTo {amount} {
+        let cpi_accounts = MintTo {
             mint: ctx.accounts.mint.to_account_info(),
             to: ctx.accounts.token_account.to_account_info(),
             authority: ctx.accounts.minter.to_account_info(),
@@ -198,15 +189,12 @@ pub mod sss_token {
     }
 
     /// Burn tokens from an account
-    /// Requires burner authority
-    pub fn burn(ctx: Context<Burn>, amount: u64) -> Result<()> {
+    pub fn burn_tokens(ctx: Context<BurnTokens>, amount: u64) -> Result<()> {
         let config = &ctx.accounts.config;
 
-        // Check if paused
         require!(!config.paused, StablecoinError::TokenPaused);
 
-        // Burn tokens
-        let cpi_accounts = token_2022::Burn {
+        let cpi_accounts = BurnCpi {
             mint: ctx.accounts.mint.to_account_info(),
             from: ctx.accounts.token_account.to_account_info(),
             authority: ctx.accounts.burner.to_account_info(),
@@ -220,9 +208,8 @@ pub mod sss_token {
     }
 
     /// Freeze a token account
-    /// Requires freeze authority
-    pub fn freeze_account(ctx: Context<FreezeAccount>) -> Result<()> {
-        let cpi_accounts = token_2022::FreezeAccount {
+    pub fn freeze_token_account(ctx: Context<FreezeTokenAccount>) -> Result<()> {
+        let cpi_accounts = FreezeAccountCpi {
             account: ctx.accounts.token_account.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
             authority: ctx.accounts.freeze_authority.to_account_info(),
@@ -236,9 +223,8 @@ pub mod sss_token {
     }
 
     /// Thaw a token account
-    /// Requires freeze authority
-    pub fn thaw_account(ctx: Context<ThawAccount>) -> Result<()> {
-        let cpi_accounts = token_2022::ThawAccount {
+    pub fn thaw_token_account(ctx: Context<ThawTokenAccount>) -> Result<()> {
+        let cpi_accounts = ThawAccountCpi {
             account: ctx.accounts.token_account.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
             authority: ctx.accounts.freeze_authority.to_account_info(),
@@ -252,7 +238,6 @@ pub mod sss_token {
     }
 
     /// Pause all token operations
-    /// Requires pauser role
     pub fn pause(ctx: Context<Pause>) -> Result<()> {
         let config = &mut ctx.accounts.config;
         config.paused = true;
@@ -261,7 +246,6 @@ pub mod sss_token {
     }
 
     /// Unpause all token operations
-    /// Requires pauser role
     pub fn unpause(ctx: Context<Unpause>) -> Result<()> {
         let config = &mut ctx.accounts.config;
         config.paused = false;
@@ -270,13 +254,9 @@ pub mod sss_token {
     }
 
     /// Add a minter with specified quota
-    /// Requires master authority
-    pub fn add_minter(
-        ctx: Context<AddMinter>,
-        quota: u64,
-    ) -> Result<()> {
+    pub fn add_minter(ctx: Context<AddMinter>, quota: u64) -> Result<()> {
         let minter_info = &mut ctx.accounts.minter_info;
-        
+
         minter_info.authority = ctx.accounts.minter.key();
         minter_info.quota = quota;
         minter_info.minted = 0;
@@ -287,11 +267,7 @@ pub mod sss_token {
     }
 
     /// Update minter quota
-    /// Requires master authority
-    pub fn update_minter_quota(
-        ctx: Context<UpdateMinterQuota>,
-        new_quota: u64,
-    ) -> Result<()> {
+    pub fn update_minter_quota(ctx: Context<UpdateMinterQuota>, new_quota: u64) -> Result<()> {
         let minter_info = &mut ctx.accounts.minter_info;
         minter_info.quota = new_quota;
 
@@ -300,17 +276,15 @@ pub mod sss_token {
     }
 
     /// Remove a minter
-    /// Requires master authority
     pub fn remove_minter(ctx: Context<RemoveMinter>) -> Result<()> {
         let minter_info = &mut ctx.accounts.minter_info;
-        minter_info.quota = 0; // Set quota to 0 to effectively remove
+        minter_info.quota = 0;
 
         msg!("Removed minter {}", ctx.accounts.minter.key());
         Ok(())
     }
 
     /// Update roles (blacklister, pauser, seizer)
-    /// Requires master authority
     pub fn update_roles(
         ctx: Context<UpdateRoles>,
         new_blacklister: Pubkey,
@@ -318,7 +292,7 @@ pub mod sss_token {
         new_seizer: Pubkey,
     ) -> Result<()> {
         let config = &mut ctx.accounts.config;
-        
+
         config.blacklister = new_blacklister;
         config.pauser = new_pauser;
         config.seizer = new_seizer;
@@ -328,20 +302,10 @@ pub mod sss_token {
     }
 
     /// Add an address to the blacklist (SSS-2)
-    /// Requires blacklister role and compliance module enabled
-    pub fn add_to_blacklist(
-        ctx: Context<AddToBlacklist>,
-        reason: String,
-    ) -> Result<()> {
+    pub fn add_to_blacklist(ctx: Context<AddToBlacklist>, reason: String) -> Result<()> {
         let config = &ctx.accounts.config;
 
-        // Check if compliance module is enabled
-        require!(
-            config.enable_transfer_hook,
-            StablecoinError::ComplianceNotEnabled
-        );
-
-        // Validate reason length
+        require!(config.enable_transfer_hook, StablecoinError::ComplianceNotEnabled);
         require!(reason.len() <= 100, StablecoinError::InvalidAccount);
 
         let blacklist_entry = &mut ctx.accounts.blacklist_entry;
@@ -357,53 +321,26 @@ pub mod sss_token {
     }
 
     /// Remove an address from the blacklist (SSS-2)
-    /// Requires blacklister role and compliance module enabled
+    /// The `close = blacklister` constraint on the account handles closing automatically
     pub fn remove_from_blacklist(ctx: Context<RemoveFromBlacklist>) -> Result<()> {
         let config = &ctx.accounts.config;
 
-        // Check if compliance module is enabled
-        require!(
-            config.enable_transfer_hook,
-            StablecoinError::ComplianceNotEnabled
-        );
-
-        // Close the blacklist entry account
-        let blacklist_entry = &ctx.accounts.blacklist_entry;
-        let signer_seeds: &[&[&[u8]]] = &[&[
-            b"blacklist",
-            config.to_account_info().key().as_ref(),
-            ctx.accounts.user.key().as_ref(),
-            &[blacklist_entry.bump],
-        ]];
-
-        let cpi_accounts = anchor_lang::system_program::CloseAccount {
-            account: blacklist_entry.to_account_info(),
-            destination: ctx.accounts.blacklister.to_account_info(),
-        };
-        let cpi_program = ctx.accounts.system_program.to_account_info();
-        let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
-        anchor_lang::system_program::close_account(cpi_ctx)?;
+        require!(config.enable_transfer_hook, StablecoinError::ComplianceNotEnabled);
 
         msg!("Removed {} from blacklist", ctx.accounts.user.key());
         Ok(())
     }
 
     /// Seize tokens from a frozen account (SSS-2)
-    /// Requires seizer role and permanent delegate enabled
-    pub fn seize(
-        ctx: Context<Seize>,
-        amount: u64,
-    ) -> Result<()> {
+    pub fn seize(ctx: Context<Seize>, amount: u64) -> Result<()> {
         let config = &ctx.accounts.config;
 
-        // Check if permanent delegate is enabled
         require!(
             config.enable_permanent_delegate,
             StablecoinError::PermanentDelegateNotEnabled
         );
 
-        // Transfer tokens using permanent delegate authority
-        let cpi_accounts = token_2022::TransferChecked {
+        let cpi_accounts = TransferChecked {
             from: ctx.accounts.source_token.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
             to: ctx.accounts.dest_token.to_account_info(),
@@ -417,8 +354,7 @@ pub mod sss_token {
         Ok(())
     }
 
-    /// Transfer authority for operations
-    /// Requires master authority
+    /// Transfer master authority
     pub fn transfer_authority(
         ctx: Context<TransferAuthority>,
         new_master_authority: Pubkey,
@@ -454,100 +390,106 @@ pub struct Initialize<'info> {
         bump
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
+
     #[account(
         init,
         payer = authority,
         mint::decimals = decimals,
         mint::authority = authority,
         mint::freeze_authority = authority,
+        mint::token_program = token_program,
     )]
-    pub mint: Account<'info, token_2022::Mint>,
-    
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
     #[account(mut)]
     pub authority: Signer<'info>,
-    
+
     pub system_program: Program<'info, System>,
-    pub token_program: Program<'info, token_2022::Token2022>,
+    pub token_program: Program<'info, Token2022>,
 }
 
 #[derive(Accounts)]
-pub struct Mint<'info> {
+pub struct MintTokens<'info> {
     #[account(
         seeds = [b"config", mint.key().as_ref()],
         bump = config.bump
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
-    pub mint: Account<'info, token_2022::Mint>,
-    
+
+    #[account(mut)]
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
     #[account(
+        mut,
         seeds = [b"minter", config.key().as_ref(), minter.key().as_ref()],
         bump = minter_info.bump
     )]
     pub minter_info: Account<'info, MinterInfo>,
-    
+
     #[account(mut)]
     pub minter: Signer<'info>,
-    
+
     #[account(mut)]
-    pub token_account: Account<'info, token_2022::TokenAccount>,
-    
-    pub token_program: Program<'info, token_2022::Token2022>,
+    pub token_account: InterfaceAccount<'info, TokenAccount>,
+
+    pub token_program: Program<'info, Token2022>,
 }
 
 #[derive(Accounts)]
-pub struct Burn<'info> {
+pub struct BurnTokens<'info> {
     #[account(
         seeds = [b"config", mint.key().as_ref()],
         bump = config.bump
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
-    pub mint: Account<'info, token_2022::Mint>,
-    
+
     #[account(mut)]
-    pub token_account: Account<'info, token_2022::TokenAccount>,
-    
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
+    #[account(mut)]
+    pub token_account: InterfaceAccount<'info, TokenAccount>,
+
     pub burner: Signer<'info>,
-    
-    pub token_program: Program<'info, token_2022::Token2022>,
+
+    pub token_program: Program<'info, Token2022>,
 }
 
 #[derive(Accounts)]
-pub struct FreezeAccount<'info> {
+pub struct FreezeTokenAccount<'info> {
     #[account(
         seeds = [b"config", mint.key().as_ref()],
         bump = config.bump
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
-    pub mint: Account<'info, token_2022::Mint>,
-    
+
     #[account(mut)]
-    pub token_account: Account<'info, token_2022::TokenAccount>,
-    
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
+    #[account(mut)]
+    pub token_account: InterfaceAccount<'info, TokenAccount>,
+
     pub freeze_authority: Signer<'info>,
-    
-    pub token_program: Program<'info, token_2022::Token2022>,
+
+    pub token_program: Program<'info, Token2022>,
 }
 
 #[derive(Accounts)]
-pub struct ThawAccount<'info> {
+pub struct ThawTokenAccount<'info> {
     #[account(
         seeds = [b"config", mint.key().as_ref()],
         bump = config.bump
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
-    pub mint: Account<'info, token_2022::Mint>,
-    
+
     #[account(mut)]
-    pub token_account: Account<'info, token_2022::TokenAccount>,
-    
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
+    #[account(mut)]
+    pub token_account: InterfaceAccount<'info, TokenAccount>,
+
     pub freeze_authority: Signer<'info>,
-    
-    pub token_program: Program<'info, token_2022::Token2022>,
+
+    pub token_program: Program<'info, Token2022>,
 }
 
 #[derive(Accounts)]
@@ -559,9 +501,9 @@ pub struct Pause<'info> {
         has_one = pauser @ StablecoinError::Unauthorized
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
-    pub mint: Account<'info, token_2022::Mint>,
-    
+
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
     pub pauser: Signer<'info>,
 }
 
@@ -574,9 +516,9 @@ pub struct Unpause<'info> {
         has_one = pauser @ StablecoinError::Unauthorized
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
-    pub mint: Account<'info, token_2022::Mint>,
-    
+
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
     pub pauser: Signer<'info>,
 }
 
@@ -588,11 +530,12 @@ pub struct AddMinter<'info> {
         has_one = master_authority @ StablecoinError::Unauthorized
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
-    pub mint: Account<'info, token_2022::Mint>,
-    
-    pub minter: Signer<'info>,
-    
+
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
+    /// CHECK: The minter's public key
+    pub minter: UncheckedAccount<'info>,
+
     #[account(
         init,
         payer = master_authority,
@@ -601,10 +544,10 @@ pub struct AddMinter<'info> {
         bump
     )]
     pub minter_info: Account<'info, MinterInfo>,
-    
+
     #[account(mut)]
     pub master_authority: Signer<'info>,
-    
+
     pub system_program: Program<'info, System>,
 }
 
@@ -616,16 +559,19 @@ pub struct UpdateMinterQuota<'info> {
         has_one = master_authority @ StablecoinError::Unauthorized
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
+
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
     #[account(
         mut,
         seeds = [b"minter", config.key().as_ref(), minter.key().as_ref()],
         bump = minter_info.bump
     )]
     pub minter_info: Account<'info, MinterInfo>,
-    
+
+    /// CHECK: The minter's public key
     pub minter: UncheckedAccount<'info>,
-    
+
     #[account(mut)]
     pub master_authority: Signer<'info>,
 }
@@ -638,16 +584,19 @@ pub struct RemoveMinter<'info> {
         has_one = master_authority @ StablecoinError::Unauthorized
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
+
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
     #[account(
         mut,
         seeds = [b"minter", config.key().as_ref(), minter.key().as_ref()],
         bump = minter_info.bump
     )]
     pub minter_info: Account<'info, MinterInfo>,
-    
+
+    /// CHECK: The minter's public key
     pub minter: UncheckedAccount<'info>,
-    
+
     #[account(mut)]
     pub master_authority: Signer<'info>,
 }
@@ -661,9 +610,9 @@ pub struct UpdateRoles<'info> {
         has_one = master_authority @ StablecoinError::Unauthorized
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
-    pub mint: Account<'info, token_2022::Mint>,
-    
+
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
     #[account(mut)]
     pub master_authority: Signer<'info>,
 }
@@ -677,14 +626,15 @@ pub struct AddToBlacklist<'info> {
         has_one = blacklister @ StablecoinError::Unauthorized
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
-    pub mint: Account<'info, token_2022::Mint>,
-    
+
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
     #[account(mut)]
     pub blacklister: Signer<'info>,
-    
+
+    /// CHECK: The user to blacklist
     pub user: UncheckedAccount<'info>,
-    
+
     #[account(
         init,
         payer = blacklister,
@@ -693,7 +643,7 @@ pub struct AddToBlacklist<'info> {
         bump
     )]
     pub blacklist_entry: Account<'info, BlacklistEntry>,
-    
+
     pub system_program: Program<'info, System>,
 }
 
@@ -705,12 +655,15 @@ pub struct RemoveFromBlacklist<'info> {
         has_one = blacklister @ StablecoinError::Unauthorized
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
+
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
     #[account(mut)]
     pub blacklister: Signer<'info>,
-    
+
+    /// CHECK: The user to remove from blacklist
     pub user: UncheckedAccount<'info>,
-    
+
     #[account(
         mut,
         close = blacklister,
@@ -718,7 +671,7 @@ pub struct RemoveFromBlacklist<'info> {
         bump = blacklist_entry.bump
     )]
     pub blacklist_entry: Account<'info, BlacklistEntry>,
-    
+
     pub system_program: Program<'info, System>,
 }
 
@@ -730,18 +683,18 @@ pub struct Seize<'info> {
         has_one = seizer @ StablecoinError::Unauthorized
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
-    pub mint: Account<'info, token_2022::Mint>,
-    
+
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
     #[account(mut)]
-    pub source_token: Account<'info, token_2022::TokenAccount>,
-    
+    pub source_token: InterfaceAccount<'info, TokenAccount>,
+
     #[account(mut)]
-    pub dest_token: Account<'info, token_2022::TokenAccount>,
-    
+    pub dest_token: InterfaceAccount<'info, TokenAccount>,
+
     pub seizer: Signer<'info>,
-    
-    pub token_program: Program<'info, token_2022::Token2022>,
+
+    pub token_program: Program<'info, Token2022>,
 }
 
 #[derive(Accounts)]
@@ -753,9 +706,9 @@ pub struct TransferAuthority<'info> {
         has_one = master_authority @ StablecoinError::Unauthorized
     )]
     pub config: Account<'info, StablecoinConfig>,
-    
-    pub mint: Account<'info, token_2022::Mint>,
-    
+
+    pub mint: InterfaceAccount<'info, TokenMint>,
+
     #[account(mut)]
     pub master_authority: Signer<'info>,
 }

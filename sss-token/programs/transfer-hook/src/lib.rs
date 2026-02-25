@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
-use spl_token_2022::{self, state::{Mint, TokenAccount}};
+use anchor_spl::token_2022::Token2022;
+use anchor_spl::token_interface::{Mint, TokenAccount};
 
 // Program ID
 declare_id!("az3oVrACpVrCJbgGhKueYhTWobmte2AwYgMp1cAzdKD");
@@ -89,7 +90,7 @@ pub mod transfer_hook {
     /// The main transfer hook function called by Token-2022
     /// This validates that neither sender nor recipient is blacklisted
     pub fn extra_account_metas(
-        ctx: Context<ExtraAccountMetas>,
+        _ctx: Context<ExtraAccountMetas>,
     ) -> Result<()> {
         // This instruction returns the accounts needed for the transfer hook
         // The actual validation happens in the transfer hook instruction
@@ -100,7 +101,6 @@ pub mod transfer_hook {
     /// This is called during every token transfer if the transfer hook extension is enabled
     pub fn execute(ctx: Context<ExecuteTransferHook>, amount: u64) -> Result<()> {
         let hook_data = &ctx.accounts.hook_data;
-        let stablecoin_program = &ctx.accounts.stablecoin_program;
 
         // Check if transfer hook is paused
         require!(!hook_data.paused, TransferHookError::TransferPaused);
@@ -108,13 +108,6 @@ pub mod transfer_hook {
         // Get sender and recipient addresses from the source and destination token accounts
         let sender = &ctx.accounts.source_token.owner;
         let recipient = &ctx.accounts.dest_token.owner;
-
-        // Check if sender is blacklisted by trying to find the blacklist entry
-        let sender_blacklist_seeds = &[
-            b"blacklist",
-            hook_data.mint.as_ref(),
-            sender.as_ref(),
-        ];
 
         let sender_blacklist_info = &ctx.accounts.sender_blacklist;
 
@@ -163,7 +156,7 @@ pub struct InitializeTransferHook<'info> {
     )]
     pub hook_data: Account<'info, TransferHookData>,
     
-    pub mint: Account<'info, Mint>,
+    pub mint: InterfaceAccount<'info, Mint>,
     
     /// CHECK: The stablecoin program ID
     pub stablecoin_program: UncheckedAccount<'info>,
@@ -184,7 +177,7 @@ pub struct Pause<'info> {
     )]
     pub hook_data: Account<'info, TransferHookData>,
     
-    pub mint: Account<'info, Mint>,
+    pub mint: InterfaceAccount<'info, Mint>,
     
     pub authority: Signer<'info>,
 }
@@ -199,7 +192,7 @@ pub struct Unpause<'info> {
     )]
     pub hook_data: Account<'info, TransferHookData>,
     
-    pub mint: Account<'info, Mint>,
+    pub mint: InterfaceAccount<'info, Mint>,
     
     pub authority: Signer<'info>,
 }
@@ -212,7 +205,7 @@ pub struct ExtraAccountMetas<'info> {
     )]
     pub hook_data: Account<'info, TransferHookData>,
     
-    pub mint: Account<'info, Mint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 }
 
 #[derive(Accounts)]
@@ -229,12 +222,12 @@ pub struct ExecuteTransferHook<'info> {
     #[account(
         constraint = source_token.mint == hook_data.mint @ TransferHookError::InvalidMintAccount
     )]
-    pub source_token: Account<'info, TokenAccount>,
+    pub source_token: InterfaceAccount<'info, TokenAccount>,
     
     #[account(
         constraint = dest_token.mint == hook_data.mint @ TransferHookError::InvalidMintAccount
     )]
-    pub dest_token: Account<'info, TokenAccount>,
+    pub dest_token: InterfaceAccount<'info, TokenAccount>,
     
     /// CHECK: Optional account for sender blacklist check
     /// If this account exists and has data, the sender is blacklisted
@@ -252,7 +245,7 @@ pub struct ExecuteTransferHook<'info> {
     )]
     pub recipient_blacklist: UncheckedAccount<'info>,
     
-    pub mint: Account<'info, Mint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 }
 
 #[derive(Accounts)]
@@ -265,7 +258,7 @@ pub struct UpdateAuthority<'info> {
     )]
     pub hook_data: Account<'info, TransferHookData>,
     
-    pub mint: Account<'info, Mint>,
+    pub mint: InterfaceAccount<'info, Mint>,
     
     #[account(mut)]
     pub authority: Signer<'info>,

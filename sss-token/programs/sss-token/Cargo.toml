@@ -21,9 +21,9 @@ custom-panic = []
 
 
 [dependencies]
-anchor-lang = "0.31.1"
-spl-token-2022 = { version = "5.0.2", features = ["no-entrypoint"] }
-solana-sdk-ids = "=2.2.0"
+anchor-lang = "0.32.1"
+anchor-spl = { version = "0.32.1", features = ["token_2022"] }
+spl-token-2022 = { version = "8", features = ["no-entrypoint"] }
 
 
 [lints.rust]

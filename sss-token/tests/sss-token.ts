@@ -4,6 +4,7 @@ import { SssToken } from "../target/types/sss_token";
 import { TransferHook } from "../target/types/transfer_hook";
 import { 
   TOKEN_PROGRAM_ID,
+  TOKEN_2022_PROGRAM_ID,
   createMint,
   createAccount,
   mintTo,
@@ -39,6 +40,7 @@ describe("Stablecoin Integration Tests", () => {
   const newAuthority = Keypair.generate();
 
   // PDAs and accounts
+  let mintKeypair: Keypair;
   let mint: PublicKey;
   let config: PublicKey;
   let transferHookData: PublicKey;
@@ -108,43 +110,9 @@ describe("Stablecoin Integration Tests", () => {
     await airdrop(minter);
     await airdrop(newAuthority);
 
-    // Create mint
-    mint = await createMint(
-      provider.connection,
-      authority.payer,
-      authority.publicKey,
-      authority.publicKey,
-      TOKEN_DECIMALS
-    );
-
-    // Create token accounts
-    user1TokenAccount = await createAccount(
-      provider.connection,
-      authority.payer,
-      mint,
-      user1.publicKey
-    );
-
-    user2TokenAccount = await createAccount(
-      provider.connection,
-      authority.payer,
-      mint,
-      user2.publicKey
-    );
-
-    authorityTokenAccount = await createAccount(
-      provider.connection,
-      authority.payer,
-      mint,
-      authority.publicKey
-    );
-
-    treasuryTokenAccount = await createAccount(
-      provider.connection,
-      authority.payer,
-      mint,
-      authority.publicKey
-    );
+    // Generate a keypair for the mint
+    mintKeypair = Keypair.generate();
+    mint = mintKeypair.publicKey;
 
     // Derive PDAs
     [config, configBump] = await findConfigPDA(mint);
@@ -171,11 +139,49 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           authority: authority.publicKey,
           systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
+        .signers([mintKeypair])
         .rpc();
 
       console.log("Initialize transaction:", tx);
+
+      // Now create token accounts after initialization
+      user1TokenAccount = await createAccount(
+        provider.connection,
+        authority.payer,
+        mint,
+        user1.publicKey,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
+      );
+
+      user2TokenAccount = await createAccount(
+        provider.connection,
+        authority.payer,
+        mint,
+        user2.publicKey,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
+      );
+
+      authorityTokenAccount = await createAccount(
+        provider.connection,
+        authority.payer,
+        mint,
+        authority.publicKey,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
+      );
+
+      treasuryTokenAccount = await createAccount(
+        provider.connection,
+        authority.payer,
+        mint,
+        authority.publicKey,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
+      );
 
       // Verify config
       const configAccount = await sssTokenProgram.account.stablecoinConfig.fetch(config);
@@ -226,7 +232,7 @@ describe("Stablecoin Integration Tests", () => {
             mint,
             authority: authority.publicKey,
             systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .rpc();
         assert.fail("Should have thrown an error");
@@ -348,7 +354,7 @@ describe("Stablecoin Integration Tests", () => {
           minterInfo,
           minter: minter.publicKey,
           tokenAccount: user1TokenAccount,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .signers([minter])
         .rpc();
@@ -376,7 +382,7 @@ describe("Stablecoin Integration Tests", () => {
             minterInfo,
             minter: minter.publicKey,
             tokenAccount: user1TokenAccount,
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .signers([minter])
           .rpc();
@@ -406,7 +412,7 @@ describe("Stablecoin Integration Tests", () => {
             minterInfo,
             minter: minter.publicKey,
             tokenAccount: user1TokenAccount,
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .signers([minter])
           .rpc();
@@ -439,7 +445,7 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           tokenAccount: user1TokenAccount,
           burner: user1.publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .signers([user1])
         .rpc();
@@ -471,7 +477,7 @@ describe("Stablecoin Integration Tests", () => {
             mint,
             tokenAccount: user1TokenAccount,
             burner: user1.publicKey,
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .signers([user1])
           .rpc();
@@ -501,7 +507,7 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           tokenAccount: user1TokenAccount,
           freezeAuthority: authority.publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .rpc();
 
@@ -520,7 +526,9 @@ describe("Stablecoin Integration Tests", () => {
           user1TokenAccount,
           user2TokenAccount,
           user1,
-          new anchor.BN(1000)
+          new anchor.BN(1000),
+          undefined,
+          TOKEN_2022_PROGRAM_ID
         );
         assert.fail("Should have thrown an error");
       } catch (error) {
@@ -536,7 +544,7 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           tokenAccount: user1TokenAccount,
           freezeAuthority: authority.publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .rpc();
 
@@ -679,7 +687,9 @@ describe("Stablecoin Integration Tests", () => {
         authority.payer,
         authority.publicKey,
         authority.publicKey,
-        TOKEN_DECIMALS
+        TOKEN_DECIMALS,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
 
       const [configNoHook] = await findConfigPDA(mintNoHook);
@@ -699,7 +709,7 @@ describe("Stablecoin Integration Tests", () => {
           mint: mintNoHook,
           authority: authority.publicKey,
           systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .rpc();
 
@@ -734,7 +744,7 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           tokenAccount: user1TokenAccount,
           freezeAuthority: authority.publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .rpc();
 
@@ -751,7 +761,7 @@ describe("Stablecoin Integration Tests", () => {
           sourceToken: user1TokenAccount,
           destToken: treasuryTokenAccount,
           seizer: authority.publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .rpc();
 
@@ -778,7 +788,7 @@ describe("Stablecoin Integration Tests", () => {
             sourceToken: user1TokenAccount,
             destToken: treasuryTokenAccount,
             seizer: user1.publicKey,
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .signers([user1])
           .rpc();
@@ -795,7 +805,9 @@ describe("Stablecoin Integration Tests", () => {
         authority.payer,
         authority.publicKey,
         authority.publicKey,
-        TOKEN_DECIMALS
+        TOKEN_DECIMALS,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
 
       const [configNoDelegate] = await findConfigPDA(mintNoDelegate);
@@ -815,13 +827,13 @@ describe("Stablecoin Integration Tests", () => {
           mint: mintNoDelegate,
           authority: authority.publicKey,
           systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .rpc();
 
       const [tokenAcc] = await PublicKey.findProgramAddressSync(
         [Buffer.from("token"), user1.publicKey.toBuffer()],
-        TOKEN_PROGRAM_ID
+        TOKEN_2022_PROGRAM_ID
       );
 
       try {
@@ -833,7 +845,7 @@ describe("Stablecoin Integration Tests", () => {
             sourceToken: user1TokenAccount,
             destToken: treasuryTokenAccount,
             seizer: authority.publicKey,
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .rpc();
         assert.fail("Should have thrown an error");
@@ -1046,7 +1058,9 @@ describe("Stablecoin Integration Tests", () => {
         authority.payer,
         authority.publicKey,
         authority.publicKey,
-        TOKEN_DECIMALS
+        TOKEN_DECIMALS,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
 
       const [configInvalid] = await findConfigPDA(mintInvalid);
@@ -1067,7 +1081,7 @@ describe("Stablecoin Integration Tests", () => {
             mint: mintInvalid,
             authority: authority.publicKey,
             systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .rpc();
         assert.fail("Should have thrown an error");
@@ -1082,7 +1096,9 @@ describe("Stablecoin Integration Tests", () => {
         authority.payer,
         authority.publicKey,
         authority.publicKey,
-        TOKEN_DECIMALS
+        TOKEN_DECIMALS,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
 
       const [configInvalid] = await findConfigPDA(mintInvalid);
@@ -1103,7 +1119,7 @@ describe("Stablecoin Integration Tests", () => {
             mint: mintInvalid,
             authority: authority.publicKey,
             systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .rpc();
         assert.fail("Should have thrown an error");
@@ -1118,7 +1134,9 @@ describe("Stablecoin Integration Tests", () => {
         authority.payer,
         authority.publicKey,
         authority.publicKey,
-        TOKEN_DECIMALS
+        TOKEN_DECIMALS,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
 
       const [configInvalid] = await findConfigPDA(mintInvalid);
@@ -1139,7 +1157,7 @@ describe("Stablecoin Integration Tests", () => {
             mint: mintInvalid,
             authority: authority.publicKey,
             systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .rpc();
         assert.fail("Should have thrown an error");
@@ -1183,7 +1201,7 @@ describe("Stablecoin Integration Tests", () => {
             minterInfo,
             minter: minter.publicKey,
             tokenAccount: user2TokenAccount,
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .signers([minter])
           .rpc();
@@ -1283,7 +1301,6 @@ describe("Stablecoin Integration Tests", () => {
             mint,
             tokenAccount: user1TokenAccount,
             freezeAuthority: authority.publicKey,
-            tokenProgram: TOKEN_PROGRAM_ID,
           })
           .rpc();
       }
@@ -1296,7 +1313,6 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           tokenAccount: user1TokenAccount,
           freezeAuthority: authority.publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
         })
         .rpc();
 
@@ -1314,7 +1330,9 @@ describe("Stablecoin Integration Tests", () => {
           user1TokenAccount,
           user2TokenAccount,
           user1,
-          new anchor.BN(0)
+          new anchor.BN(0),
+          undefined,
+          TOKEN_2022_PROGRAM_ID
         );
       } catch (error) {
         // Zero amount transfers might be rejected, that's acceptable
@@ -1335,14 +1353,18 @@ describe("Stablecoin Integration Tests", () => {
         provider.connection,
         authority.payer,
         mint,
-        user3.publicKey
+        user3.publicKey,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
 
       const user4TokenAccount = await createAccount(
         provider.connection,
         authority.payer,
         mint,
-        user4.publicKey
+        user4.publicKey,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
 
       const transferAmount = new anchor.BN(1000);
@@ -1357,7 +1379,7 @@ describe("Stablecoin Integration Tests", () => {
           minterInfo,
           minter: minter.publicKey,
           tokenAccount: user3TokenAccount,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .signers([minter])
         .rpc();
@@ -1372,7 +1394,9 @@ describe("Stablecoin Integration Tests", () => {
         user3TokenAccount,
         user4TokenAccount,
         user3,
-        transferAmount
+        transferAmount,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
 
       account = await getAccount(provider.connection, user3TokenAccount);
@@ -1389,7 +1413,7 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           tokenAccount: user4TokenAccount,
           burner: user4.publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .signers([user4])
         .rpc();
@@ -1407,14 +1431,18 @@ describe("Stablecoin Integration Tests", () => {
         provider.connection,
         authority.payer,
         mint,
-        badActor.publicKey
+        badActor.publicKey,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
 
       const seizureAccount = await createAccount(
         provider.connection,
         authority.payer,
         mint,
-        authority.publicKey
+        authority.publicKey,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
 
       // Mint tokens to bad actor
@@ -1427,7 +1455,7 @@ describe("Stablecoin Integration Tests", () => {
           minterInfo,
           minter: minter.publicKey,
           tokenAccount: badActorTokenAccount,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .signers([minter])
         .rpc();
@@ -1454,7 +1482,6 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           tokenAccount: badActorTokenAccount,
           freezeAuthority: authority.publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
         })
         .rpc();
 
@@ -1472,7 +1499,7 @@ describe("Stablecoin Integration Tests", () => {
           sourceToken: badActorTokenAccount,
           destToken: seizureAccount,
           seizer: authority.publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .rpc();
 
@@ -1502,7 +1529,6 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           tokenAccount: badActorTokenAccount,
           freezeAuthority: authority.publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
         })
         .rpc();
 
@@ -1535,7 +1561,7 @@ describe("Stablecoin Integration Tests", () => {
             minterInfo,
             minter: minter.publicKey,
             tokenAccount: user1TokenAccount,
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .signers([minter])
           .rpc();

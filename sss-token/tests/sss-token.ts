@@ -140,7 +140,7 @@ describe("Stablecoin Integration Tests", () => {
           authority: authority.publicKey,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .signers([mintKeypair])
         .rpc();
 
@@ -207,7 +207,7 @@ describe("Stablecoin Integration Tests", () => {
           stablecoinProgram: sssTokenProgram.programId,
           authority: authority.publicKey,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .rpc();
 
       console.log("Transfer hook initialize transaction:", tx);
@@ -237,7 +237,7 @@ describe("Stablecoin Integration Tests", () => {
             authority: authority.publicKey,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .rpc();
         assert.fail("Should have thrown an error");
       } catch (error) {
@@ -257,7 +257,7 @@ describe("Stablecoin Integration Tests", () => {
           minterInfo,
           masterAuthority: authority.publicKey,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .rpc();
 
       console.log("Add minter transaction:", tx);
@@ -280,7 +280,7 @@ describe("Stablecoin Integration Tests", () => {
           minter: minter.publicKey,
           minterInfo,
           masterAuthority: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       console.log("Update minter quota transaction:", tx);
@@ -306,7 +306,7 @@ describe("Stablecoin Integration Tests", () => {
             minterInfo: unauthorizedMinterInfo,
             masterAuthority: user1.publicKey,
             systemProgram: SystemProgram.programId,
-          })
+          } as any)
           .signers([user1])
           .rpc();
         assert.fail("Should have thrown an error");
@@ -324,7 +324,7 @@ describe("Stablecoin Integration Tests", () => {
           minter: minter.publicKey,
           minterInfo,
           masterAuthority: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       console.log("Remove minter transaction:", tx);
@@ -343,7 +343,7 @@ describe("Stablecoin Integration Tests", () => {
           minterInfo,
           masterAuthority: authority.publicKey,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .rpc();
     });
   });
@@ -359,7 +359,7 @@ describe("Stablecoin Integration Tests", () => {
           minter: minter.publicKey,
           tokenAccount: user1TokenAccount,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .signers([minter])
         .rpc();
 
@@ -387,7 +387,7 @@ describe("Stablecoin Integration Tests", () => {
             minter: minter.publicKey,
             tokenAccount: user1TokenAccount,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .signers([minter])
           .rpc();
         assert.fail("Should have thrown an error");
@@ -404,7 +404,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           pauser: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       try {
@@ -417,7 +417,7 @@ describe("Stablecoin Integration Tests", () => {
             minter: minter.publicKey,
             tokenAccount: user1TokenAccount,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .signers([minter])
           .rpc();
         assert.fail("Should have thrown an error");
@@ -432,7 +432,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           pauser: authority.publicKey,
-        })
+        } as any)
         .rpc();
     });
   });
@@ -450,7 +450,7 @@ describe("Stablecoin Integration Tests", () => {
           tokenAccount: user1TokenAccount,
           burner: user1.publicKey,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .signers([user1])
         .rpc();
 
@@ -470,7 +470,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           pauser: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       try {
@@ -482,7 +482,7 @@ describe("Stablecoin Integration Tests", () => {
             tokenAccount: user1TokenAccount,
             burner: user1.publicKey,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .signers([user1])
           .rpc();
         assert.fail("Should have thrown an error");
@@ -497,7 +497,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           pauser: authority.publicKey,
-        })
+        } as any)
         .rpc();
     });
   });
@@ -512,7 +512,7 @@ describe("Stablecoin Integration Tests", () => {
           tokenAccount: user1TokenAccount,
           freezeAuthority: authority.publicKey,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .rpc();
 
       console.log("Freeze account transaction:", tx);
@@ -550,7 +550,7 @@ describe("Stablecoin Integration Tests", () => {
           tokenAccount: user1TokenAccount,
           freezeAuthority: authority.publicKey,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .rpc();
 
       console.log("Thaw account transaction:", tx);
@@ -569,7 +569,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           pauser: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       console.log("Pause transaction:", tx);
@@ -586,7 +586,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           pauser: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       console.log("Unpause transaction:", tx);
@@ -604,7 +604,7 @@ describe("Stablecoin Integration Tests", () => {
             config,
             mint,
             pauser: user1.publicKey,
-          })
+          } as any)
           .signers([user1])
           .rpc();
         assert.fail("Should have thrown an error");
@@ -627,7 +627,7 @@ describe("Stablecoin Integration Tests", () => {
           user: user1.publicKey,
           blacklistEntry: blacklistEntry1,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .rpc();
 
       console.log("Add to blacklist transaction:", tx);
@@ -651,7 +651,7 @@ describe("Stablecoin Integration Tests", () => {
           user: user1.publicKey,
           blacklistEntry: blacklistEntry1,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .rpc();
 
       console.log("Remove from blacklist transaction:", tx);
@@ -676,7 +676,7 @@ describe("Stablecoin Integration Tests", () => {
             user: user2.publicKey,
             blacklistEntry: blacklistEntry2,
             systemProgram: SystemProgram.programId,
-          })
+          } as any)
           .signers([user1])
           .rpc();
         assert.fail("Should have thrown an error");
@@ -716,7 +716,7 @@ describe("Stablecoin Integration Tests", () => {
           authority: authority.publicKey,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .rpc();
 
       const [blEntry] = await findBlacklistEntryPDA(configNoHook, user1.publicKey);
@@ -731,7 +731,7 @@ describe("Stablecoin Integration Tests", () => {
             user: user1.publicKey,
             blacklistEntry: blEntry,
             systemProgram: SystemProgram.programId,
-          })
+          } as any)
           .rpc();
         assert.fail("Should have thrown an error");
       } catch (error) {
@@ -751,7 +751,7 @@ describe("Stablecoin Integration Tests", () => {
           tokenAccount: user1TokenAccount,
           freezeAuthority: authority.publicKey,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .rpc();
 
       // Get initial balances
@@ -768,7 +768,7 @@ describe("Stablecoin Integration Tests", () => {
           destToken: treasuryTokenAccount,
           seizer: authority.publicKey,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .rpc();
 
       console.log("Seize tokens transaction:", tx);
@@ -795,7 +795,7 @@ describe("Stablecoin Integration Tests", () => {
             destToken: treasuryTokenAccount,
             seizer: user1.publicKey,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .signers([user1])
           .rpc();
         assert.fail("Should have thrown an error");
@@ -835,7 +835,7 @@ describe("Stablecoin Integration Tests", () => {
           authority: authority.publicKey,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .rpc();
 
       const [tokenAcc] = await PublicKey.findProgramAddressSync(
@@ -853,7 +853,7 @@ describe("Stablecoin Integration Tests", () => {
             destToken: treasuryTokenAccount,
             seizer: authority.publicKey,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .rpc();
         assert.fail("Should have thrown an error");
       } catch (error) {
@@ -874,7 +874,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           masterAuthority: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       console.log("Update roles transaction:", tx);
@@ -892,7 +892,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           masterAuthority: authority.publicKey,
-        })
+        } as any)
         .rpc();
     });
 
@@ -908,7 +908,7 @@ describe("Stablecoin Integration Tests", () => {
             config,
             mint,
             masterAuthority: user1.publicKey,
-          })
+          } as any)
           .signers([user1])
           .rpc();
         assert.fail("Should have thrown an error");
@@ -926,7 +926,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           masterAuthority: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       console.log("Transfer authority transaction:", tx);
@@ -945,7 +945,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           masterAuthority: newAuthority.publicKey,
-        })
+        } as any)
         .signers([newAuthority])
         .rpc();
     });
@@ -958,7 +958,7 @@ describe("Stablecoin Integration Tests", () => {
             config,
             mint,
             masterAuthority: user1.publicKey,
-          })
+          } as any)
           .signers([user1])
           .rpc();
         assert.fail("Should have thrown an error");
@@ -976,7 +976,7 @@ describe("Stablecoin Integration Tests", () => {
           hookData: transferHookData,
           mint,
           authority: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       console.log("Pause transfer hook transaction:", tx);
@@ -995,7 +995,7 @@ describe("Stablecoin Integration Tests", () => {
           hookData: transferHookData,
           mint,
           authority: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       console.log("Unpause transfer hook transaction:", tx);
@@ -1014,7 +1014,7 @@ describe("Stablecoin Integration Tests", () => {
           hookData: transferHookData,
           mint,
           authority: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       console.log("Update transfer hook authority transaction:", tx);
@@ -1035,7 +1035,7 @@ describe("Stablecoin Integration Tests", () => {
           hookData: transferHookData,
           mint,
           authority: newAuthority.publicKey,
-        })
+        } as any)
         .signers([newAuthority])
         .rpc();
     });
@@ -1048,7 +1048,7 @@ describe("Stablecoin Integration Tests", () => {
             hookData: transferHookData,
             mint,
             authority: user1.publicKey,
-          })
+          } as any)
           .signers([user1])
           .rpc();
         assert.fail("Should have thrown an error");
@@ -1090,7 +1090,7 @@ describe("Stablecoin Integration Tests", () => {
             authority: authority.publicKey,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .rpc();
         assert.fail("Should have thrown an error");
       } catch (error) {
@@ -1129,7 +1129,7 @@ describe("Stablecoin Integration Tests", () => {
             authority: authority.publicKey,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .rpc();
         assert.fail("Should have thrown an error");
       } catch (error) {
@@ -1168,7 +1168,7 @@ describe("Stablecoin Integration Tests", () => {
             authority: authority.publicKey,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .rpc();
         assert.fail("Should have thrown an error");
       } catch (error) {
@@ -1189,7 +1189,7 @@ describe("Stablecoin Integration Tests", () => {
             user: user1.publicKey,
             blacklistEntry: blEntry,
             systemProgram: SystemProgram.programId,
-          })
+          } as any)
           .rpc();
         assert.fail("Should have thrown an error");
       } catch (error) {
@@ -1212,7 +1212,7 @@ describe("Stablecoin Integration Tests", () => {
             minter: minter.publicKey,
             tokenAccount: user2TokenAccount,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .signers([minter])
           .rpc();
       }
@@ -1264,7 +1264,7 @@ describe("Stablecoin Integration Tests", () => {
           user: user2.publicKey,
           blacklistEntry: blacklistEntry2,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .rpc();
 
       const blacklistAccount = await sssTokenProgram.account.blacklistEntry.fetch(blacklistEntry2);
@@ -1285,7 +1285,7 @@ describe("Stablecoin Integration Tests", () => {
           user: user2.publicKey,
           blacklistEntry: blacklistEntry2,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .rpc();
     });
 
@@ -1312,7 +1312,7 @@ describe("Stablecoin Integration Tests", () => {
             tokenAccount: user1TokenAccount,
             freezeAuthority: authority.publicKey,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .rpc();
       }
 
@@ -1325,7 +1325,7 @@ describe("Stablecoin Integration Tests", () => {
           tokenAccount: user1TokenAccount,
           freezeAuthority: authority.publicKey,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .rpc();
 
       // Verify account is not frozen
@@ -1395,7 +1395,7 @@ describe("Stablecoin Integration Tests", () => {
           minter: minter.publicKey,
           tokenAccount: user3TokenAccount,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .signers([minter])
         .rpc();
 
@@ -1430,7 +1430,7 @@ describe("Stablecoin Integration Tests", () => {
           tokenAccount: user4TokenAccount,
           burner: user4.publicKey,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .signers([user4])
         .rpc();
 
@@ -1474,7 +1474,7 @@ describe("Stablecoin Integration Tests", () => {
           minter: minter.publicKey,
           tokenAccount: badActorTokenAccount,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .signers([minter])
         .rpc();
 
@@ -1489,7 +1489,7 @@ describe("Stablecoin Integration Tests", () => {
           user: badActor.publicKey,
           blacklistEntry: blEntry,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .rpc();
 
       // Freeze account
@@ -1501,7 +1501,7 @@ describe("Stablecoin Integration Tests", () => {
           tokenAccount: badActorTokenAccount,
           freezeAuthority: authority.publicKey,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .rpc();
 
       // Verify frozen
@@ -1519,7 +1519,7 @@ describe("Stablecoin Integration Tests", () => {
           destToken: seizureAccount,
           seizer: authority.publicKey,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .rpc();
 
       // Verify seizure
@@ -1537,7 +1537,7 @@ describe("Stablecoin Integration Tests", () => {
           user: badActor.publicKey,
           blacklistEntry: blEntry,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .rpc();
 
       // Thaw account
@@ -1549,7 +1549,7 @@ describe("Stablecoin Integration Tests", () => {
           tokenAccount: badActorTokenAccount,
           freezeAuthority: authority.publicKey,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-        })
+        } as any)
         .rpc();
 
       // Verify thawed
@@ -1565,7 +1565,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           pauser: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       const configAccount = await sssTokenProgram.account.stablecoinConfig.fetch(config);
@@ -1582,7 +1582,7 @@ describe("Stablecoin Integration Tests", () => {
             minter: minter.publicKey,
             tokenAccount: user1TokenAccount,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-          })
+          } as any)
           .signers([minter])
           .rpc();
         assert.fail("Should have thrown an error");
@@ -1597,7 +1597,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           pauser: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       const unpausedConfig = await sssTokenProgram.account.stablecoinConfig.fetch(config);
@@ -1618,7 +1618,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           masterAuthority: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       // Verify authority transfer
@@ -1638,7 +1638,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           masterAuthority: newMaster.publicKey,
-        })
+        } as any)
         .signers([newMaster])
         .rpc();
     });
@@ -1659,7 +1659,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           masterAuthority: authority.publicKey,
-        })
+        } as any)
         .rpc();
 
       const configUpdated = await sssTokenProgram.account.stablecoinConfig.fetch(config);
@@ -1678,7 +1678,7 @@ describe("Stablecoin Integration Tests", () => {
           user: user1.publicKey,
           blacklistEntry: blEntry,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .signers([user1])
         .rpc();
 
@@ -1692,7 +1692,7 @@ describe("Stablecoin Integration Tests", () => {
           user: user1.publicKey,
           blacklistEntry: blEntry,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .signers([user1])
         .rpc();
 
@@ -1703,7 +1703,7 @@ describe("Stablecoin Integration Tests", () => {
           config,
           mint,
           masterAuthority: authority.publicKey,
-        })
+        } as any)
         .rpc();
     });
   });

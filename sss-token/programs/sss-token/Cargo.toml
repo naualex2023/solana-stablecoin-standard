@@ -24,6 +24,7 @@ custom-panic = []
 anchor-lang = "0.32.1"
 anchor-spl = { version = "0.32.1", features = ["token_2022"] }
 spl-token-2022 = { version = "8", features = ["no-entrypoint"] }
+blake3 = "=1.8.2"
 
 
 [lints.rust]

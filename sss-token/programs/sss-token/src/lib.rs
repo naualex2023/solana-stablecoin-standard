@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token_2022::{self, MintTo, Burn as BurnCpi, FreezeAccount as FreezeAccountCpi, ThawAccount as ThawAccountCpi, TransferChecked};
-use anchor_spl::token_interface::{Mint as TokenMint, TokenAccount, Token2022};
+use anchor_spl::token_2022::{self, MintTo, Burn as BurnCpi, FreezeAccount as FreezeAccountCpi, ThawAccount as ThawAccountCpi, TransferChecked, Token2022};
+use anchor_spl::token_interface::{Mint, TokenAccount};
 
 // Program ID
 declare_id!("Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw");
@@ -399,7 +399,7 @@ pub struct Initialize<'info> {
         mint::freeze_authority = authority,
         mint::token_program = token_program,
     )]
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -417,7 +417,7 @@ pub struct MintTokens<'info> {
     pub config: Account<'info, StablecoinConfig>,
 
     #[account(mut)]
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(
         mut,
@@ -444,7 +444,7 @@ pub struct BurnTokens<'info> {
     pub config: Account<'info, StablecoinConfig>,
 
     #[account(mut)]
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(mut)]
     pub token_account: InterfaceAccount<'info, TokenAccount>,
@@ -463,7 +463,7 @@ pub struct FreezeTokenAccount<'info> {
     pub config: Account<'info, StablecoinConfig>,
 
     #[account(mut)]
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(mut)]
     pub token_account: InterfaceAccount<'info, TokenAccount>,
@@ -482,7 +482,7 @@ pub struct ThawTokenAccount<'info> {
     pub config: Account<'info, StablecoinConfig>,
 
     #[account(mut)]
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(mut)]
     pub token_account: InterfaceAccount<'info, TokenAccount>,
@@ -502,7 +502,7 @@ pub struct Pause<'info> {
     )]
     pub config: Account<'info, StablecoinConfig>,
 
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     pub pauser: Signer<'info>,
 }
@@ -517,7 +517,7 @@ pub struct Unpause<'info> {
     )]
     pub config: Account<'info, StablecoinConfig>,
 
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     pub pauser: Signer<'info>,
 }
@@ -531,7 +531,7 @@ pub struct AddMinter<'info> {
     )]
     pub config: Account<'info, StablecoinConfig>,
 
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     /// CHECK: The minter's public key
     pub minter: UncheckedAccount<'info>,
@@ -560,7 +560,7 @@ pub struct UpdateMinterQuota<'info> {
     )]
     pub config: Account<'info, StablecoinConfig>,
 
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(
         mut,
@@ -585,7 +585,7 @@ pub struct RemoveMinter<'info> {
     )]
     pub config: Account<'info, StablecoinConfig>,
 
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(
         mut,
@@ -611,7 +611,7 @@ pub struct UpdateRoles<'info> {
     )]
     pub config: Account<'info, StablecoinConfig>,
 
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(mut)]
     pub master_authority: Signer<'info>,
@@ -627,7 +627,7 @@ pub struct AddToBlacklist<'info> {
     )]
     pub config: Account<'info, StablecoinConfig>,
 
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(mut)]
     pub blacklister: Signer<'info>,
@@ -656,7 +656,7 @@ pub struct RemoveFromBlacklist<'info> {
     )]
     pub config: Account<'info, StablecoinConfig>,
 
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(mut)]
     pub blacklister: Signer<'info>,
@@ -684,7 +684,7 @@ pub struct Seize<'info> {
     )]
     pub config: Account<'info, StablecoinConfig>,
 
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(mut)]
     pub source_token: InterfaceAccount<'info, TokenAccount>,
@@ -707,7 +707,7 @@ pub struct TransferAuthority<'info> {
     )]
     pub config: Account<'info, StablecoinConfig>,
 
-    pub mint: InterfaceAccount<'info, TokenMint>,
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(mut)]
     pub master_authority: Signer<'info>,

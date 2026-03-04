@@ -391,14 +391,7 @@ pub struct Initialize<'info> {
     )]
     pub config: Account<'info, StablecoinConfig>,
 
-    #[account(
-        init,
-        payer = authority,
-        mint::decimals = decimals,
-        mint::authority = authority,
-        mint::freeze_authority = authority,
-        mint::token_program = token_program,
-    )]
+    #[account(mut)]
     pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(mut)]

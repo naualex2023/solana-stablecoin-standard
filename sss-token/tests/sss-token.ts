@@ -153,6 +153,7 @@ describe("Stablecoin Integration Tests", () => {
         mint,
         user1.publicKey,
         undefined,
+        undefined,
         TOKEN_2022_PROGRAM_ID
       );
 
@@ -161,6 +162,7 @@ describe("Stablecoin Integration Tests", () => {
         authority.payer,
         mint,
         user2.publicKey,
+        undefined,
         undefined,
         TOKEN_2022_PROGRAM_ID
       );
@@ -171,6 +173,7 @@ describe("Stablecoin Integration Tests", () => {
         mint,
         authority.publicKey,
         undefined,
+        undefined,
         TOKEN_2022_PROGRAM_ID
       );
 
@@ -179,6 +182,7 @@ describe("Stablecoin Integration Tests", () => {
         authority.payer,
         mint,
         authority.publicKey,
+        undefined,
         undefined,
         TOKEN_2022_PROGRAM_ID
       );
@@ -526,7 +530,8 @@ describe("Stablecoin Integration Tests", () => {
           user1TokenAccount,
           user2TokenAccount,
           user1,
-          new anchor.BN(1000),
+          1000,
+          undefined,
           undefined,
           TOKEN_2022_PROGRAM_ID
         );
@@ -689,6 +694,7 @@ describe("Stablecoin Integration Tests", () => {
         authority.publicKey,
         TOKEN_DECIMALS,
         undefined,
+        undefined,
         TOKEN_2022_PROGRAM_ID
       );
 
@@ -781,7 +787,7 @@ describe("Stablecoin Integration Tests", () => {
     it("Should fail to seize without seizer authority", async () => {
       try {
         await sssTokenProgram.methods
-          .seize(new anchor.BN(1000))
+          .seize(1000)
           .accounts({
             config,
             mint,
@@ -806,6 +812,7 @@ describe("Stablecoin Integration Tests", () => {
         authority.publicKey,
         authority.publicKey,
         TOKEN_DECIMALS,
+        undefined,
         undefined,
         TOKEN_2022_PROGRAM_ID
       );
@@ -838,7 +845,7 @@ describe("Stablecoin Integration Tests", () => {
 
       try {
         await sssTokenProgram.methods
-          .seize(new anchor.BN(1000))
+          .seize(1000)
           .accounts({
             config: configNoDelegate,
             mint: mintNoDelegate,
@@ -1060,6 +1067,7 @@ describe("Stablecoin Integration Tests", () => {
         authority.publicKey,
         TOKEN_DECIMALS,
         undefined,
+        undefined,
         TOKEN_2022_PROGRAM_ID
       );
 
@@ -1098,6 +1106,7 @@ describe("Stablecoin Integration Tests", () => {
         authority.publicKey,
         TOKEN_DECIMALS,
         undefined,
+        undefined,
         TOKEN_2022_PROGRAM_ID
       );
 
@@ -1135,6 +1144,7 @@ describe("Stablecoin Integration Tests", () => {
         authority.publicKey,
         authority.publicKey,
         TOKEN_DECIMALS,
+        undefined,
         undefined,
         TOKEN_2022_PROGRAM_ID
       );
@@ -1301,6 +1311,7 @@ describe("Stablecoin Integration Tests", () => {
             mint,
             tokenAccount: user1TokenAccount,
             freezeAuthority: authority.publicKey,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
           })
           .rpc();
       }
@@ -1313,6 +1324,7 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           tokenAccount: user1TokenAccount,
           freezeAuthority: authority.publicKey,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .rpc();
 
@@ -1330,7 +1342,8 @@ describe("Stablecoin Integration Tests", () => {
           user1TokenAccount,
           user2TokenAccount,
           user1,
-          new anchor.BN(0),
+          0,
+          undefined,
           undefined,
           TOKEN_2022_PROGRAM_ID
         );
@@ -1355,6 +1368,7 @@ describe("Stablecoin Integration Tests", () => {
         mint,
         user3.publicKey,
         undefined,
+        undefined,
         TOKEN_2022_PROGRAM_ID
       );
 
@@ -1363,6 +1377,7 @@ describe("Stablecoin Integration Tests", () => {
         authority.payer,
         mint,
         user4.publicKey,
+        undefined,
         undefined,
         TOKEN_2022_PROGRAM_ID
       );
@@ -1433,6 +1448,7 @@ describe("Stablecoin Integration Tests", () => {
         mint,
         badActor.publicKey,
         undefined,
+        undefined,
         TOKEN_2022_PROGRAM_ID
       );
 
@@ -1441,6 +1457,7 @@ describe("Stablecoin Integration Tests", () => {
         authority.payer,
         mint,
         authority.publicKey,
+        undefined,
         undefined,
         TOKEN_2022_PROGRAM_ID
       );
@@ -1482,6 +1499,7 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           tokenAccount: badActorTokenAccount,
           freezeAuthority: authority.publicKey,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .rpc();
 
@@ -1529,6 +1547,7 @@ describe("Stablecoin Integration Tests", () => {
           mint,
           tokenAccount: badActorTokenAccount,
           freezeAuthority: authority.publicKey,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
         })
         .rpc();
 
@@ -1554,7 +1573,7 @@ describe("Stablecoin Integration Tests", () => {
       // Try to mint (should fail)
       try {
         await sssTokenProgram.methods
-          .mintTokens(new anchor.BN(1000))
+          .mintTokens(1000)
           .accounts({
             config,
             mint,

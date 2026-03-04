@@ -638,7 +638,7 @@ describe("Stablecoin Integration Tests", () => {
       );
       assert.equal(blacklistAccount.user.toString(), user1.publicKey.toString());
       assert.equal(blacklistAccount.reason, reason);
-      assert.isAbove(blacklistAccount.timestamp, 0);
+      assert.isAbove(blacklistAccount.timestamp.toNumber(), 0);
     });
 
     it("Should remove user from blacklist", async () => {
@@ -787,7 +787,7 @@ describe("Stablecoin Integration Tests", () => {
     it("Should fail to seize without seizer authority", async () => {
       try {
         await sssTokenProgram.methods
-          .seize(1000)
+          .seize(new anchor.BN(1000))
           .accounts({
             config,
             mint,
@@ -845,7 +845,7 @@ describe("Stablecoin Integration Tests", () => {
 
       try {
         await sssTokenProgram.methods
-          .seize(1000)
+          .seize(new anchor.BN(1000))
           .accounts({
             config: configNoDelegate,
             mint: mintNoDelegate,
@@ -1272,7 +1272,7 @@ describe("Stablecoin Integration Tests", () => {
       // Verify all fields
       assert.equal(blacklistAccount.user.toString(), user2.publicKey.toString());
       assert.equal(blacklistAccount.reason, reason);
-      assert.isAbove(blacklistAccount.timestamp, 0);
+      assert.isAbove(blacklistAccount.timestamp.toNumber(), 0);
       assert.exists(blacklistAccount.bump);
       
       // Clean up
@@ -1409,7 +1409,8 @@ describe("Stablecoin Integration Tests", () => {
         user3TokenAccount,
         user4TokenAccount,
         user3,
-        transferAmount,
+        transferAmount.toNumber(),
+        undefined,
         undefined,
         TOKEN_2022_PROGRAM_ID
       );
@@ -1573,7 +1574,7 @@ describe("Stablecoin Integration Tests", () => {
       // Try to mint (should fail)
       try {
         await sssTokenProgram.methods
-          .mintTokens(1000)
+          .mintTokens(new anchor.BN(1000))
           .accounts({
             config,
             mint,

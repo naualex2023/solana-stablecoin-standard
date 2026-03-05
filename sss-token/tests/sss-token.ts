@@ -269,7 +269,6 @@ describe("Stablecoin Integration Tests", () => {
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
           } as any)
-          .signers([mintKeypair])
           .rpc();
         assert.fail("Should have thrown an error");
       } catch (error) {
@@ -690,9 +689,18 @@ describe("Stablecoin Integration Tests", () => {
     });
 
     it("Should fail to blacklist when transfer hook not enabled", async () => {
-      // Create a new config WITHOUT transfer hook enabled
-      const mintNoHook = Keypair.generate();
-      const [configNoHook] = await findConfigPDA(mintNoHook.publicKey);
+      // Create a new mint and config WITHOUT transfer hook enabled
+      const mintNoHook = await createMint(
+        provider.connection,
+        authority.payer,
+        authority.publicKey,
+        authority.publicKey,
+        TOKEN_DECIMALS,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
+      );
+      const [configNoHook] = await findConfigPDA(mintNoHook);
 
       await sssTokenProgram.methods
         .initialize(
@@ -706,12 +714,11 @@ describe("Stablecoin Integration Tests", () => {
         )
         .accounts({
           config: configNoHook,
-          mint: mintNoHook.publicKey,
+          mint: mintNoHook,
           authority: authority.publicKey,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
         } as any)
-        .signers([mintNoHook])
         .rpc();
 
       const [blEntry] = await findBlacklistEntryPDA(configNoHook, user1.publicKey);
@@ -721,7 +728,7 @@ describe("Stablecoin Integration Tests", () => {
           .addToBlacklist("Test reason")
           .accounts({
             config: configNoHook,
-            mint: mintNoHook.publicKey,
+            mint: mintNoHook,
             blacklister: authority.publicKey,
             user: user1.publicKey,
             blacklistEntry: blEntry,

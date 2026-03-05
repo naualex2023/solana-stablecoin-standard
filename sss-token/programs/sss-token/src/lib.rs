@@ -178,7 +178,7 @@ pub mod sss_token {
         let cpi_accounts = MintTo {
             mint: ctx.accounts.mint.to_account_info(),
             to: ctx.accounts.token_account.to_account_info(),
-            authority: ctx.accounts.minter.to_account_info(),
+            authority: ctx.accounts.mint_authority.to_account_info(),
         };
         let cpi_program = ctx.accounts.token_program.to_account_info();
         let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
@@ -412,6 +412,9 @@ pub struct MintTokens<'info> {
     #[account(mut)]
     pub mint: InterfaceAccount<'info, Mint>,
 
+    /// CHECK: The mint authority (must match mint's mint_authority)
+    pub mint_authority: Signer<'info>,
+
     #[account(
         mut,
         seeds = [b"minter", config.key().as_ref(), minter.key().as_ref()],
@@ -419,8 +422,8 @@ pub struct MintTokens<'info> {
     )]
     pub minter_info: Account<'info, MinterInfo>,
 
-    #[account(mut)]
-    pub minter: Signer<'info>,
+    /// CHECK: The minter requesting the mint
+    pub minter: UncheckedAccount<'info>,
 
     #[account(mut)]
     pub token_account: InterfaceAccount<'info, TokenAccount>,
@@ -498,6 +501,8 @@ pub struct Pause<'info> {
     pub mint: InterfaceAccount<'info, Mint>,
 
     pub pauser: Signer<'info>,
+
+    pub token_program: Program<'info, Token2022>,
 }
 
 #[derive(Accounts)]
@@ -513,6 +518,8 @@ pub struct Unpause<'info> {
     pub mint: InterfaceAccount<'info, Mint>,
 
     pub pauser: Signer<'info>,
+
+    pub token_program: Program<'info, Token2022>,
 }
 
 #[derive(Accounts)]

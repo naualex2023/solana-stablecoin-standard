@@ -37,24 +37,21 @@ export {
 
 // Helper utilities
 export {
-  createProvider,
-  getOrCreateTokenAccount,
   createTokenMint,
-  mintTo,
-  burn,
-  transfer,
-  freezeAccount,
-  thawAccount,
-  getTokenBalance,
+  createTokenAccount,
+  getOrCreateTokenAccount,
+  mintTokensToAccount,
+  burnTokensFromAccount,
+  freezeTokenAccount,
+  thawTokenAccount,
   fetchConfig,
   fetchMinterInfo,
   fetchBlacklistEntry,
-  accountExists,
-  waitForConfirmation,
-  getCurrentSlot,
-  getCurrentBlockTime,
-  lamportsToSol,
-  solToLamports,
+  isAccountFrozen,
+  getAccountBalance,
+  sleep,
+  lamportsToTokens,
+  tokensToLamports,
 } from "./utils";
 
 // Type definitions

@@ -1,0 +1,1334 @@
+{
+  "address": "Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw",
+  "metadata": {
+    "name": "sss_token",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "add_minter",
+      "docs": [
+        "Add a minter with specified quota"
+      ],
+      "discriminator": [
+        75,
+        86,
+        218,
+        40,
+        219,
+        6,
+        141,
+        29
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "minter"
+        },
+        {
+          "name": "minter_info",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  105,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config"
+              },
+              {
+                "kind": "account",
+                "path": "minter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "master_authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "quota",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "add_to_blacklist",
+      "docs": [
+        "Add an address to the blacklist (SSS-2)"
+      ],
+      "discriminator": [
+        90,
+        115,
+        98,
+        231,
+        173,
+        119,
+        117,
+        176
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "blacklister",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "user"
+        },
+        {
+          "name": "blacklist_entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  108,
+                  97,
+                  99,
+                  107,
+                  108,
+                  105,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "reason",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "burn_tokens",
+      "docs": [
+        "Burn tokens from an account"
+      ],
+      "discriminator": [
+        76,
+        15,
+        51,
+        254,
+        229,
+        215,
+        121,
+        66
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "token_account",
+          "writable": true
+        },
+        {
+          "name": "burner",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "freeze_token_account",
+      "docs": [
+        "Freeze a token account"
+      ],
+      "discriminator": [
+        138,
+        168,
+        178,
+        109,
+        205,
+        224,
+        209,
+        93
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "token_account",
+          "writable": true
+        },
+        {
+          "name": "freeze_authority",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize",
+      "docs": [
+        "Initialize a new stablecoin with specified configuration"
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        },
+        {
+          "name": "enable_permanent_delegate",
+          "type": "bool"
+        },
+        {
+          "name": "enable_transfer_hook",
+          "type": "bool"
+        },
+        {
+          "name": "default_account_frozen",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "mint_tokens",
+      "docs": [
+        "Mint tokens to a recipient account"
+      ],
+      "discriminator": [
+        59,
+        132,
+        24,
+        246,
+        122,
+        39,
+        8,
+        243
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "mint_authority",
+          "signer": true
+        },
+        {
+          "name": "minter_info",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  105,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config"
+              },
+              {
+                "kind": "account",
+                "path": "minter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "minter"
+        },
+        {
+          "name": "token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "pause",
+      "docs": [
+        "Pause all token operations"
+      ],
+      "discriminator": [
+        211,
+        22,
+        221,
+        251,
+        74,
+        121,
+        193,
+        47
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "pauser",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "remove_from_blacklist",
+      "docs": [
+        "Remove an address from the blacklist (SSS-2)",
+        "The `close = blacklister` constraint on the account handles closing automatically"
+      ],
+      "discriminator": [
+        47,
+        105,
+        20,
+        10,
+        165,
+        168,
+        203,
+        219
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "blacklister",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "user"
+        },
+        {
+          "name": "blacklist_entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  108,
+                  97,
+                  99,
+                  107,
+                  108,
+                  105,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "remove_minter",
+      "docs": [
+        "Remove a minter"
+      ],
+      "discriminator": [
+        241,
+        69,
+        84,
+        16,
+        164,
+        232,
+        131,
+        79
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "minter_info",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  105,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config"
+              },
+              {
+                "kind": "account",
+                "path": "minter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "minter"
+        },
+        {
+          "name": "master_authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "seize",
+      "docs": [
+        "Seize tokens from a frozen account (SSS-2)"
+      ],
+      "discriminator": [
+        129,
+        159,
+        143,
+        31,
+        161,
+        224,
+        241,
+        84
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "source_token",
+          "writable": true
+        },
+        {
+          "name": "dest_token",
+          "writable": true
+        },
+        {
+          "name": "seizer",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "thaw_token_account",
+      "docs": [
+        "Thaw a token account"
+      ],
+      "discriminator": [
+        199,
+        172,
+        96,
+        93,
+        244,
+        252,
+        137,
+        171
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "token_account",
+          "writable": true
+        },
+        {
+          "name": "freeze_authority",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "transfer_authority",
+      "docs": [
+        "Transfer master authority"
+      ],
+      "discriminator": [
+        48,
+        169,
+        76,
+        72,
+        229,
+        180,
+        55,
+        161
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "master_authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_master_authority",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "unpause",
+      "docs": [
+        "Unpause all token operations"
+      ],
+      "discriminator": [
+        169,
+        144,
+        4,
+        38,
+        10,
+        141,
+        188,
+        255
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "pauser",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update_minter_quota",
+      "docs": [
+        "Update minter quota"
+      ],
+      "discriminator": [
+        221,
+        28,
+        229,
+        118,
+        214,
+        28,
+        220,
+        247
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "minter_info",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  105,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config"
+              },
+              {
+                "kind": "account",
+                "path": "minter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "minter"
+        },
+        {
+          "name": "master_authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_quota",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "update_roles",
+      "docs": [
+        "Update roles (blacklister, pauser, seizer)"
+      ],
+      "discriminator": [
+        220,
+        152,
+        205,
+        233,
+        177,
+        123,
+        219,
+        125
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "master_authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_blacklister",
+          "type": "pubkey"
+        },
+        {
+          "name": "new_pauser",
+          "type": "pubkey"
+        },
+        {
+          "name": "new_seizer",
+          "type": "pubkey"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "BlacklistEntry",
+      "discriminator": [
+        218,
+        179,
+        231,
+        40,
+        141,
+        25,
+        168,
+        189
+      ]
+    },
+    {
+      "name": "MinterInfo",
+      "discriminator": [
+        158,
+        4,
+        176,
+        199,
+        251,
+        15,
+        209,
+        131
+      ]
+    },
+    {
+      "name": "StablecoinConfig",
+      "discriminator": [
+        127,
+        25,
+        244,
+        213,
+        1,
+        192,
+        101,
+        6
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized access"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidAccount",
+      "msg": "Invalid account"
+    },
+    {
+      "code": 6002,
+      "name": "QuotaExceeded",
+      "msg": "Mint quota exceeded"
+    },
+    {
+      "code": 6003,
+      "name": "AccountFrozen",
+      "msg": "Account is frozen"
+    },
+    {
+      "code": 6004,
+      "name": "TokenPaused",
+      "msg": "Token is paused"
+    },
+    {
+      "code": 6005,
+      "name": "ComplianceNotEnabled",
+      "msg": "Compliance module not enabled"
+    },
+    {
+      "code": 6006,
+      "name": "PermanentDelegateNotEnabled",
+      "msg": "Permanent delegate not enabled"
+    },
+    {
+      "code": 6007,
+      "name": "AlreadyBlacklisted",
+      "msg": "Already in blacklist"
+    },
+    {
+      "code": 6008,
+      "name": "NotBlacklisted",
+      "msg": "Not in blacklist"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidAmount",
+      "msg": "Invalid amount"
+    }
+  ],
+  "types": [
+    {
+      "name": "BlacklistEntry",
+      "docs": [
+        "Blacklist entry for SSS-2 compliance",
+        "PDA seeds: [\"blacklist\", config.key(), user_address.key()]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "reason",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MinterInfo",
+      "docs": [
+        "Minter information with quota tracking",
+        "PDA seeds: [\"minter\", config.key(), minter_authority.key()]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "quota",
+            "type": "u64"
+          },
+          {
+            "name": "minted",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StablecoinConfig",
+      "docs": [
+        "Main configuration account for the stablecoin",
+        "PDA seeds: [\"config\", mint.key()]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "master_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "enable_permanent_delegate",
+            "type": "bool"
+          },
+          {
+            "name": "enable_transfer_hook",
+            "type": "bool"
+          },
+          {
+            "name": "default_account_frozen",
+            "type": "bool"
+          },
+          {
+            "name": "blacklister",
+            "type": "pubkey"
+          },
+          {
+            "name": "pauser",
+            "type": "pubkey"
+          },
+          {
+            "name": "seizer",
+            "type": "pubkey"
+          }
+        ]
+      }
+    }
+  ]
+}

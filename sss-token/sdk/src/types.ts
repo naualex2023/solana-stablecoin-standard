@@ -4,7 +4,7 @@
 
 import { PublicKey, Signer, TransactionInstruction } from "@solana/web3.js";
 import BN from "bn.js";
-import { Program, Provider } from "@coral-xyz/anchor";
+import { Program, Provider, AnchorProvider } from "@coral-xyz/anchor";
 
 /**
  * StablecoinConfig account data
@@ -140,7 +140,7 @@ export interface TransferAuthorityParams {
  * SDK configuration
  */
 export interface SSSTokenSDKConfig {
-  provider: Provider;
+  provider: AnchorProvider;
   programId?: PublicKey;
 }
 

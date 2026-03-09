@@ -6,12 +6,33 @@
 import { 
   SSSTokenClient, 
   AnchorProvider,
-  getOrCreateTokenAccount,
+  createTokenAccount,
   createTokenMint,
   findConfigPDA
 } from '../src/index';
-import { Keypair, Connection, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Keypair, Connection, LAMPORTS_PER_SOL, Transaction } from '@solana/web3.js';
 import BN from 'bn.js';
+
+// Simple wallet wrapper
+class NodeWallet {
+  constructor(public payer: Keypair) {}
+
+  get publicKey() {
+    return this.payer.publicKey;
+  }
+
+  async signTransaction(tx: any): Promise<any> {
+    tx.partialSign(this.payer);
+    return tx;
+  }
+
+  async signAllTransactions(txs: any[]): Promise<any[]> {
+    return txs.map((tx) => {
+      tx.partialSign(this.payer);
+      return tx;
+    });
+  }
+}
 
 async function main() {
   // 1. Setup connection and provider
@@ -30,7 +51,8 @@ async function main() {
     await connection.confirmTransaction(airdrop);
   }
 
-  const provider = new AnchorProvider(connection, { payer: authority });
+  const wallet = new NodeWallet(authority);
+  const provider = new AnchorProvider(connection, wallet);
   const sdk = new SSSTokenClient({ provider });
 
   // 2. Create roles

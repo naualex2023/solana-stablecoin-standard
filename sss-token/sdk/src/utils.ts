@@ -1,290 +1,253 @@
 /**
- * Helper utilities for SSS Token SDK
+ * Utility functions for the SDK
  */
 
+import { PublicKey, Keypair, SystemProgram } from "@solana/web3.js";
 import {
-  Connection,
-  Keypair,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-  Signer,
-  TransactionInstruction,
-} from "@solana/web3.js";
-import {
-  TOKEN_PROGRAM_ID,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  getAssociatedTokenAddress,
-  createAssociatedTokenAccountInstruction,
   createMint,
-  createMintToInstruction,
-  createBurnInstruction,
-  createTransferCheckedInstruction,
-  createFreezeAccountInstruction,
-  createThawAccountInstruction,
-  MintLayout,
+  createAccount,
+  mintTo,
+  burn,
+  getAccount,
+  freezeAccount,
+  thawAccount,
 } from "@solana/spl-token";
-import { Program, AnchorProvider, Wallet } from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
 import BN from "bn.js";
-import { SSS_TOKEN_PROGRAM_ID } from "./constants";
 import { StablecoinConfig, MinterInfo, BlacklistEntry } from "./types";
 
 /**
- * Create a new provider from a connection and wallet
+ * Create a new token mint with specified authority
  */
-export function createProvider(
-  connection: Connection,
-  wallet: Wallet
-): AnchorProvider {
-  return new AnchorProvider(connection, wallet, {
-    commitment: "confirmed",
-  });
+export async function createTokenMint(
+  connection: any,
+  payer: Keypair,
+  authority: PublicKey,
+  freezeAuthority: PublicKey | null,
+  decimals: number
+): Promise<PublicKey> {
+  const mint = await createMint(
+    connection,
+    payer,
+    authority,
+    freezeAuthority,
+    decimals
+  );
+  return mint;
 }
 
 /**
- * Get or create a token account for a given mint and owner
+ * Create a token account
+ */
+export async function createTokenAccount(
+  connection: any,
+  payer: Keypair,
+  mint: PublicKey,
+  owner: PublicKey
+): Promise<PublicKey> {
+  const tokenAccount = await createAccount(
+    connection,
+    payer,
+    mint,
+    owner
+  );
+  return tokenAccount;
+}
+
+/**
+ * Get or create a token account for a given owner
  */
 export async function getOrCreateTokenAccount(
-  connection: Connection,
+  connection: any,
   mint: PublicKey,
   owner: PublicKey,
-  payer: Signer,
-  allowOwnerOffCurve: boolean = false
+  payer: Keypair
 ): Promise<PublicKey> {
-  const associatedTokenAddress = await getAssociatedTokenAddress(
-    mint,
-    owner,
-    allowOwnerOffCurve
-  );
-
   try {
-    await connection.getAccountInfo(associatedTokenAddress);
+    const { getAssociatedTokenAddress, getAccount } = await import("@solana/spl-token");
+    const associatedTokenAddress = await getAssociatedTokenAddress(mint, owner);
+    await getAccount(connection, associatedTokenAddress);
     return associatedTokenAddress;
   } catch {
-    // Account doesn't exist, create it
-    const transaction = new Transaction().add(
-      createAssociatedTokenAccountInstruction(
-        payer.publicKey,
-        associatedTokenAddress,
-        owner,
-        mint
-      )
-    );
-
-    await connection.sendTransaction(transaction, [payer]);
-    return associatedTokenAddress;
+    return await createTokenAccount(connection, payer, mint, owner);
   }
 }
 
 /**
- * Create a new mint account
+ * Mint tokens to an account
  */
-export async function createTokenMint(
-  connection: Connection,
-  payer: Signer,
-  mintAuthority: PublicKey,
-  freezeAuthority: PublicKey | null,
-  decimals: number
-): Promise<PublicKey> {
-  const mint = Keypair.generate();
-  await createMint(
-    connection,
-    payer,
-    mintAuthority,
-    freezeAuthority,
-    decimals,
-    mint
-  );
-  return mint.publicKey;
-}
-
-/**
- * Mint tokens to a token account
- */
-export async function mintTo(
-  connection: Connection,
+export async function mintTokensToAccount(
+  connection: any,
+  payer: Keypair,
   mint: PublicKey,
   destination: PublicKey,
-  authority: Signer,
-  amount: number | BN
+  authority: Keypair,
+  amount: BN
 ): Promise<void> {
-  const amountBN = typeof amount === "number" ? new BN(amount) : amount;
-  const instruction = createMintToInstruction(
+  await mintTo(
+    connection,
+    payer,
     mint,
     destination,
-    authority.publicKey,
-    amountBN.toNumber()
+    authority,
+    amount.toNumber()
   );
-
-  const transaction = new Transaction().add(instruction);
-  await connection.sendTransaction(transaction, [authority]);
 }
 
 /**
- * Burn tokens from a token account
+ * Burn tokens from an account
  */
-export async function burn(
-  connection: Connection,
+export async function burnTokensFromAccount(
+  connection: any,
+  payer: Keypair,
+  account: PublicKey,
   mint: PublicKey,
-  source: PublicKey,
-  owner: Signer,
-  amount: number | BN
+  owner: Keypair,
+  amount: BN
 ): Promise<void> {
-  const amountBN = typeof amount === "number" ? new BN(amount) : amount;
-  const instruction = createBurnInstruction(source, mint, owner.publicKey, amountBN.toNumber());
-
-  const transaction = new Transaction().add(instruction);
-  await connection.sendTransaction(transaction, [owner]);
-}
-
-/**
- * Transfer tokens between accounts
- */
-export async function transfer(
-  connection: Connection,
-  from: PublicKey,
-  to: PublicKey,
-  owner: Signer,
-  mint: PublicKey,
-  amount: number | BN,
-  decimals: number
-): Promise<void> {
-  const amountBN = typeof amount === "number" ? new BN(amount) : amount;
-  const instruction = createTransferCheckedInstruction(
-    from,
+  await burn(
+    connection,
+    payer,
+    account,
     mint,
-    to,
-    owner.publicKey,
-    amountBN.toNumber(),
-    decimals
+    owner,
+    amount.toNumber()
   );
-
-  const transaction = new Transaction().add(instruction);
-  await connection.sendTransaction(transaction, [owner]);
 }
 
 /**
  * Freeze a token account
  */
-export async function freezeAccount(
-  connection: Connection,
+export async function freezeTokenAccount(
+  connection: any,
+  payer: Keypair,
   account: PublicKey,
   mint: PublicKey,
-  authority: Signer
+  authority: Keypair
 ): Promise<void> {
-  const instruction = createFreezeAccountInstruction(account, mint, authority.publicKey);
-
-  const transaction = new Transaction().add(instruction);
-  await connection.sendTransaction(transaction, [authority]);
+  await freezeAccount(connection, payer, account, mint, authority);
 }
 
 /**
  * Thaw (unfreeze) a token account
  */
-export async function thawAccount(
-  connection: Connection,
+export async function thawTokenAccount(
+  connection: any,
+  payer: Keypair,
   account: PublicKey,
   mint: PublicKey,
-  authority: Signer
+  authority: Keypair
 ): Promise<void> {
-  const instruction = createThawAccountInstruction(account, mint, authority.publicKey);
-
-  const transaction = new Transaction().add(instruction);
-  await connection.sendTransaction(transaction, [authority]);
+  await thawAccount(connection, payer, account, mint, authority);
 }
 
 /**
- * Get token balance for an account
- */
-export async function getTokenBalance(
-  connection: Connection,
-  tokenAccount: PublicKey
-): Promise<number> {
-  const accountInfo = await connection.getTokenAccountBalance(tokenAccount);
-  return Number(accountInfo.value.amount);
-}
-
-/**
- * Fetch stablecoin config account data
+ * Fetch stablecoin config from the program
  */
 export async function fetchConfig(
   program: Program,
-  configPda: PublicKey
+  mint: PublicKey
 ): Promise<StablecoinConfig> {
-  const account = await program.account.stablecoinConfig.fetch(configPda);
+  const configPDA = PublicKey.findProgramAddressSync(
+    [Buffer.from("config"), mint.toBuffer()],
+    program.programId
+  )[0];
+  
+  const account = await (program.account as any)["stablecoinConfig"].fetch(configPDA);
   return account as unknown as StablecoinConfig;
 }
 
 /**
- * Fetch minter info account data
+ * Fetch minter info from the program
  */
 export async function fetchMinterInfo(
   program: Program,
-  minterInfoPda: PublicKey
+  mint: PublicKey,
+  minter: PublicKey
 ): Promise<MinterInfo> {
-  const account = await program.account.minterInfo.fetch(minterInfoPda);
+  const configPDA = PublicKey.findProgramAddressSync(
+    [Buffer.from("config"), mint.toBuffer()],
+    program.programId
+  )[0];
+  
+  const minterInfoPDA = PublicKey.findProgramAddressSync(
+    [Buffer.from("minter"), configPDA.toBuffer(), minter.toBuffer()],
+    program.programId
+  )[0];
+  
+  const account = await (program.account as any)["minterInfo"].fetch(minterInfoPDA);
   return account as unknown as MinterInfo;
 }
 
 /**
- * Fetch blacklist entry account data
+ * Fetch blacklist entry from the program
  */
 export async function fetchBlacklistEntry(
   program: Program,
-  blacklistEntryPda: PublicKey
-): Promise<BlacklistEntry> {
-  const account = await program.account.blacklistEntry.fetch(blacklistEntryPda);
-  return account as unknown as BlacklistEntry;
+  mint: PublicKey,
+  user: PublicKey
+): Promise<BlacklistEntry | null> {
+  try {
+    const configPDA = PublicKey.findProgramAddressSync(
+      [Buffer.from("config"), mint.toBuffer()],
+      program.programId
+    )[0];
+    
+    const blacklistEntryPDA = PublicKey.findProgramAddressSync(
+      [Buffer.from("blacklist"), configPDA.toBuffer(), user.toBuffer()],
+      program.programId
+    )[0];
+    
+    const account = await (program.account as any)["blacklistEntry"].fetch(blacklistEntryPDA);
+    return account as unknown as BlacklistEntry;
+  } catch {
+    return null;
+  }
 }
 
 /**
- * Check if an account exists
+ * Check if an account is frozen
  */
-export async function accountExists(
-  connection: Connection,
+export async function isAccountFrozen(
+  connection: any,
   account: PublicKey
 ): Promise<boolean> {
-  const accountInfo = await connection.getAccountInfo(account);
-  return accountInfo !== null;
+  try {
+    const accountInfo = await getAccount(connection, account);
+    return accountInfo.isFrozen;
+  } catch {
+    return false;
+  }
 }
 
 /**
- * Wait for transaction confirmation
+ * Get account balance
  */
-export async function waitForConfirmation(
-  connection: Connection,
-  signature: string
-): Promise<void> {
-  await connection.confirmTransaction(signature, "confirmed");
+export async function getAccountBalance(
+  connection: any,
+  account: PublicKey
+): Promise<number> {
+  const accountInfo = await getAccount(connection, account);
+  return Number(accountInfo.amount);
 }
 
 /**
- * Get the current slot
+ * Create a sleep/delay function
  */
-export async function getCurrentSlot(connection: Connection): Promise<number> {
-  return await connection.getSlot();
+export function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
- * Get the current block time
+ * Convert lamports to tokens based on decimals
  */
-export async function getCurrentBlockTime(connection: Connection): Promise<number> {
-  const slot = await getCurrentSlot(connection);
-  const blockTime = await connection.getBlockTime(slot);
-  return blockTime || 0;
+export function lamportsToTokens(lamports: number, decimals: number): number {
+  return lamports / Math.pow(10, decimals);
 }
 
 /**
- * Convert lamports to SOL
+ * Convert tokens to lamports based on decimals
  */
-export function lamportsToSol(lamports: number | BN): number {
-  const lamportsBN = typeof lamports === "number" ? new BN(lamports) : lamports;
-  return lamportsBN.toNumber() / 1_000_000_000;
-}
-
-/**
- * Convert SOL to lamports
- */
-export function solToLamports(sol: number): BN {
-  return new BN(sol * 1_000_000_000);
+export function tokensToLamports(tokens: number, decimals: number): number {
+  return Math.floor(tokens * Math.pow(10, decimals));
 }

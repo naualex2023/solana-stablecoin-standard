@@ -13,6 +13,7 @@ import {
 } from "@solana/spl-token";
 import { Program, AnchorProvider, Wallet } from "@coral-xyz/anchor";
 import BN from "bn.js";
+import idl from "./idl.json";
 import { SSS_TOKEN_PROGRAM_ID } from "./constants";
 import {
   SSSTokenSDKConfig,
@@ -39,36 +40,22 @@ import { findConfigPDA, findMinterInfoPDA, findBlacklistEntryPDA } from "./pda";
 export class SSSTokenClient {
   readonly provider: AnchorProvider;
   readonly programId: PublicKey;
-  readonly program: any;
+  readonly program: Program;
   readonly connection: any;
-  readonly wallet: Wallet;
+  readonly wallet: any;
 
   constructor(config: SSSTokenSDKConfig) {
     this.provider = config.provider;
     this.programId = config.programId || new PublicKey(SSS_TOKEN_PROGRAM_ID);
     this.connection = this.provider.connection;
-    this.wallet = this.provider.wallet;
+    this.wallet = this.provider.wallet as any;
+    // Use IDL with type assertion - common pattern in Anchor SDKs
+    // The IDL structure doesn't perfectly match Anchor's TypeScript types
+    // but is functionally correct at runtime
     this.program = new Program(
-      this.getIdl(),
-      this.programId,
+      idl as any,
       this.provider
-    );
-  }
-
-  /**
-   * Get the IDL for the SSS Token program
-   * This should be replaced with the actual IDL from the program
-   */
-  private getIdl(): any {
-    return {
-      name: "sss_token",
-      version: "0.1.0",
-      instructions: [],
-      accounts: [],
-      types: [],
-      errors: [],
-      events: [],
-    };
+    ) as any;
   }
 
   /**
@@ -470,27 +457,30 @@ export class SSSTokenClient {
   /**
    * Fetch the stablecoin config
    */
-  async getConfig(mint: PublicKey): Promise<any> {
+  async getConfig(mint: PublicKey): Promise<StablecoinConfig> {
     const { pda: configPda } = findConfigPDA(mint, this.programId);
-    return await this.program.account["stablecoinConfig"].fetch(configPda);
+    const account = await (this.program.account as any)["stablecoinConfig"].fetch(configPda);
+    return account as unknown as StablecoinConfig;
   }
 
   /**
    * Fetch minter info
    */
-  async getMinterInfo(mint: PublicKey, minter: PublicKey): Promise<any> {
+  async getMinterInfo(mint: PublicKey, minter: PublicKey): Promise<MinterInfo> {
     const { pda: configPda } = findConfigPDA(mint, this.programId);
     const { pda: minterInfoPda } = findMinterInfoPDA(configPda, minter, this.programId);
-    return await this.program.account["minterInfo"].fetch(minterInfoPda);
+    const account = await (this.program.account as any)["minterInfo"].fetch(minterInfoPda);
+    return account as unknown as MinterInfo;
   }
 
   /**
    * Fetch blacklist entry
    */
-  async getBlacklistEntry(mint: PublicKey, user: PublicKey): Promise<any> {
+  async getBlacklistEntry(mint: PublicKey, user: PublicKey): Promise<BlacklistEntry> {
     const { pda: configPda } = findConfigPDA(mint, this.programId);
     const { pda: blacklistEntryPda } = findBlacklistEntryPDA(configPda, user, this.programId);
-    return await this.program.account["blacklistEntry"].fetch(blacklistEntryPda);
+    const account = await (this.program.account as any)["blacklistEntry"].fetch(blacklistEntryPda);
+    return account as unknown as BlacklistEntry;
   }
 
   /**

@@ -5280,10 +5280,13 @@ dependencies = [
 name = "transfer-hook"
 version = "0.1.0"
 dependencies = [
+ "anchor-client",
  "anchor-lang",
  "anchor-spl",
  "blake3",
+ "solana-sdk",
  "spl-token-2022",
+ "tokio",
 ]
 
 [[package]]

@@ -1,0 +1,6 @@
+{
+  "rust-analyzer.linkedProjects": [
+    "sss-token/Cargo.toml"
+  ],
+  "rust-analyzer.cargo.features": "all"
+}

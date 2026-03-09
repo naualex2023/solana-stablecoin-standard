@@ -514,6 +514,34 @@ console.log(MAX_LENGTHS.REASON); // 100
 
 ## Testing
 
+### Quick Test with Automated Script
+
+For a complete automated testing experience, use the provided test script from the parent directory:
+
+```bash
+# From sss-token directory (not sss-token/sdk)
+./test.sh
+```
+
+The `test.sh` script automatically:
+- Starts local Solana validator
+- Requests airdrop if needed
+- Builds and deploys Anchor programs
+- Runs all SDK tests
+- Cleans up validator
+
+**Options:**
+```bash
+./test.sh --clean        # Clean ledger and start fresh
+./test.sh --skip-deploy  # Skip program deployment
+./test.sh --no-stop      # Keep validator running
+./test.sh --help         # Show all options
+```
+
+See [TEST_SCRIPT_GUIDE.md](../TEST_SCRIPT_GUIDE.md) for complete documentation.
+
+### Manual Testing
+
 ```bash
 # Run tests
 npm test

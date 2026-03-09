@@ -27,18 +27,26 @@ describe("SSS Token SDK Tests", function () {
   this.timeout(100000);
 
   // Setup test environment
-  const provider = AnchorProvider.env();
-  const connection = provider.connection;
-  const wallet = provider.wallet as Wallet;
+  // Use localnet by default, fallback to devnet
+  const connection = new Connection(
+    process.env.ANCHOR_PROVIDER_URL || "http://localhost:8899",
+    "confirmed"
+  );
   
   // Test keypairs
-  const payer = wallet.payer || Keypair.generate();
+  const payer = Keypair.generate();
   const authority = payer;
   const minter = Keypair.generate();
   const user = Keypair.generate();
   const seizer = Keypair.generate();
   const blacklister = Keypair.generate();
   const pauser = Keypair.generate();
+
+  // Create wallet from payer
+  const wallet = new Wallet(payer);
+
+  // Create provider
+  const provider = new AnchorProvider(connection, wallet);
 
   // SDK instance
   const sdk = new SSSTokenClient({ provider });
@@ -197,12 +205,13 @@ describe("SSS Token SDK Tests", function () {
   describe("test_mint_tokens", () => {
     it("should mint tokens to a recipient account", async () => {
       // Create token account for user
-      const userTokenAccount = await getOrCreateAssociatedTokenAccount(
+      const userTokenAccountInfo = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
         mint,
         user.publicKey
       );
+      const userTokenAccount = userTokenAccountInfo.address;
 
       const amount = new BN(1_000_000); // 1 token
 
@@ -226,12 +235,13 @@ describe("SSS Token SDK Tests", function () {
     });
 
     it("should enforce quota limits", async () => {
-      const userTokenAccount = await getOrCreateAssociatedTokenAccount(
+      const userTokenAccountInfo = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
         mint,
         user.publicKey
       );
+      const userTokenAccount = userTokenAccountInfo.address;
 
       const amount = new BN(2_000_000_000); // More than quota
 
@@ -253,12 +263,13 @@ describe("SSS Token SDK Tests", function () {
 
   describe("test_burn_tokens", () => {
     it("should burn tokens from an account", async () => {
-      const userTokenAccount = await getOrCreateAssociatedTokenAccount(
+      const userTokenAccountInfo = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
         mint,
         user.publicKey
       );
+      const userTokenAccount = userTokenAccountInfo.address;
 
       // First, mint some tokens
       await sdk.mintTokens(
@@ -287,12 +298,13 @@ describe("SSS Token SDK Tests", function () {
 
   describe("test_freeze_and_thaw_token_account", () => {
     it("should freeze a token account", async () => {
-      const userTokenAccount = await getOrCreateAssociatedTokenAccount(
+      const userTokenAccountInfo = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
         mint,
         user.publicKey
       );
+      const userTokenAccount = userTokenAccountInfo.address;
 
       const tx = await sdk.freezeTokenAccount(
         mint,
@@ -308,23 +320,32 @@ describe("SSS Token SDK Tests", function () {
     });
 
     it("should thaw (unfreeze) a token account", async () => {
-      const userTokenAccount = await getOrCreateAssociatedTokenAccount(
+      const freezeUser = Keypair.generate();
+      const freezeTokenAccountInfo = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
         mint,
-        user.publicKey
+        freezeUser.publicKey
+      );
+      const freezeTokenAccount = freezeTokenAccountInfo.address;
+
+      // Freeze first
+      await sdk.freezeTokenAccount(
+        mint,
+        freezeTokenAccount,
+        authority
       );
 
       const tx = await sdk.thawTokenAccount(
         mint,
-        userTokenAccount,
+        freezeTokenAccount,
         authority
       );
 
       console.log("Thaw transaction:", tx);
 
       // Verify account is not frozen
-      const accountInfo = await getAccount(connection, userTokenAccount);
+      const accountInfo = await getAccount(connection, freezeTokenAccount);
       expect(accountInfo.isFrozen).to.be.false;
     });
   });
@@ -396,18 +417,21 @@ describe("SSS Token SDK Tests", function () {
       const destUser = Keypair.generate();
 
       // Create token accounts
-      const sourceTokenAccount = await getOrCreateAssociatedTokenAccount(
+      const sourceTokenAccountInfo = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
         mint,
         sourceUser.publicKey
       );
-      const destTokenAccount = await getOrCreateAssociatedTokenAccount(
+      const sourceTokenAccount = sourceTokenAccountInfo.address;
+      
+      const destTokenAccountInfo = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
         mint,
         destUser.publicKey
       );
+      const destTokenAccount = destTokenAccountInfo.address;
 
       // Mint tokens to source
       await sdk.mintTokens(
@@ -470,12 +494,13 @@ describe("SSS Token SDK Tests", function () {
       // 3. Mint tokens to user
       console.log("Step 3: Mint tokens");
       const workflowUser = Keypair.generate();
-      const userTokenAccount = await getOrCreateAssociatedTokenAccount(
+      const userTokenAccountInfo = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
         workflowMint,
         workflowUser.publicKey
       );
+      const userTokenAccount = userTokenAccountInfo.address;
 
       await sdk.mintTokens(
         workflowMint,
@@ -499,12 +524,13 @@ describe("SSS Token SDK Tests", function () {
       // 6. Seize tokens from blacklisted user
       console.log("Step 6: Seize tokens");
       const treasury = Keypair.generate();
-      const treasuryTokenAccount = await getOrCreateAssociatedTokenAccount(
+      const treasuryTokenAccountInfo = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
         workflowMint,
         treasury.publicKey
       );
+      const treasuryTokenAccount = treasuryTokenAccountInfo.address;
 
       await sdk.seize(workflowMint, seizer, {
         sourceToken: userTokenAccount,

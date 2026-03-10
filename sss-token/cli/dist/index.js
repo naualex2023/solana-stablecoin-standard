@@ -110,6 +110,7 @@ program
     .option("--decimals <decimals>", "Token decimals", "6")
     .option("--uri <uri>", "Metadata URI")
     .option("--mint <mint>", "Existing mint address (optional)")
+    .option("-y, --yes", "Skip confirmation prompts", false)
     .action(async (options) => {
     try {
         spinner.start("Initializing stablecoin...");
@@ -157,8 +158,8 @@ program
                 return;
             }
         }
-        // Prompt for missing info if needed
-        if (!options.name && !options.custom) {
+        // Prompt for missing info if needed (skip if --yes flag is set)
+        if (!options.name && !options.custom && !options.yes) {
             const answers = await inquirer.prompt([
                 { type: "input", name: "name", message: "Token name:", default: initParams.name },
                 { type: "input", name: "symbol", message: "Token symbol:", default: initParams.symbol },

@@ -274,7 +274,7 @@ run_integration_tests() {
     export ANCHOR_PROVIDER_URL="http://localhost:8899"
     
     # Test 1: Initialize stablecoin (SSS-1 preset)
-    print_info "Test: init --preset sss-1 --name TestCoin --symbol TEST"
+    print_info "Test: init --preset sss-1 --name TestCoin --symbol TEST --yes"
     if node dist/index.js init --preset sss-1 --name "TestCoin" --symbol "TEST" --yes 2>&1; then
         print_success "init successful"
     else

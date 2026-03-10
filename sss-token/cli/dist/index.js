@@ -31,10 +31,16 @@ dotenv.config();
 // Import Solana dependencies
 import { Connection, Keypair, PublicKey, } from "@solana/web3.js";
 import { getAccount, getMint, getOrCreateAssociatedTokenAccount, TOKEN_2022_PROGRAM_ID, } from "@solana/spl-token";
-import { AnchorProvider, Wallet, BN } from "@coral-xyz/anchor";
-// Import SDK - use the built SDK from dist
+import pkg from "@coral-xyz/anchor";
+const { AnchorProvider, Wallet, BN } = pkg;
+// Import SDK - use the built SDK from dist (CommonJS)
 // The SDK should be built first: cd ../sdk && npm run build
-import { SSSTokenClient, SSS_TOKEN_PROGRAM_ID } from "../../sdk/dist/index.js";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const sdkPkg = require("../../sdk/dist/index.js");
+const SSSTokenClient = sdkPkg.SSSTokenClient;
+const findConfigPDA = sdkPkg.findConfigPDA;
+const SSS_TOKEN_PROGRAM_ID = sdkPkg.SSS_TOKEN_PROGRAM_ID;
 const program = new Command();
 let config = {
     rpcUrl: process.env.ANCHOR_PROVIDER_URL || "http://localhost:8899",

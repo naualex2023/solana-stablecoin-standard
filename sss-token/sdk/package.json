@@ -4,7 +4,6 @@
   "description": "TypeScript SDK for SSS Token Stablecoin Program",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "module",
   "license": "ISC",
   "scripts": {
     "build": "tsc",

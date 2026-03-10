@@ -48,9 +48,14 @@ import {
 import pkg from "@coral-xyz/anchor";
 const { AnchorProvider, Wallet, BN } = pkg;
 
-// Import SDK - use the built SDK from dist
+// Import SDK - use the built SDK from dist (CommonJS)
 // The SDK should be built first: cd ../sdk && npm run build
-import { SSSTokenClient, findConfigPDA, SSS_TOKEN_PROGRAM_ID } from "../../sdk/dist/index.js";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const sdkPkg = require("../../sdk/dist/index.js");
+const SSSTokenClient = sdkPkg.SSSTokenClient;
+const findConfigPDA = sdkPkg.findConfigPDA;
+const SSS_TOKEN_PROGRAM_ID = sdkPkg.SSS_TOKEN_PROGRAM_ID;
 
 const program = new Command();
 
@@ -81,7 +86,7 @@ async function getConnection(): Promise<Connection> {
   return new Connection(config.rpcUrl, "confirmed");
 }
 
-async function getProvider(): Promise<{ provider: typeof AnchorProvider; wallet: typeof Wallet; connection: Connection }> {
+async function getProvider(): Promise<{ provider: InstanceType<typeof AnchorProvider>; wallet: InstanceType<typeof Wallet>; connection: Connection }> {
   const connection = await getConnection();
   const keypair = loadKeypair(config.keypairPath);
   const wallet = new Wallet(keypair);
@@ -89,13 +94,13 @@ async function getProvider(): Promise<{ provider: typeof AnchorProvider; wallet:
   return { provider, wallet, connection };
 }
 
-async function getSDK(): Promise<{ sdk: typeof SSSTokenClient; connection: Connection; wallet: typeof Wallet }> {
-  const { provider, wallet, connection } = await get
+async function getSDK(): Promise<{ sdk: InstanceType<typeof SSSTokenClient>; connection: Connection; wallet: InstanceType<typeof Wallet> }> {
+  const { provider, wallet, connection } = await getProvider();
   const sdk = new SSSTokenClient({ provider });
   return { sdk, connection, wallet };
 }
 
-function parseAmount(amountStr: string, decimals: number = 6): BN {
+function parseAmount(amountStr: string, decimals: number = 6): InstanceType<typeof BN> {
   // Handle both raw amounts and decimal amounts
   if (amountStr.includes(".")) {
     const [whole, fractional = ""] = amountStr.split(".");
@@ -105,7 +110,7 @@ function parseAmount(amountStr: string, decimals: number = 6): BN {
   return new BN(amountStr);
 }
 
-function formatAmount(amount: BN | number, decimals: number = 6): string {
+function formatAmount(amount: InstanceType<typeof BN> | number, decimals: number = 6): string {
   const amountStr = amount.toString().padStart(decimals + 1, "0");
   const whole = amountStr.slice(0, -decimals) || "0";
   const fractional = amountStr.slice(-decimals).replace(/0+$/, "");
@@ -643,7 +648,7 @@ program
       }
       
       // Determine amount
-      let amount: BN;
+      let amount: InstanceType<typeof BN>;
       if (options.amount) {
         amount = parseAmount(options.amount);
       } else {

@@ -31,19 +31,28 @@ function parseRedisUrl(url) {
     // Parse URL like: redis://:password@host:port or redis://user:password@host:port
     try {
         const parsed = new URL(url);
-        return {
+        const config = {
             host: parsed.hostname || 'localhost',
             port: parseInt(parsed.port) || 6379,
-            password: parsed.password || undefined,
-            username: parsed.username || undefined,
         };
+        // Handle password - URL format redis://:password@host means empty username, password is set
+        if (parsed.password) {
+            config.password = parsed.password;
+        }
+        console.log('Redis config:', {
+            host: config.host,
+            port: config.port,
+            hasPassword: !!config.password
+        });
+        return config;
     }
-    catch {
+    catch (e) {
+        console.error('Failed to parse Redis URL:', e);
         // Fallback for simple host:port format
-        const [host, port] = url.split(':');
+        const parts = url.replace(/^redis:\/\//, '').split(':');
         return {
-            host: host || 'localhost',
-            port: parseInt(port) || 6379,
+            host: parts[0] || 'localhost',
+            port: parseInt(parts[1]) || 6379,
         };
     }
 }
@@ -60,7 +69,6 @@ function initRedis(url) {
         host: config.host,
         port: config.port,
         password: config.password,
-        username: config.username,
         maxRetriesPerRequest: 3,
         lazyConnect: false,
         retryStrategy: (times) => {

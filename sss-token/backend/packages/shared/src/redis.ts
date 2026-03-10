@@ -10,22 +10,34 @@ let redis: RedisType | null = null;
 /**
  * Parse Redis URL to extract connection parameters
  */
-function parseRedisUrl(url: string): { host: string; port: number; password?: string; username?: string } {
+function parseRedisUrl(url: string): { host: string; port: number; password?: string } {
   // Parse URL like: redis://:password@host:port or redis://user:password@host:port
   try {
     const parsed = new URL(url);
-    return {
+    const config: { host: string; port: number; password?: string } = {
       host: parsed.hostname || 'localhost',
       port: parseInt(parsed.port) || 6379,
-      password: parsed.password || undefined,
-      username: parsed.username || undefined,
     };
-  } catch {
+    
+    // Handle password - URL format redis://:password@host means empty username, password is set
+    if (parsed.password) {
+      config.password = parsed.password;
+    }
+    
+    console.log('Redis config:', { 
+      host: config.host, 
+      port: config.port, 
+      hasPassword: !!config.password 
+    });
+    
+    return config;
+  } catch (e) {
+    console.error('Failed to parse Redis URL:', e);
     // Fallback for simple host:port format
-    const [host, port] = url.split(':');
+    const parts = url.replace(/^redis:\/\//, '').split(':');
     return {
-      host: host || 'localhost',
-      port: parseInt(port) || 6379,
+      host: parts[0] || 'localhost',
+      port: parseInt(parts[1]) || 6379,
     };
   }
 }
@@ -45,7 +57,6 @@ export function initRedis(url?: string): RedisType {
     host: config.host,
     port: config.port,
     password: config.password,
-    username: config.username,
     maxRetriesPerRequest: 3,
     lazyConnect: false,
     retryStrategy: (times: number) => {

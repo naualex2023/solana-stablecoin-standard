@@ -2,29 +2,25 @@
 > @sss-backend/webhook-service@1.0.0 dev /home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/packages/webhook-service
 > ts-node-dev --respawn --transpile-only src/index.ts
 
-[INFO] 23:11:08 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+[INFO] 23:21:34 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
 Redis connected
-Redis connection error: ReplyError: NOAUTH Authentication required.
-    at parseError (/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/node_modules/.pnpm/redis-parser@3.0.0/node_modules/redis-parser/lib/parser.js:179:12)
-    at parseType (/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/node_modules/.pnpm/redis-parser@3.0.0/node_modules/redis-parser/lib/parser.js:302:14) {
-  command: { name: 'info', args: [] }
-}
+Redis connection error: NOAUTH Authentication required.
 [ioredis] Unhandled error event: ReplyError: NOAUTH Authentication required.
     at parseError (/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/node_modules/.pnpm/redis-parser@3.0.0/node_modules/redis-parser/lib/parser.js:179:12)
     at parseType (/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/node_modules/.pnpm/redis-parser@3.0.0/node_modules/redis-parser/lib/parser.js:302:14)
 ReplyError: NOAUTH Authentication required.
     at parseError (/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/node_modules/.pnpm/redis-parser@3.0.0/node_modules/redis-parser/lib/parser.js:179:12)
     at parseType (/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/node_modules/.pnpm/redis-parser@3.0.0/node_modules/redis-parser/lib/parser.js:302:14)
-[ERROR] 23:11:08 ReplyError: NOAUTH Authentication required.
-[2026-03-10 23:11:08.827 +0300] [32mINFO[39m: [36mInitializing webhook service...[39m
+[ERROR] 23:21:35 ReplyError: NOAUTH Authentication required.
+[2026-03-10 23:21:35.122 +0300] [32mINFO[39m: [36mInitializing webhook service...[39m
     service: "webhook-service"
-[2026-03-10 23:11:08.827 +0300] [32mINFO[39m: [36mDatabase initialized[39m
+[2026-03-10 23:21:35.123 +0300] [32mINFO[39m: [36mDatabase initialized[39m
     service: "webhook-service"
-[2026-03-10 23:11:08.829 +0300] [32mINFO[39m: [36mRedis initialized[39m
+[2026-03-10 23:21:35.124 +0300] [32mINFO[39m: [36mRedis initialized[39m
     service: "webhook-service"
-[2026-03-10 23:11:08.831 +0300] [32mINFO[39m: [36mBackground jobs started[39m
+[2026-03-10 23:21:35.127 +0300] [32mINFO[39m: [36mBackground jobs started[39m
     service: "webhook-service"
     schedule: "*/5 * * * *"
-[2026-03-10 23:11:08.853 +0300] [32mINFO[39m: [36mShutting down webhook service...[39m
+[2026-03-10 23:21:35.150 +0300] [32mINFO[39m: [36mShutting down webhook service...[39m
     service: "webhook-service"
  ELIFECYCLE  Command failed.

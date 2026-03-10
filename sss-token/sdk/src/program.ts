@@ -8,13 +8,13 @@ import {
   SystemProgram,
 } from "@solana/web3.js";
 import {
-  TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress,
+  TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
 import { Program, AnchorProvider, Wallet } from "@coral-xyz/anchor";
 import BN from "bn.js";
 import idl from "./idl.json";
-import { SSS_TOKEN_PROGRAM_ID } from "./constants";
+import { SSS_TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID as TOKEN_2022_PROGRAM_ID_STR } from "./constants";
 import {
   SSSTokenSDKConfig,
   StablecoinConfig,
@@ -83,7 +83,7 @@ export class SSSTokenClient {
         mint: mint,
         authority: authority.publicKey,
         systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .signers([authority])
       .rpc();
@@ -113,7 +113,7 @@ export class SSSTokenClient {
         minter: minter,
         minterInfo: minterInfoPda,
         tokenAccount: tokenAccount,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .signers([mintAuthority])
       .rpc();
@@ -139,7 +139,7 @@ export class SSSTokenClient {
         mint: mint,
         tokenAccount: tokenAccount,
         burner: burner.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .signers([burner])
       .rpc();
@@ -164,7 +164,7 @@ export class SSSTokenClient {
         mint: mint,
         tokenAccount: tokenAccount,
         freezeAuthority: freezeAuthority.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .signers([freezeAuthority])
       .rpc();
@@ -189,7 +189,7 @@ export class SSSTokenClient {
         mint: mint,
         tokenAccount: tokenAccount,
         freezeAuthority: freezeAuthority.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .signers([freezeAuthority])
       .rpc();
@@ -209,7 +209,7 @@ export class SSSTokenClient {
         config: configPda,
         mint: mint,
         pauser: pauser.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .signers([pauser])
       .rpc();
@@ -229,7 +229,7 @@ export class SSSTokenClient {
         config: configPda,
         mint: mint,
         pauser: pauser.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .signers([pauser])
       .rpc();
@@ -423,7 +423,7 @@ export class SSSTokenClient {
         sourceToken: params.sourceToken,
         destToken: params.destToken,
         seizer: seizer.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .signers([seizer])
       .rpc();

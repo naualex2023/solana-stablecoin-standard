@@ -17,6 +17,12 @@ export const PDA_SEEDS = {
 } as const;
 
 /**
+ * Token-2022 Program ID
+ * The SSS Token program uses Token-2022 extensions
+ */
+export const TOKEN_2022_PROGRAM_ID = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
+
+/**
  * Error codes matching the Rust program
  */
 export const SSS_TOKEN_ERROR_CODE = {

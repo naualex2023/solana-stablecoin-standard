@@ -11,7 +11,7 @@ import {
   getMint,
   getOrCreateAssociatedTokenAccount,
   mintTo,
-  TOKEN_PROGRAM_ID,
+  TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
 import { Program, AnchorProvider, Wallet } from "@coral-xyz/anchor";
 import BN from "bn.js";
@@ -66,24 +66,60 @@ describe("SSS Token SDK Tests", function () {
       await connection.confirmTransaction(airdrop);
     }
 
-    // Create token mint
+    // Create token mint using Token-2022 program with freeze authority
     console.log("Creating token mint...");
     mint = await createMint(
       connection,
       payer,
       authority.publicKey,
-      null,
-      6
+      authority.publicKey, // freeze authority
+      6,
+      undefined,
+      undefined,
+      TOKEN_2022_PROGRAM_ID
     );
     console.log("Mint created:", mint.toString());
+
+    // Initialize the shared mint for use by other tests
+    const initTx = await sdk.initialize(mint, authority, {
+      name: "Test Stablecoin",
+      symbol: "TST",
+      uri: "https://example.com/metadata.json",
+      decimals: 6,
+      enablePermanentDelegate: true,  // Enable for seize operations
+      enableTransferHook: false,
+      defaultAccountFrozen: false,
+    });
+    await connection.confirmTransaction(initTx, "confirmed");
+    console.log("Shared mint initialized");
+
+    // Fund blacklister for rent costs
+    const blacklisterFund = await connection.requestAirdrop(
+      blacklister.publicKey,
+      LAMPORTS_PER_SOL
+    );
+    await connection.confirmTransaction(blacklisterFund, "confirmed");
+    console.log("Blacklister funded");
   });
 
   describe("test_initialize_sss1_minimal_stablecoin", () => {
     it("should initialize a new stablecoin with minimal configuration", async () => {
-      const configPDA = findConfigPDA(mint);
+      // Create a fresh mint for this test
+      const testMint = await createMint(
+        connection,
+        payer,
+        authority.publicKey,
+        authority.publicKey,
+        6,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
+      );
+
+      const configPDA = findConfigPDA(testMint);
       console.log("Config PDA:", configPDA.pda.toString());
 
-      const tx = await sdk.initialize(mint, authority, {
+      const tx = await sdk.initialize(testMint, authority, {
         name: "Test Stablecoin",
         symbol: "TST",
         uri: "https://example.com/metadata.json",
@@ -95,8 +131,11 @@ describe("SSS Token SDK Tests", function () {
 
       console.log("Initialize transaction:", tx);
 
+      // Wait for confirmation
+      await connection.confirmTransaction(tx, "confirmed");
+
       // Verify config exists
-      const config = await sdk.getConfig(mint);
+      const config = await sdk.getConfig(testMint);
       expect(config).to.exist;
       expect(config.name).to.equal("Test Stablecoin");
       expect(config.symbol).to.equal("TST");
@@ -116,6 +155,9 @@ describe("SSS Token SDK Tests", function () {
 
       console.log("Add minter transaction:", tx);
 
+      // Wait for confirmation
+      await connection.confirmTransaction(tx, "confirmed");
+
       // Verify minter info
       const minterInfo = await sdk.getMinterInfo(mint, minter.publicKey);
       expect(minterInfo).to.exist;
@@ -129,10 +171,11 @@ describe("SSS Token SDK Tests", function () {
     it("should remove a minter by setting quota to 0", async () => {
       // First, ensure minter exists
       const minter2 = Keypair.generate();
-      await sdk.addMinter(mint, authority, {
+      const addTx = await sdk.addMinter(mint, authority, {
         minter: minter2.publicKey,
         quota: new BN(100_000_000),
       });
+      await connection.confirmTransaction(addTx, "confirmed");
 
       // Remove minter
       const tx = await sdk.removeMinter(mint, authority, {
@@ -140,6 +183,7 @@ describe("SSS Token SDK Tests", function () {
       });
 
       console.log("Remove minter transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       // Verify quota is set to 0
       const minterInfo = await sdk.getMinterInfo(mint, minter2.publicKey);
@@ -149,8 +193,17 @@ describe("SSS Token SDK Tests", function () {
 
   describe("test_pause_and_unpause", () => {
     it("should pause all token operations", async () => {
+      // First update roles to make authority the pauser
+      const rolesTx = await sdk.updateRoles(mint, authority, {
+        newBlacklister: blacklister.publicKey,
+        newPauser: authority.publicKey,
+        newSeizer: seizer.publicKey,
+      });
+      await connection.confirmTransaction(rolesTx, "confirmed");
+
       const tx = await sdk.pause(mint, authority);
       console.log("Pause transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       const config = await sdk.getConfig(mint);
       expect(config.paused).to.be.true;
@@ -159,6 +212,7 @@ describe("SSS Token SDK Tests", function () {
     it("should unpause all token operations", async () => {
       const tx = await sdk.unpause(mint, authority);
       console.log("Unpause transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       const config = await sdk.getConfig(mint);
       expect(config.paused).to.be.false;
@@ -175,13 +229,18 @@ describe("SSS Token SDK Tests", function () {
 
       console.log("Transfer authority transaction:", tx);
 
+      // Wait for confirmation
+      await connection.confirmTransaction(tx, "confirmed");
+
       const config = await sdk.getConfig(mint);
       expect(config.masterAuthority.toString()).to.equal(newAuthority.publicKey.toString());
 
       // Transfer back to original authority
-      await sdk.transferAuthority(mint, newAuthority, {
+      const restoreTx = await sdk.transferAuthority(mint, newAuthority, {
         newMasterAuthority: authority.publicKey,
       });
+      await connection.confirmTransaction(restoreTx, "confirmed");
+      console.log("Authority restored to original");
     });
   });
 
@@ -194,6 +253,7 @@ describe("SSS Token SDK Tests", function () {
       });
 
       console.log("Update roles transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       const config = await sdk.getConfig(mint);
       expect(config.blacklister.toString()).to.equal(blacklister.publicKey.toString());
@@ -209,7 +269,11 @@ describe("SSS Token SDK Tests", function () {
         connection,
         payer,
         mint,
-        user.publicKey
+        user.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
       const userTokenAccount = userTokenAccountInfo.address;
 
@@ -224,9 +288,10 @@ describe("SSS Token SDK Tests", function () {
       );
 
       console.log("Mint tokens transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       // Verify balance
-      const accountInfo = await getAccount(connection, userTokenAccount);
+      const accountInfo = await getAccount(connection, userTokenAccount, undefined, TOKEN_2022_PROGRAM_ID);
       expect(Number(accountInfo.amount)).to.equal(amount.toNumber());
 
       // Verify minter's minted amount
@@ -239,7 +304,11 @@ describe("SSS Token SDK Tests", function () {
         connection,
         payer,
         mint,
-        user.publicKey
+        user.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
       const userTokenAccount = userTokenAccountInfo.address;
 
@@ -263,46 +332,58 @@ describe("SSS Token SDK Tests", function () {
 
   describe("test_burn_tokens", () => {
     it("should burn tokens from an account", async () => {
+      const burnUser = Keypair.generate();  // Use fresh user to avoid state conflicts
       const userTokenAccountInfo = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
         mint,
-        user.publicKey
+        burnUser.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
       const userTokenAccount = userTokenAccountInfo.address;
 
       // First, mint some tokens
-      await sdk.mintTokens(
+      const mintTx = await sdk.mintTokens(
         mint,
         authority,
         minter.publicKey,
         userTokenAccount,
         { amount: new BN(1_000_000) }
       );
+      await connection.confirmTransaction(mintTx, "confirmed");
 
       const burnAmount = new BN(500_000);
       const tx = await sdk.burnTokens(
         mint,
         userTokenAccount,
-        user,
+        burnUser,
         { amount: burnAmount }
       );
 
       console.log("Burn tokens transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       // Verify balance
-      const accountInfo = await getAccount(connection, userTokenAccount);
+      const accountInfo = await getAccount(connection, userTokenAccount, undefined, TOKEN_2022_PROGRAM_ID);
       expect(Number(accountInfo.amount)).to.equal(500_000);
     });
   });
 
   describe("test_freeze_and_thaw_token_account", () => {
     it("should freeze a token account", async () => {
+      const freezeUser = Keypair.generate();  // Use fresh user
       const userTokenAccountInfo = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
         mint,
-        user.publicKey
+        freezeUser.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
       const userTokenAccount = userTokenAccountInfo.address;
 
@@ -313,9 +394,10 @@ describe("SSS Token SDK Tests", function () {
       );
 
       console.log("Freeze transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       // Verify account is frozen
-      const accountInfo = await getAccount(connection, userTokenAccount);
+      const accountInfo = await getAccount(connection, userTokenAccount, undefined, TOKEN_2022_PROGRAM_ID);
       expect(accountInfo.isFrozen).to.be.true;
     });
 
@@ -325,16 +407,21 @@ describe("SSS Token SDK Tests", function () {
         connection,
         payer,
         mint,
-        freezeUser.publicKey
+        freezeUser.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
       const freezeTokenAccount = freezeTokenAccountInfo.address;
 
       // Freeze first
-      await sdk.freezeTokenAccount(
+      const freezeTx = await sdk.freezeTokenAccount(
         mint,
         freezeTokenAccount,
         authority
       );
+      await connection.confirmTransaction(freezeTx, "confirmed");
 
       const tx = await sdk.thawTokenAccount(
         mint,
@@ -343,9 +430,10 @@ describe("SSS Token SDK Tests", function () {
       );
 
       console.log("Thaw transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       // Verify account is not frozen
-      const accountInfo = await getAccount(connection, freezeTokenAccount);
+      const accountInfo = await getAccount(connection, freezeTokenAccount, undefined, TOKEN_2022_PROGRAM_ID);
       expect(accountInfo.isFrozen).to.be.false;
     });
   });
@@ -360,6 +448,7 @@ describe("SSS Token SDK Tests", function () {
       });
 
       console.log("Update quota transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       const minterInfo = await sdk.getMinterInfo(mint, minter.publicKey);
       expect(minterInfo.quota.toString()).to.equal(newQuota.toString());
@@ -377,6 +466,7 @@ describe("SSS Token SDK Tests", function () {
       });
 
       console.log("Add to blacklist transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       // Verify blacklist entry exists
       const isBlacklisted = await sdk.isBlacklisted(mint, maliciousUser.publicKey);
@@ -394,16 +484,18 @@ describe("SSS Token SDK Tests", function () {
       const maliciousUser = Keypair.generate();
       
       // First add to blacklist
-      await sdk.addToBlacklist(mint, blacklister, {
+      const addTx = await sdk.addToBlacklist(mint, blacklister, {
         user: maliciousUser.publicKey,
         reason: "Test reason",
       });
+      await connection.confirmTransaction(addTx, "confirmed");
 
       const tx = await sdk.removeFromBlacklist(mint, blacklister, {
         user: maliciousUser.publicKey,
       });
 
       console.log("Remove from blacklist transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       // Verify blacklist entry no longer exists
       const isBlacklisted = await sdk.isBlacklisted(mint, maliciousUser.publicKey);
@@ -421,7 +513,11 @@ describe("SSS Token SDK Tests", function () {
         connection,
         payer,
         mint,
-        sourceUser.publicKey
+        sourceUser.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
       const sourceTokenAccount = sourceTokenAccountInfo.address;
       
@@ -429,32 +525,38 @@ describe("SSS Token SDK Tests", function () {
         connection,
         payer,
         mint,
-        destUser.publicKey
+        destUser.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
       const destTokenAccount = destTokenAccountInfo.address;
 
       // Mint tokens to source
-      await sdk.mintTokens(
+      const mintTx = await sdk.mintTokens(
         mint,
         authority,
         minter.publicKey,
         sourceTokenAccount,
         { amount: new BN(1_000_000) }
       );
+      await connection.confirmTransaction(mintTx, "confirmed");
 
-      // Seize tokens
+      // Seize tokens - seizer is the authority since permanent delegate is enabled
       const seizeAmount = new BN(500_000);
-      const tx = await sdk.seize(mint, seizer, {
+      const tx = await sdk.seize(mint, authority, {
         sourceToken: sourceTokenAccount,
         destToken: destTokenAccount,
         amount: seizeAmount,
       });
 
       console.log("Seize transaction:", tx);
+      await connection.confirmTransaction(tx, "confirmed");
 
       // Verify balances
-      const sourceInfo = await getAccount(connection, sourceTokenAccount);
-      const destInfo = await getAccount(connection, destTokenAccount);
+      const sourceInfo = await getAccount(connection, sourceTokenAccount, undefined, TOKEN_2022_PROGRAM_ID);
+      const destInfo = await getAccount(connection, destTokenAccount, undefined, TOKEN_2022_PROGRAM_ID);
       expect(Number(sourceInfo.amount)).to.equal(500_000);
       expect(Number(destInfo.amount)).to.equal(500_000);
     });
@@ -471,7 +573,10 @@ describe("SSS Token SDK Tests", function () {
         payer,
         authority.publicKey,
         seizer.publicKey,
-        6
+        6,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
 
       await sdk.initialize(workflowMint, authority, {
@@ -498,7 +603,11 @@ describe("SSS Token SDK Tests", function () {
         connection,
         payer,
         workflowMint,
-        workflowUser.publicKey
+        workflowUser.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
       const userTokenAccount = userTokenAccountInfo.address;
 
@@ -511,7 +620,7 @@ describe("SSS Token SDK Tests", function () {
       );
 
       // 4. Verify user has tokens
-      const accountInfo = await getAccount(connection, userTokenAccount);
+      const accountInfo = await getAccount(connection, userTokenAccount, undefined, TOKEN_2022_PROGRAM_ID);
       expect(Number(accountInfo.amount)).to.equal(1_000_000);
 
       // 5. Add user to blacklist
@@ -528,7 +637,11 @@ describe("SSS Token SDK Tests", function () {
         connection,
         payer,
         workflowMint,
-        treasury.publicKey
+        treasury.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
       );
       const treasuryTokenAccount = treasuryTokenAccountInfo.address;
 

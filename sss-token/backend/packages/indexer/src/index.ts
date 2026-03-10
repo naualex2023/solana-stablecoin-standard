@@ -303,5 +303,3 @@ process.on('SIGTERM', shutdown);
 
 // Start the service
 main();
-</task_progress>
-</write_to_file>

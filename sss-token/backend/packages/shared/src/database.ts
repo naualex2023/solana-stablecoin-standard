@@ -399,5 +399,3 @@ export async function createAuditLog(params: CreateAuditLogParams) {
      JSON.stringify(params.details || {}), params.ipAddress || null, params.userAgent || null]
   );
 }
-</task_progress>
-</write_to_file>

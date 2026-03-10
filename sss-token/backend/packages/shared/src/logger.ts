@@ -35,5 +35,3 @@ export function createLogger(context: Record<string, unknown>) {
 }
 
 export default logger;
-</task_progress>
-</write_to_file>

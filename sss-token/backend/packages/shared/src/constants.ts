@@ -141,5 +141,3 @@ export const ERROR_CODES = {
   INSUFFICIENT_BALANCE: 'INSUFFICIENT_BALANCE',
   RPC_ERROR: 'RPC_ERROR',
 } as const;
-</task_progress>
-</write_to_file>

@@ -16,5 +16,3 @@
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
-</task_progress>
-</write_to_file>

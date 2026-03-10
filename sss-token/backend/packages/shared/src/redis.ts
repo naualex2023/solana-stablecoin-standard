@@ -159,5 +159,3 @@ export async function srem(key: string, ...members: string[]): Promise<number> {
 export async function smembers(key: string): Promise<string[]> {
   return getRedis().smembers(key);
 }
-</task_progress>
-</write_to_file>

@@ -146,5 +146,3 @@ ENV NODE_ENV=production
 EXPOSE 3003
 
 CMD ["node", "packages/webhook-service/dist/index.js"]
-</task_progress>
-</write_to_file>

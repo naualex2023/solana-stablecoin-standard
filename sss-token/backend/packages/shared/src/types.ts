@@ -339,5 +339,3 @@ export interface WebhookServiceConfig extends ServiceConfig {
 export interface IndexerConfig extends ServiceConfig {
   startSlot?: number;
 }
-</task_progress>
-</write_to_file>

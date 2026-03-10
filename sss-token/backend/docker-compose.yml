@@ -203,5 +203,3 @@ volumes:
     driver: local
   redis_data:
     driver: local
-</task_progress>
-</write_to_file>

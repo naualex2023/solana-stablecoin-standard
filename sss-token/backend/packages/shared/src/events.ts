@@ -92,5 +92,3 @@ export function matchesEventFilter(
 
   return true;
 }
-</task_progress>
-</write_to_file>

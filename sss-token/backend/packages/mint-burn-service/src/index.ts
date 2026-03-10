@@ -360,5 +360,3 @@ async function main() {
 }
 
 main();
-</task_progress>
-</write_to_file>

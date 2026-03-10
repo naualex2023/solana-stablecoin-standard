@@ -1,0 +1,36 @@
+{
+  "name": "sss-token-cli",
+  "version": "1.0.0",
+  "description": "Admin CLI for SSS Token Stablecoin operations",
+  "main": "dist/index.js",
+  "bin": {
+    "sss-token": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.0",
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.95.0",
+    "bn.js": "^5.2.1",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.1",
+    "inquirer": "^9.2.15",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "toml": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.5",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

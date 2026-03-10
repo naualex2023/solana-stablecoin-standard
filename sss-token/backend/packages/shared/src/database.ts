@@ -4,7 +4,7 @@
 
 import pg from 'pg';
 const { Pool } = pg;
-import type { Pool as PoolType, PoolClient, QueryResult } from 'pg';
+import type { Pool as PoolType, PoolClient, QueryResult, QueryResultRow } from 'pg';
 
 // Database configuration
 interface DatabaseConfig {
@@ -68,7 +68,7 @@ export function getPool(): PoolType {
 /**
  * Execute a query
  */
-export async function query<T = unknown>(
+export async function query<T extends QueryResultRow = any>(
   text: string,
   params?: unknown[]
 ): Promise<QueryResult<T>> {

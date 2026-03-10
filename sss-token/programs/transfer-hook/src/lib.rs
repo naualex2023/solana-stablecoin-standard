@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token_interface::{Mint, TokenAccount};
 
 // Program ID
-declare_id!("az3oVrACpVrCJbgGhKueYhTWobmte2AwYgMp1cAzdKD");
+declare_id!("8Zaw1qJer6QPw15yg2bBgkAEB5rP73QisHVv6djANpSB");
 
 // ============================================
 // ERROR DEFINITIONS

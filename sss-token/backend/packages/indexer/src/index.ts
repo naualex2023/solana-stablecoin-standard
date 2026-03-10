@@ -285,14 +285,14 @@ async function main() {
   try {
     await init();
     
-    // Start both polling and WebSocket subscription
-    await Promise.all([
-      startIndexing(),
-      subscribeToLogs(),
-    ]);
+    // Subscribe to real-time logs first
+    await subscribeToLogs();
+    
+    // Then start polling loop (this runs forever)
+    await startIndexing();
 
   } catch (error) {
-    log.error({ error }, 'Fatal error');
+    log.error({ error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined }, 'Fatal error');
     process.exit(1);
   }
 }

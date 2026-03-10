@@ -20,8 +20,15 @@ function parseRedisUrl(url: string): { host: string; port: number; password?: st
     };
     
     // Handle password - URL format redis://:password@host means empty username, password is set
+    // The URL API correctly parses this, but we also check the raw URL as fallback
     if (parsed.password) {
       config.password = parsed.password;
+    } else if (url.includes('@') && url.match(/redis:\/\/[^@]*@/)) {
+      // Fallback: extract password from URL like redis://:password@host:port
+      const authMatch = url.match(/redis:\/\/(?:([^:]*):)?([^@]*)@/);
+      if (authMatch && authMatch[2]) {
+        config.password = authMatch[2];
+      }
     }
     
     console.log('Redis config:', { 

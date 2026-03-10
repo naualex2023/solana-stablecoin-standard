@@ -2,31 +2,33 @@
 > @sss-backend/indexer@1.0.0 dev /home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/packages/indexer
 > ts-node-dev --respawn --transpile-only src/index.ts
 
-[INFO] 23:21:28 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+[INFO] 23:31:41 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+Redis config: { host: 'localhost', port: 6379, hasPassword: false }
 Redis connected
-[2026-03-10 23:21:29.047 +0300] [32mINFO[39m: [36mInitializing indexer service...[39m
+Redis connection error: NOAUTH Authentication required.
+[2026-03-10 23:31:41.460 +0300] [32mINFO[39m: [36mInitializing indexer service...[39m
     service: "indexer"
-[2026-03-10 23:21:29.048 +0300] [32mINFO[39m: [36mConfiguration[39m
+[2026-03-10 23:31:41.460 +0300] [32mINFO[39m: [36mConfiguration[39m
     service: "indexer"
     rpcUrl: "http://localhost:8899"
     programId: "Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw"
-[2026-03-10 23:21:29.048 +0300] [32mINFO[39m: [36mDatabase initialized[39m
+[2026-03-10 23:31:41.460 +0300] [32mINFO[39m: [36mDatabase initialized[39m
     service: "indexer"
-[2026-03-10 23:21:29.049 +0300] [32mINFO[39m: [36mRedis initialized[39m
+[2026-03-10 23:31:41.462 +0300] [32mINFO[39m: [36mRedis initialized[39m
     service: "indexer"
-[2026-03-10 23:21:29.050 +0300] [32mINFO[39m: [36mSolana connection established[39m
+[2026-03-10 23:31:41.463 +0300] [32mINFO[39m: [36mSolana connection established[39m
     service: "indexer"
-[2026-03-10 23:21:29.100 +0300] [32mINFO[39m: [36mConnected to Solana node[39m
+[2026-03-10 23:31:41.513 +0300] [32mINFO[39m: [36mConnected to Solana node[39m
     service: "indexer"
     version: {
       "feature-set": 2142755730,
       "solana-core": "2.3.13"
     }
-[2026-03-10 23:21:29.102 +0300] [32mINFO[39m: [36mSubscribing to real-time logs...[39m
+[2026-03-10 23:31:41.516 +0300] [32mINFO[39m: [36mSubscribing to real-time logs...[39m
     service: "indexer"
-[2026-03-10 23:21:29.106 +0300] [32mINFO[39m: [36mSubscribed to program logs[39m
+[2026-03-10 23:31:41.520 +0300] [32mINFO[39m: [36mSubscribed to program logs[39m
     service: "indexer"
-[2026-03-10 23:21:29.118 +0300] [31mERROR[39m: [36mFatal error[39m
+[2026-03-10 23:31:41.554 +0300] [31mERROR[39m: [36mFatal error[39m
     service: "indexer"
     error: {}
  ELIFECYCLE  Command failed.

@@ -90,7 +90,7 @@ async function fetchSignatures(startSlot: number, endSlot: number) {
   try {
     const signatures = await connection.getSignaturesForAddress(programId, {
       minContextSlot: startSlot,
-      maxContextSlot: endSlot,
+      until: endSlot.toString(),
       limit: 1000,
     });
     return signatures;
@@ -117,8 +117,8 @@ async function processTransaction(signature: string) {
     // Check if transaction involves our program
     const message = tx.transaction.message;
     const accountKeys = 'accountKeys' in message 
-      ? message.accountKeys 
-      : message.staticAccountKeys;
+      ? (message as any).accountKeys 
+      : (message as any).staticAccountKeys || [];
     
     const programIndex = accountKeys.findIndex(
       (key: any) => key.pubkey?.toString() === PROGRAM_ID || 

@@ -18,12 +18,12 @@ import {
   subscribe,
   logger,
   createWebhookSubscription,
-  getWebhookSubscription,
+  getWebhookSubscriptionById,
   deleteWebhookSubscription,
-  getActiveSubscriptions,
+  getActiveWebhookSubscriptions,
   createWebhookDelivery,
   updateWebhookDeliveryStatus,
-  getPendingDeliveries,
+  getPendingWebhookDeliveries,
   createAuditLog,
   query,
   CreateWebhookSubscriptionSchema,
@@ -106,13 +106,14 @@ app.post('/api/v1/subscriptions', async (req: Request, res: Response) => {
       });
     }
 
-    const { url, eventTypes, mintAddresses, description } = parseResult.data;
+    const { url, eventTypes, mintAddresses, name } = parseResult.data;
 
     const subscriptionId = await createWebhookSubscription({
       url,
       eventTypes,
       mintAddresses,
-      description,
+      name,
+      secret: WEBHOOK_SECRET,
     });
 
     await createAuditLog({
@@ -140,7 +141,7 @@ app.post('/api/v1/subscriptions', async (req: Request, res: Response) => {
 // Get subscription
 app.get('/api/v1/subscriptions/:id', async (req: Request, res: Response) => {
   try {
-    const subscription = await getWebhookSubscription(req.params.id);
+    const subscription = await getWebhookSubscriptionById(req.params.id);
     
     if (!subscription) {
       return res.status(HTTP_STATUS.NOT_FOUND).json({
@@ -162,14 +163,7 @@ app.get('/api/v1/subscriptions/:id', async (req: Request, res: Response) => {
 // Delete subscription
 app.delete('/api/v1/subscriptions/:id', async (req: Request, res: Response) => {
   try {
-    const deleted = await deleteWebhookSubscription(req.params.id);
-    
-    if (!deleted) {
-      return res.status(HTTP_STATUS.NOT_FOUND).json({
-        success: false,
-        error: { code: ERROR_CODES.NOT_FOUND, message: 'Subscription not found' },
-      });
-    }
+    await deleteWebhookSubscription(req.params.id);
 
     await createAuditLog({
       action: 'webhook_subscription_deleted',
@@ -234,7 +228,7 @@ function generateSignature(payload: string, secret: string): string {
   return CryptoJS.HmacSHA256(payload, secret).toString();
 }
 
-async function deliverWebhook(deliveryId: number, url: string, payload: object): Promise<boolean> {
+async function deliverWebhook(deliveryId: string, url: string, payload: object): Promise<boolean> {
   const payloadStr = JSON.stringify(payload);
   const signature = generateSignature(payloadStr, WEBHOOK_SECRET);
 
@@ -267,7 +261,7 @@ async function deliverWebhook(deliveryId: number, url: string, payload: object):
 
 async function processEvent(eventData: any) {
   try {
-    const subscriptions = await getActiveSubscriptions();
+    const subscriptions = await getActiveWebhookSubscriptions();
     
     for (const sub of subscriptions) {
       // Check if event type matches
@@ -286,8 +280,7 @@ async function processEvent(eventData: any) {
       const deliveryId = await createWebhookDelivery({
         subscriptionId: sub.id,
         eventId: eventData.id,
-        url: sub.url,
-        payload: eventData,
+        requestBody: eventData,
       });
 
       // Attempt delivery
@@ -300,11 +293,11 @@ async function processEvent(eventData: any) {
 
 async function retryFailedDeliveries() {
   try {
-    const pending = await getPendingDeliveries(MAX_RETRIES);
+    const pending = await getPendingWebhookDeliveries(MAX_RETRIES);
     log.info({ count: pending.length }, 'Retrying failed deliveries');
 
     for (const delivery of pending) {
-      await deliverWebhook(delivery.id, delivery.url, delivery.payload);
+      await deliverWebhook(delivery.id, delivery.url, delivery.request_body);
     }
   } catch (error) {
     log.error({ error }, 'Failed to retry deliveries');
@@ -326,7 +319,7 @@ function startBackgroundJobs() {
 // ============================================
 
 async function startEventListener() {
-  await subscribe(REDIS_CHANNELS.EVENTS, (message) => {
+  await subscribe(REDIS_CHANNELS.EVENTS, (message: string) => {
     try {
       const eventData = JSON.parse(message);
       processEvent(eventData);

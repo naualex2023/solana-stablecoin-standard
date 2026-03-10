@@ -1,0 +1,22 @@
+{
+  "name": "sss-backend",
+  "version": "1.0.0",
+  "description": "SSS Token Backend Services",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "start": "pnpm -r start",
+    "clean": "pnpm -r clean",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
+</task_progress>
+</write_to_file>

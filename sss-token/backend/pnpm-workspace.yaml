@@ -1,0 +1,4 @@
+packages:
+  - 'packages/*'
+</task_progress>
+</write_to_file>

@@ -1,0 +1,207 @@
+version: "3.9"
+
+services:
+  # ============================================
+  # Infrastructure Services
+  # ============================================
+  
+  postgres:
+    image: postgres:16-alpine
+    container_name: sss-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sss}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sss_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-sss_token}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sss} -d ${POSTGRES_DB:-sss_token}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sss-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: sss-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-sss_redis_secret}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-sss_redis_secret}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sss-network
+
+  # ============================================
+  # Application Services
+  # ============================================
+
+  indexer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: indexer
+    container_name: sss-indexer
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - SOLANA_RPC_URL=${SOLANA_RPC_URL}
+      - SOLANA_WS_URL=${SOLANA_WS_URL}
+      - SSS_PROGRAM_ID=${SSS_PROGRAM_ID:-Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sss}:${POSTGRES_PASSWORD:-sss_secret}@postgres:5432/${POSTGRES_DB:-sss_token}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-sss_redis_secret}@redis:6379
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sss-network
+
+  mint-burn-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: mint-burn-service
+    container_name: sss-mint-burn
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - SOLANA_RPC_URL=${SOLANA_RPC_URL}
+      - SSS_PROGRAM_ID=${SSS_PROGRAM_ID:-Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sss}:${POSTGRES_PASSWORD:-sss_secret}@postgres:5432/${POSTGRES_DB:-sss_token}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-sss_redis_secret}@redis:6379
+      - KEYPAIR_PATH=/app/secrets/minter.json
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - ${KEYPAIR_PATH:-./secrets/minter.json}:/app/secrets/minter.json:ro
+    ports:
+      - "${MINT_BURN_PORT:-3001}:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      indexer:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - sss-network
+
+  compliance-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: compliance-service
+    container_name: sss-compliance
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - SOLANA_RPC_URL=${SOLANA_RPC_URL}
+      - SSS_PROGRAM_ID=${SSS_PROGRAM_ID:-Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sss}:${POSTGRES_PASSWORD:-sss_secret}@postgres:5432/${POSTGRES_DB:-sss_token}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-sss_redis_secret}@redis:6379
+      - KEYPAIR_PATH=/app/secrets/blacklister.json
+      - OFAC_API_URL=${OFAC_API_URL:-https://sanctionslist.ofac.treas.gov/api}
+      - OFAC_SYNC_INTERVAL=${OFAC_SYNC_INTERVAL:-86400000}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - ${BLACKLISTER_KEYPAIR_PATH:-./secrets/blacklister.json}:/app/secrets/blacklister.json:ro
+    ports:
+      - "${COMPLIANCE_PORT:-3002}:3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - sss-network
+
+  webhook-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: webhook-service
+    container_name: sss-webhook
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sss}:${POSTGRES_PASSWORD:-sss_secret}@postgres:5432/${POSTGRES_DB:-sss_token}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-sss_redis_secret}@redis:6379
+      - WEBHOOK_TIMEOUT=${WEBHOOK_TIMEOUT:-30000}
+      - WEBHOOK_MAX_RETRIES=${WEBHOOK_MAX_RETRIES:-5}
+      - WEBHOOK_RETRY_BASE_DELAY=${WEBHOOK_RETRY_BASE_DELAY:-1000}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    ports:
+      - "${WEBHOOK_PORT:-3003}:3003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      indexer:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - sss-network
+
+  # ============================================
+  # Reverse Proxy (Production)
+  # ============================================
+
+  nginx:
+    image: nginx:alpine
+    container_name: sss-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - mint-burn-service
+      - compliance-service
+      - webhook-service
+    networks:
+      - sss-network
+
+networks:
+  sss-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+</task_progress>
+</write_to_file>

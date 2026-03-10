@@ -349,9 +349,18 @@ run_integration_tests() {
         failed=$((failed + 1))
     fi
     
-    # Test 8: Mint tokens (to self)
-    print_info "Test: mint <wallet> 100"
+    # Test 8: Add minter (required before minting)
+    print_info "Test: minters add <wallet>"
     WALLET=$(solana address)
+    if node dist/index.js minters add "$WALLET" --quota 1000000000000 2>&1; then
+        print_success "minters add works"
+    else
+        print_error "minters add failed"
+        failed=$((failed + 1))
+    fi
+    
+    # Test 9: Mint tokens (to self)
+    print_info "Test: mint <wallet> 100"
     if node dist/index.js mint "$WALLET" 100 2>&1; then
         print_success "mint works"
     else

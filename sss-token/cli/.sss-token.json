@@ -1,0 +1,8 @@
+{
+  "mint": "FBsXJtxS4A7fa4KiK6FEBJyt8KrnfFfUWgYaHV2SLQ58",
+  "name": "TestCoin",
+  "symbol": "TEST",
+  "decimals": 6,
+  "preset": "sss-1",
+  "programId": "Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw"
+}

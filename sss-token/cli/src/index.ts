@@ -45,15 +45,12 @@ import {
   getOrCreateAssociatedTokenAccount,
   TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
-import { AnchorProvider, Wallet, BN } from "@coral-xyz/anchor";
+import pkg from "@coral-xyz/anchor";
+const { AnchorProvider, Wallet, BN } = pkg;
 
 // Import SDK - use the built SDK from dist
 // The SDK should be built first: cd ../sdk && npm run build
-const {
-  SSSTokenClient,
-  findConfigPDA,
-  SSS_TOKEN_PROGRAM_ID,
-} = require("../../sdk/dist/index");
+import { SSSTokenClient, findConfigPDA, SSS_TOKEN_PROGRAM_ID } from "../../sdk/dist/index.js";
 
 const program = new Command();
 
@@ -84,7 +81,7 @@ async function getConnection(): Promise<Connection> {
   return new Connection(config.rpcUrl, "confirmed");
 }
 
-async function getProvider(): Promise<{ provider: AnchorProvider; wallet: Wallet; connection: Connection }> {
+async function getProvider(): Promise<{ provider: typeof AnchorProvider; wallet: typeof Wallet; connection: Connection }> {
   const connection = await getConnection();
   const keypair = loadKeypair(config.keypairPath);
   const wallet = new Wallet(keypair);
@@ -92,8 +89,8 @@ async function getProvider(): Promise<{ provider: AnchorProvider; wallet: Wallet
   return { provider, wallet, connection };
 }
 
-async function getSDK(): Promise<{ sdk: SSSTokenClient; connection: Connection; wallet: Wallet }> {
-  const { provider, wallet, connection } = await getProvider();
+async function getSDK(): Promise<{ sdk: typeof SSSTokenClient; connection: Connection; wallet: typeof Wallet }> {
+  const { provider, wallet, connection } = await get
   const sdk = new SSSTokenClient({ provider });
   return { sdk, connection, wallet };
 }
@@ -308,10 +305,10 @@ program
         { amount }
       );
       
-      const config = await sdk.getConfig(mint);
-      const formattedAmount = formatAmount(amount, config.decimals);
+      const configData = await sdk.getConfig(mint);
+      const formattedAmount = formatAmount(amount, configData.decimals);
       
-      spinner.succeed(chalk.green(`Minted ${formattedAmount} ${config.symbol} to ${recipientStr}`));
+      spinner.succeed(chalk.green(`Minted ${formattedAmount} ${configData.symbol} to ${recipientStr}`));
       console.log(chalk.gray(`  Transaction: ${tx}`));
       
     } catch (error: any) {
@@ -485,7 +482,7 @@ program
       console.log(chalk.cyan("  Decimals:"), configData.decimals);
       console.log(chalk.cyan("  Paused:"), configData.paused ? chalk.red("YES") : chalk.green("NO"));
       console.log();
-      console.log(chalk.cyan("  Total Supply:"), formatAmount(mintInfo.supply.toString(), configData.decimals));
+      console.log(chalk.cyan("  Total Supply:"), formatAmount(new BN(mintInfo.supply.toString()), configData.decimals));
       console.log();
       console.log(chalk.cyan.bold("  === Roles ==="));
       console.log(chalk.cyan("  Master Authority:"), configData.masterAuthority.toString());
@@ -519,7 +516,7 @@ program
       const configData = await sdk.getConfig(mint);
       const mintInfo = await getMint(connection, mint, "confirmed", TOKEN_2022_PROGRAM_ID);
       
-      const supply = formatAmount(mintInfo.supply.toString(), configData.decimals);
+      const supply = formatAmount(new BN(mintInfo.supply.toString()), configData.decimals);
       
       spinner.succeed(chalk.green(`Total Supply: ${supply} ${configData.symbol}`));
       
@@ -1024,7 +1021,7 @@ program
       try {
         const accountInfo = await getAccount(connection, tokenAccount, "confirmed", TOKEN_2022_PROGRAM_ID);
         const configData = await sdk.getConfig(mint);
-        const balance = formatAmount(accountInfo.amount.toString(), configData.decimals);
+        const balance = formatAmount(new BN(accountInfo.amount.toString()), configData.decimals);
         
         spinner.succeed(chalk.green(`Balance: ${balance} ${configData.symbol}`));
         console.log(chalk.gray(`  Account: ${tokenAccount.toString()}`));

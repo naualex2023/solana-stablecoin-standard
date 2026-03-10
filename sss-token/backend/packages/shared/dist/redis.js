@@ -25,6 +25,29 @@ exports.smembers = smembers;
 const ioredis_1 = __importDefault(require("ioredis"));
 let redis = null;
 /**
+ * Parse Redis URL to extract connection parameters
+ */
+function parseRedisUrl(url) {
+    // Parse URL like: redis://:password@host:port or redis://user:password@host:port
+    try {
+        const parsed = new URL(url);
+        return {
+            host: parsed.hostname || 'localhost',
+            port: parseInt(parsed.port) || 6379,
+            password: parsed.password || undefined,
+            username: parsed.username || undefined,
+        };
+    }
+    catch {
+        // Fallback for simple host:port format
+        const [host, port] = url.split(':');
+        return {
+            host: host || 'localhost',
+            port: parseInt(port) || 6379,
+        };
+    }
+}
+/**
  * Initialize Redis connection
  */
 function initRedis(url) {
@@ -32,15 +55,30 @@ function initRedis(url) {
         return redis;
     }
     const redisUrl = url || process.env.REDIS_URL || 'redis://localhost:6379';
-    redis = new ioredis_1.default(redisUrl, {
+    const config = parseRedisUrl(redisUrl);
+    redis = new ioredis_1.default({
+        host: config.host,
+        port: config.port,
+        password: config.password,
+        username: config.username,
         maxRetriesPerRequest: 3,
         lazyConnect: false,
+        retryStrategy: (times) => {
+            if (times > 3) {
+                console.error('Redis connection failed after 3 retries');
+                return null;
+            }
+            return Math.min(times * 100, 2000);
+        },
     });
     redis.on('error', (err) => {
-        console.error('Redis connection error:', err);
+        console.error('Redis connection error:', err.message);
     });
     redis.on('connect', () => {
         console.log('Redis connected');
+    });
+    redis.on('ready', () => {
+        console.log('Redis ready');
     });
     return redis;
 }

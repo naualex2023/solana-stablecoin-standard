@@ -496,7 +496,7 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
       );
 
       const client = new SSSTokenClient({ provider });
-      await client.initialize(mint, authority, {
+      const initTx = await client.initialize(mint, authority, {
         name: "Authority Test Stablecoin",
         symbol: "AUTH",
         uri: "https://example.com/auth.json",
@@ -505,6 +505,7 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
         enableTransferHook: false,
         defaultAccountFrozen: false,
       });
+      await connection.confirmTransaction(initTx, "confirmed");
 
       stable = await SolanaStablecoin.connect(provider, { mint });
     });
@@ -658,17 +659,20 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
 
       // 7. Pause
       console.log("Step 7: Pause");
-      await stable.pause.pause(pauser);
+      const pauseTx = await stable.pause.pause(pauser);
+      await connection.confirmTransaction(pauseTx, "confirmed");
       expect(await stable.pause.isPaused()).to.be.true;
 
       // 8. Unpause
       console.log("Step 8: Unpause");
-      await stable.pause.unpause(pauser);
+      const unpauseTx = await stable.pause.unpause(pauser);
+      await connection.confirmTransaction(unpauseTx, "confirmed");
       expect(await stable.pause.isPaused()).to.be.false;
 
       // 9. Burn tokens
       console.log("Step 9: Burn tokens");
-      await stable.burning.burn(userTokenAccount.address, workflowUser, new BN(500_000));
+      const burnTx = await stable.burning.burn(userTokenAccount.address, workflowUser, new BN(500_000));
+      await connection.confirmTransaction(burnTx, "confirmed");
 
       const finalBalance = await getAccount(connection, userTokenAccount.address, undefined, TOKEN_2022_PROGRAM_ID);
       expect(Number(finalBalance.amount)).to.equal(500_000);

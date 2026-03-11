@@ -1,10 +1,10 @@
 # SSS Token Devnet Proof of Transactions
 
-**Generated:** 2026-03-11T18:01:37.937Z
+**Generated:** 2026-03-11T18:08:07.511Z
 **Network:** Devnet
 **Total Tests:** 17
-**Passed:** 16
-**Failed:** 1
+**Passed:** 17
+**Failed:** 0
 
 ---
 
@@ -22,21 +22,21 @@
 
 **Operation:** `initialize`
 
-**Timestamp:** 2026-03-11T18:01:03.579Z
+**Timestamp:** 2026-03-11T18:07:02.574Z
 
 **Transaction:**
 ```
-5oqBZsu6vXskXndKUsSuEie83ziqvc6wh8QbKKM6Tk3k7cTssnJmKPbmWSkEFF5hybiGtULzXamDCqpzKVf14JLW
+YGo5dFMCKM1ZFEDh76JRC6JczpKMZnyuYB34PPegwg5F9PWApaHspYCaQEgD2VrqwskGAJYjYbrCbs1AEUyGqyb
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/5oqBZsu6vXskXndKUsSuEie83ziqvc6wh8QbKKM6Tk3k7cTssnJmKPbmWSkEFF5hybiGtULzXamDCqpzKVf14JLW?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/YGo5dFMCKM1ZFEDh76JRC6JczpKMZnyuYB34PPegwg5F9PWApaHspYCaQEgD2VrqwskGAJYjYbrCbs1AEUyGqyb?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
-| Mint | `395fvhWgWMsfHZiSVgz6zGmtXNDUzksuAbdoznvvvdih` | [View](https://explorer.solana.com/address/395fvhWgWMsfHZiSVgz6zGmtXNDUzksuAbdoznvvvdih?cluster=devnet) |
-| Config PDA | `DgN5HXP8JXpjuTT6R5H2qUboj7p97yN1LaCeMUaSRUXW` | [View](https://explorer.solana.com/address/DgN5HXP8JXpjuTT6R5H2qUboj7p97yN1LaCeMUaSRUXW?cluster=devnet) |
+| Mint | `9d4HuEe6TNjL1o4uKoNsBkx1ijBw7hNd56P9bAY9qkAa` | [View](https://explorer.solana.com/address/9d4HuEe6TNjL1o4uKoNsBkx1ijBw7hNd56P9bAY9qkAa?cluster=devnet) |
+| Config PDA | `8nx56dQatJcvyVvwsEnrUchCwogA1NGXn2GnNLGYKx6U` | [View](https://explorer.solana.com/address/8nx56dQatJcvyVvwsEnrUchCwogA1NGXn2GnNLGYKx6U?cluster=devnet) |
 
 ---
 
@@ -44,14 +44,14 @@
 
 **Operation:** `update_roles`
 
-**Timestamp:** 2026-03-11T18:01:04.471Z
+**Timestamp:** 2026-03-11T18:07:04.494Z
 
 **Transaction:**
 ```
-25SwQUNyxXiQyK3kUCuH8pnyf1RSrpEZ7uzCtf4Z9FEjT1Z2ufFYaF2Yi91qLzW9N11aYAC8y167aueH7BUxmPQJ
+4erycNGh8YeAYyhMeiF2zmR9RzUJH5ygbWk8Z5dCU1X8EYRx1k9jEpXLnEM1NmKz3zdjquCCjzzJQf585mR8i9A1
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/25SwQUNyxXiQyK3kUCuH8pnyf1RSrpEZ7uzCtf4Z9FEjT1Z2ufFYaF2Yi91qLzW9N11aYAC8y167aueH7BUxmPQJ?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/4erycNGh8YeAYyhMeiF2zmR9RzUJH5ygbWk8Z5dCU1X8EYRx1k9jEpXLnEM1NmKz3zdjquCCjzzJQf585mR8i9A1?cluster=devnet)
 
 **Accounts Involved:**
 
@@ -67,20 +67,20 @@
 
 **Operation:** `add_minter`
 
-**Timestamp:** 2026-03-11T18:01:05.464Z
+**Timestamp:** 2026-03-11T18:07:06.134Z
 
 **Transaction:**
 ```
-5fhocrf8fPwcwr4ajCireLT2UpUqfg9xpTgZvfscxrYbiHXCKtazcyHQeqTodvQfYV6yLxk716MiW26KRiT6FVvK
+5k3xwUYmdgkGfsJJWzfrLPDUemcP7kWRTjUUhu8zaPPsniSvgY6ouiuF7Ln23G86FSAFPKEZVtrXstByuJk1byWZ
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/5fhocrf8fPwcwr4ajCireLT2UpUqfg9xpTgZvfscxrYbiHXCKtazcyHQeqTodvQfYV6yLxk716MiW26KRiT6FVvK?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/5k3xwUYmdgkGfsJJWzfrLPDUemcP7kWRTjUUhu8zaPPsniSvgY6ouiuF7Ln23G86FSAFPKEZVtrXstByuJk1byWZ?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
-| Minter | `7kekDfcdu1yf26T8AzwRSBoJ3aTcLdfvmqcoUUF4YCue` | [View](https://explorer.solana.com/address/7kekDfcdu1yf26T8AzwRSBoJ3aTcLdfvmqcoUUF4YCue?cluster=devnet) |
+| Minter | `4sykWn5jo41WGo62viw6p4qzu359siQXaqSWUvm9EmqC` | [View](https://explorer.solana.com/address/4sykWn5jo41WGo62viw6p4qzu359siQXaqSWUvm9EmqC?cluster=devnet) |
 | Quota | `10000000000 (10,000 tokens)` | [View](https://explorer.solana.com/address/10000000000 (10,000 tokens)?cluster=devnet) |
 
 ---
@@ -89,20 +89,20 @@
 
 **Operation:** `update_minter_quota`
 
-**Timestamp:** 2026-03-11T18:01:06.498Z
+**Timestamp:** 2026-03-11T18:07:09.509Z
 
 **Transaction:**
 ```
-3NV6YTuXK2Ygz7eqZ1ypNhcNdBX1ahGZ1WjSJCynUHxhTDzn8qFZVcSUbjKCfCyKo6QYnZ1C425avR4MeeLvKiLr
+5rempUxLWKzTVoFieP6BNxhw7Xo6nYsKGHPusrB44eR68fiVDf9eTdXX7r3zfZCcyACRQH91a7GPngRoc7PKr8eU
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/3NV6YTuXK2Ygz7eqZ1ypNhcNdBX1ahGZ1WjSJCynUHxhTDzn8qFZVcSUbjKCfCyKo6QYnZ1C425avR4MeeLvKiLr?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/5rempUxLWKzTVoFieP6BNxhw7Xo6nYsKGHPusrB44eR68fiVDf9eTdXX7r3zfZCcyACRQH91a7GPngRoc7PKr8eU?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
-| Minter | `7kekDfcdu1yf26T8AzwRSBoJ3aTcLdfvmqcoUUF4YCue` | [View](https://explorer.solana.com/address/7kekDfcdu1yf26T8AzwRSBoJ3aTcLdfvmqcoUUF4YCue?cluster=devnet) |
+| Minter | `4sykWn5jo41WGo62viw6p4qzu359siQXaqSWUvm9EmqC` | [View](https://explorer.solana.com/address/4sykWn5jo41WGo62viw6p4qzu359siQXaqSWUvm9EmqC?cluster=devnet) |
 | New Quota | `20000000000 (20,000 tokens)` | [View](https://explorer.solana.com/address/20000000000 (20,000 tokens)?cluster=devnet) |
 
 ---
@@ -111,21 +111,21 @@
 
 **Operation:** `mint_tokens`
 
-**Timestamp:** 2026-03-11T18:01:08.545Z
+**Timestamp:** 2026-03-11T18:07:12.686Z
 
 **Transaction:**
 ```
-5E1rwudVzhVGFvdeh3pZFSK4S6cTkkBwsQgXAuhHH8S5G6uUYz1vUPWPv8CH48dC9GE4fkcnY4do3ciPFiFJwudG
+5EcQJb6KTeNnKEFKHuS7CjMDR1TF9u3Tyw8a3ahmVooZbDt3rbgm7vMzo94obWFjVv7t1AG6CT8A414fwPDgdHy4
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/5E1rwudVzhVGFvdeh3pZFSK4S6cTkkBwsQgXAuhHH8S5G6uUYz1vUPWPv8CH48dC9GE4fkcnY4do3ciPFiFJwudG?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/5EcQJb6KTeNnKEFKHuS7CjMDR1TF9u3Tyw8a3ahmVooZbDt3rbgm7vMzo94obWFjVv7t1AG6CT8A414fwPDgdHy4?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
 | Recipient | `HhJFT5DBkwvdekU7uz1AqtrKeeFiApRWdbSQPzCrxhLD` | [View](https://explorer.solana.com/address/HhJFT5DBkwvdekU7uz1AqtrKeeFiApRWdbSQPzCrxhLD?cluster=devnet) |
-| Token Account | `B8mqXwhP8NT63MFXjwUcptmDQmo8rZMz8vX66QHSL6wB` | [View](https://explorer.solana.com/address/B8mqXwhP8NT63MFXjwUcptmDQmo8rZMz8vX66QHSL6wB?cluster=devnet) |
+| Token Account | `5F82rJ9G6BgeVSZj1bnhHwArgJXRk2i5kuocWw92E1dA` | [View](https://explorer.solana.com/address/5F82rJ9G6BgeVSZj1bnhHwArgJXRk2i5kuocWw92E1dA?cluster=devnet) |
 | Amount | `2,000,000 (2 tokens)` | [View](https://explorer.solana.com/address/2,000,000 (2 tokens)?cluster=devnet) |
 
 ---
@@ -134,21 +134,21 @@
 
 **Operation:** `transfer`
 
-**Timestamp:** 2026-03-11T18:01:10.183Z
+**Timestamp:** 2026-03-11T18:07:15.874Z
 
 **Transaction:**
 ```
-5sofjB2PocyyG46G645w63Rc5SoJvYKdcEw8hyJ6knhUkHwSQzLSiCagZKBLQ442huCDrURvMMkrTDYZHxk5fgpS
+2QTiAgxxiv5YQTSwQzPpgx4spSvkyLQ8xnz3HvUPrvEQjtBdAhjTS2fAeCquC5tVJjakf6U57NnEeUe2GMDN33AR
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/5sofjB2PocyyG46G645w63Rc5SoJvYKdcEw8hyJ6knhUkHwSQzLSiCagZKBLQ442huCDrURvMMkrTDYZHxk5fgpS?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/2QTiAgxxiv5YQTSwQzPpgx4spSvkyLQ8xnz3HvUPrvEQjtBdAhjTS2fAeCquC5tVJjakf6U57NnEeUe2GMDN33AR?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
 | Sender | `HhJFT5DBkwvdekU7uz1AqtrKeeFiApRWdbSQPzCrxhLD` | [View](https://explorer.solana.com/address/HhJFT5DBkwvdekU7uz1AqtrKeeFiApRWdbSQPzCrxhLD?cluster=devnet) |
-| Recipient | `GgobyQEwVTrdFjZY4zamFtXgzdgUJpXR9oHF3jsZ4hNC` | [View](https://explorer.solana.com/address/GgobyQEwVTrdFjZY4zamFtXgzdgUJpXR9oHF3jsZ4hNC?cluster=devnet) |
+| Recipient | `C9uScQMh7qX2sgNG4pt1Qp4FaeZSyc4JuJNDBzK53DHp` | [View](https://explorer.solana.com/address/C9uScQMh7qX2sgNG4pt1Qp4FaeZSyc4JuJNDBzK53DHp?cluster=devnet) |
 | Amount | `500,000 (0.5 tokens)` | [View](https://explorer.solana.com/address/500,000 (0.5 tokens)?cluster=devnet) |
 
 ---
@@ -157,20 +157,20 @@
 
 **Operation:** `burn_tokens`
 
-**Timestamp:** 2026-03-11T18:01:11.496Z
+**Timestamp:** 2026-03-11T18:07:17.331Z
 
 **Transaction:**
 ```
-5cGpBuZwVh4iRh6M3dWDqPU51TMikgXwY7dVAAvYELSovt9nttWaeWcWnjCvbMTyUoXuWczmAWoatddL8Vh6TKRk
+2j4QTa1Q8asKKXEdNXdCKzdA3YJXX7B6wTyBsLwCmUzdgRE56evD89xqXgkWcrjSfWDwuk7hYwjqVQqdsNknwypb
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/5cGpBuZwVh4iRh6M3dWDqPU51TMikgXwY7dVAAvYELSovt9nttWaeWcWnjCvbMTyUoXuWczmAWoatddL8Vh6TKRk?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/2j4QTa1Q8asKKXEdNXdCKzdA3YJXX7B6wTyBsLwCmUzdgRE56evD89xqXgkWcrjSfWDwuk7hYwjqVQqdsNknwypb?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
-| Token Account | `B8mqXwhP8NT63MFXjwUcptmDQmo8rZMz8vX66QHSL6wB` | [View](https://explorer.solana.com/address/B8mqXwhP8NT63MFXjwUcptmDQmo8rZMz8vX66QHSL6wB?cluster=devnet) |
+| Token Account | `5F82rJ9G6BgeVSZj1bnhHwArgJXRk2i5kuocWw92E1dA` | [View](https://explorer.solana.com/address/5F82rJ9G6BgeVSZj1bnhHwArgJXRk2i5kuocWw92E1dA?cluster=devnet) |
 | Amount Burned | `250,000 (0.25 tokens)` | [View](https://explorer.solana.com/address/250,000 (0.25 tokens)?cluster=devnet) |
 
 ---
@@ -179,20 +179,20 @@
 
 **Operation:** `blacklist_add`
 
-**Timestamp:** 2026-03-11T18:01:12.642Z
+**Timestamp:** 2026-03-11T18:07:19.240Z
 
 **Transaction:**
 ```
-3Hc4JUSjeUzRD2fkiWLMpugXDThka3E6Le9RYBFiCTDnV3PN6sHyQ2rYRxLpQKEG2QE9K9Mzd8pWRs2QthspVkuh
+2sodFothRsvxqusrYhUHECQ75AnHEg6fLYt2N7HLa1hkvrL2NZhJPiomuXzbTCGfJRwdRgefydVMTNVVsvi9oYa
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/3Hc4JUSjeUzRD2fkiWLMpugXDThka3E6Le9RYBFiCTDnV3PN6sHyQ2rYRxLpQKEG2QE9K9Mzd8pWRs2QthspVkuh?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/2sodFothRsvxqusrYhUHECQ75AnHEg6fLYt2N7HLa1hkvrL2NZhJPiomuXzbTCGfJRwdRgefydVMTNVVsvi9oYa?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
-| Blacklisted Address | `GgobyQEwVTrdFjZY4zamFtXgzdgUJpXR9oHF3jsZ4hNC` | [View](https://explorer.solana.com/address/GgobyQEwVTrdFjZY4zamFtXgzdgUJpXR9oHF3jsZ4hNC?cluster=devnet) |
+| Blacklisted Address | `C9uScQMh7qX2sgNG4pt1Qp4FaeZSyc4JuJNDBzK53DHp` | [View](https://explorer.solana.com/address/C9uScQMh7qX2sgNG4pt1Qp4FaeZSyc4JuJNDBzK53DHp?cluster=devnet) |
 | Reason | `Suspicious activity - Devnet test` | [View](https://explorer.solana.com/address/Suspicious activity - Devnet test?cluster=devnet) |
 
 ---
@@ -201,20 +201,20 @@
 
 **Operation:** `blacklist_remove`
 
-**Timestamp:** 2026-03-11T18:01:13.767Z
+**Timestamp:** 2026-03-11T18:07:21.082Z
 
 **Transaction:**
 ```
-U4X6GUarrwetqDDnLz1m8SkMiyNz7bAqHC4nZr8ag2UCawbSqPtvm3bgRhC2kJkp1SA1q3x94CSARowwnp3w4sX
+2fwmYg4GNcgfqfi9ZRrjQJZ3QBPqHqMhiCTg27trNUnZrcVGPp7EwpGC9qiJVhDFtrn1zWvTMSnBo4DZgc9e49J7
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/U4X6GUarrwetqDDnLz1m8SkMiyNz7bAqHC4nZr8ag2UCawbSqPtvm3bgRhC2kJkp1SA1q3x94CSARowwnp3w4sX?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/2fwmYg4GNcgfqfi9ZRrjQJZ3QBPqHqMhiCTg27trNUnZrcVGPp7EwpGC9qiJVhDFtrn1zWvTMSnBo4DZgc9e49J7?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
-| Unblacklisted Address | `GgobyQEwVTrdFjZY4zamFtXgzdgUJpXR9oHF3jsZ4hNC` | [View](https://explorer.solana.com/address/GgobyQEwVTrdFjZY4zamFtXgzdgUJpXR9oHF3jsZ4hNC?cluster=devnet) |
+| Unblacklisted Address | `C9uScQMh7qX2sgNG4pt1Qp4FaeZSyc4JuJNDBzK53DHp` | [View](https://explorer.solana.com/address/C9uScQMh7qX2sgNG4pt1Qp4FaeZSyc4JuJNDBzK53DHp?cluster=devnet) |
 
 ---
 
@@ -222,21 +222,21 @@ U4X6GUarrwetqDDnLz1m8SkMiyNz7bAqHC4nZr8ag2UCawbSqPtvm3bgRhC2kJkp1SA1q3x94CSARoww
 
 **Operation:** `freeze`
 
-**Timestamp:** 2026-03-11T18:01:15.406Z
+**Timestamp:** 2026-03-11T18:07:24.359Z
 
 **Transaction:**
 ```
-675d9dTyP9qCaWkWkbY4pETYRHvY3GxmYkZ6u6xKZPYhkyNgdNas3JQ7Uk55Jxa9jXAHZAUKbE4tehomS7XvVozo
+2uGR1SZx8tUUnoEaFDfH3T4R6YG5TxatP8jnhQcpnMKNx4Z5zXWFDLpsDDNddTdiLHrAJALm14zBpTqr4wPMv28C
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/675d9dTyP9qCaWkWkbY4pETYRHvY3GxmYkZ6u6xKZPYhkyNgdNas3JQ7Uk55Jxa9jXAHZAUKbE4tehomS7XvVozo?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/2uGR1SZx8tUUnoEaFDfH3T4R6YG5TxatP8jnhQcpnMKNx4Z5zXWFDLpsDDNddTdiLHrAJALm14zBpTqr4wPMv28C?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
-| Token Account | `5hPJdB3FEr2qYQUoQhvYrGPr6PjJwBKHv7bWiBiNmBuu` | [View](https://explorer.solana.com/address/5hPJdB3FEr2qYQUoQhvYrGPr6PjJwBKHv7bWiBiNmBuu?cluster=devnet) |
-| Owner | `CtxcGPxUdmvbWqJdt7navLMsytp7hZqEjwhmD6WbZzxK` | [View](https://explorer.solana.com/address/CtxcGPxUdmvbWqJdt7navLMsytp7hZqEjwhmD6WbZzxK?cluster=devnet) |
+| Token Account | `AQ35ircLyQwAj5TuXMZ1fEUEQDGFTvTe2TQ2zp6DUpW8` | [View](https://explorer.solana.com/address/AQ35ircLyQwAj5TuXMZ1fEUEQDGFTvTe2TQ2zp6DUpW8?cluster=devnet) |
+| Owner | `CBLCbwmV8wGVSbd2ywJH3ZHKmy2VxoFP6YxJftvnKiJi` | [View](https://explorer.solana.com/address/CBLCbwmV8wGVSbd2ywJH3ZHKmy2VxoFP6YxJftvnKiJi?cluster=devnet) |
 
 ---
 
@@ -244,48 +244,46 @@ U4X6GUarrwetqDDnLz1m8SkMiyNz7bAqHC4nZr8ag2UCawbSqPtvm3bgRhC2kJkp1SA1q3x94CSARoww
 
 **Operation:** `thaw`
 
-**Timestamp:** 2026-03-11T18:01:19.094Z
+**Timestamp:** 2026-03-11T18:07:29.789Z
 
 **Transaction:**
 ```
-18ccCKpyyKARV54jqYTCYad1Jfwg1HU7Z8FVAQSLxd8DDQH2khSt2P4gyC7c1zuSWpw1JcgWP2cV9h61iQ9f1um
+2hnDtCHfztwbV4AGJvmjaz3T8mBXb2qDAXjmK4aviKW1KBenWwhQG27n2RpJ9FmPeDadmeyqUQSGLehrbTAWAR6m
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/18ccCKpyyKARV54jqYTCYad1Jfwg1HU7Z8FVAQSLxd8DDQH2khSt2P4gyC7c1zuSWpw1JcgWP2cV9h61iQ9f1um?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/2hnDtCHfztwbV4AGJvmjaz3T8mBXb2qDAXjmK4aviKW1KBenWwhQG27n2RpJ9FmPeDadmeyqUQSGLehrbTAWAR6m?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
-| Token Account | `29gPYhKKFkudemFT75jNiKHsFfcokshT4hGvYc24Fz26` | [View](https://explorer.solana.com/address/29gPYhKKFkudemFT75jNiKHsFfcokshT4hGvYc24Fz26?cluster=devnet) |
-| Owner | `HeuSvkdiRTsfeuBo2kZihprDfN8WfwXvwELPTbL69bny` | [View](https://explorer.solana.com/address/HeuSvkdiRTsfeuBo2kZihprDfN8WfwXvwELPTbL69bny?cluster=devnet) |
+| Token Account | `8uwpPwzFCg7cLNNnjL6xcs4d1dBjdFq1XH7YdfTN2E57` | [View](https://explorer.solana.com/address/8uwpPwzFCg7cLNNnjL6xcs4d1dBjdFq1XH7YdfTN2E57?cluster=devnet) |
+| Owner | `CEc1bwfTzGEbFXpYxNNwZSQVs7JycYwgMhwcTGrEiu5R` | [View](https://explorer.solana.com/address/CEc1bwfTzGEbFXpYxNNwZSQVs7JycYwgMhwcTGrEiu5R?cluster=devnet) |
 
 ---
 
-### ❌ Seize Tokens
+### ✅ Seize Tokens
 
 **Operation:** `seize`
 
-**Timestamp:** 2026-03-11T18:01:22.372Z
+**Timestamp:** 2026-03-11T18:07:44.328Z
 
-**Error:**
+**Transaction:**
 ```
-Simulation failed. 
-Message: Transaction simulation failed: Error processing Instruction 0: custom program error: 0x4. 
-Logs: 
-[
-  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw invoke [1]",
-  "Program log: Instruction: Seize",
-  "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [2]",
-  "Program log: Instruction: ThawAccount",
-  "Program log: Error: owner does not match",
-  "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 1165 of 187802 compute units",
-  "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb failed: custom program error: 0x4",
-  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw consumed 13363 of 200000 compute units",
-  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw failed: custom program error: 0x4"
-]. 
-Catch the `SendTransactionError` and call `getLogs()` on it for full details.
+2nBMmieFMQDhn7DCpBWxSjeoKp6uYsFQP71cT834K7oobn63QQSWLkV2riA2kLmDqtQGPXnhFBbcadfqB8Ut9UrK
 ```
+
+[View on Explorer](https://explorer.solana.com/tx/2nBMmieFMQDhn7DCpBWxSjeoKp6uYsFQP71cT834K7oobn63QQSWLkV2riA2kLmDqtQGPXnhFBbcadfqB8Ut9UrK?cluster=devnet)
+
+**Accounts Involved:**
+
+| Label | Address | Explorer |
+|-------|---------|----------|
+| Seize Mint | `FfbdhtGDokvg1wHKb5sWPj9c7rp5zy7qCWMM54Ljrn9a` | [View](https://explorer.solana.com/address/FfbdhtGDokvg1wHKb5sWPj9c7rp5zy7qCWMM54Ljrn9a?cluster=devnet) |
+| Source Account | `5GF1fr65VCwN5crt4AWYsSgB1HQqnvMdw3w5fDajKDkz` | [View](https://explorer.solana.com/address/5GF1fr65VCwN5crt4AWYsSgB1HQqnvMdw3w5fDajKDkz?cluster=devnet) |
+| Destination Account | `A9DprGK2njo2tT6h54GqgQDDwNXfyqSmMRJ2ckcRsuyn` | [View](https://explorer.solana.com/address/A9DprGK2njo2tT6h54GqgQDDwNXfyqSmMRJ2ckcRsuyn?cluster=devnet) |
+| Amount Seized | `500,000 (0.5 tokens)` | [View](https://explorer.solana.com/address/500,000 (0.5 tokens)?cluster=devnet) |
+| Seizer | `HhJFT5DBkwvdekU7uz1AqtrKeeFiApRWdbSQPzCrxhLD` | [View](https://explorer.solana.com/address/HhJFT5DBkwvdekU7uz1AqtrKeeFiApRWdbSQPzCrxhLD?cluster=devnet) |
 
 ---
 
@@ -293,14 +291,14 @@ Catch the `SendTransactionError` and call `getLogs()` on it for full details.
 
 **Operation:** `pause`
 
-**Timestamp:** 2026-03-11T18:01:23.700Z
+**Timestamp:** 2026-03-11T18:07:46.070Z
 
 **Transaction:**
 ```
-vb6jaU5n4DcVWehoPVKN8SK2WJrntyAtxBhwehVu4dcvuUSfsHAgskJuncpf4CBSsgjdJ53gVY5xbqotZtDwwSr
+3JEM1TVxKNz9gAzj32qeEe8wVRXe9aBNa95XM6ZdC6FCzbHp9HVU6ACKH9HGJK73WYVejFPiysi2XNxL1w1BHhpg
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/vb6jaU5n4DcVWehoPVKN8SK2WJrntyAtxBhwehVu4dcvuUSfsHAgskJuncpf4CBSsgjdJ53gVY5xbqotZtDwwSr?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/3JEM1TVxKNz9gAzj32qeEe8wVRXe9aBNa95XM6ZdC6FCzbHp9HVU6ACKH9HGJK73WYVejFPiysi2XNxL1w1BHhpg?cluster=devnet)
 
 ---
 
@@ -308,14 +306,14 @@ vb6jaU5n4DcVWehoPVKN8SK2WJrntyAtxBhwehVu4dcvuUSfsHAgskJuncpf4CBSsgjdJ53gVY5xbqot
 
 **Operation:** `unpause`
 
-**Timestamp:** 2026-03-11T18:01:24.725Z
+**Timestamp:** 2026-03-11T18:07:48.218Z
 
 **Transaction:**
 ```
-3Yns8UDTYEvzg3yf6FoBFT8Z8FTJLHgYicCZfxHdXfmQnRVP3Wedu8kEkK56ev4LVMPpvEhReqNgkJ1n2oyJVkCL
+XMrTnWgrDQwMfSqq7drNLotDdDXN7sHZ4UbQDUWNAkXsx4JF46gPNzzL9ydvqV9US7fviBvNGezYtQgorariDgn
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/3Yns8UDTYEvzg3yf6FoBFT8Z8FTJLHgYicCZfxHdXfmQnRVP3Wedu8kEkK56ev4LVMPpvEhReqNgkJ1n2oyJVkCL?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/XMrTnWgrDQwMfSqq7drNLotDdDXN7sHZ4UbQDUWNAkXsx4JF46gPNzzL9ydvqV9US7fviBvNGezYtQgorariDgn?cluster=devnet)
 
 ---
 
@@ -323,20 +321,20 @@ vb6jaU5n4DcVWehoPVKN8SK2WJrntyAtxBhwehVu4dcvuUSfsHAgskJuncpf4CBSsgjdJ53gVY5xbqot
 
 **Operation:** `transfer_authority`
 
-**Timestamp:** 2026-03-11T18:01:26.977Z
+**Timestamp:** 2026-03-11T18:07:51.697Z
 
 **Transaction:**
 ```
-28Lsw7cPfVQ7cQ3CVQGpt11GgtmTSHEcfPSoUQJ1pdx5UFtZ2aUSRMpXRmpLexPHvtzgw1QSMm8XVacwaB9Hm1YX
+WV3hEqDF9JhhQHhGK5AtsiyjFsb2Xyg1oGhqYW6ZANK2jvDsqPGSU4QGzc9YPa3ZwCyP8MZ45n3B4Fi1NbXNgXH
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/28Lsw7cPfVQ7cQ3CVQGpt11GgtmTSHEcfPSoUQJ1pdx5UFtZ2aUSRMpXRmpLexPHvtzgw1QSMm8XVacwaB9Hm1YX?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/WV3hEqDF9JhhQHhGK5AtsiyjFsb2Xyg1oGhqYW6ZANK2jvDsqPGSU4QGzc9YPa3ZwCyP8MZ45n3B4Fi1NbXNgXH?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
-| New Authority | `6KRT1jfZYfWm5QKRhPcwcrQdFnS5nhBQYcrEx3HUj28N` | [View](https://explorer.solana.com/address/6KRT1jfZYfWm5QKRhPcwcrQdFnS5nhBQYcrEx3HUj28N?cluster=devnet) |
+| New Authority | `45qqYa8eRGbFbhdkEaVaD2YNqNqfZ68FAtFT1Vf4iMUN` | [View](https://explorer.solana.com/address/45qqYa8eRGbFbhdkEaVaD2YNqNqfZ68FAtFT1Vf4iMUN?cluster=devnet) |
 
 ---
 
@@ -344,20 +342,20 @@ vb6jaU5n4DcVWehoPVKN8SK2WJrntyAtxBhwehVu4dcvuUSfsHAgskJuncpf4CBSsgjdJ53gVY5xbqot
 
 **Operation:** `remove_minter`
 
-**Timestamp:** 2026-03-11T18:01:28.206Z
+**Timestamp:** 2026-03-11T18:07:53.339Z
 
 **Transaction:**
 ```
-R3Gq2ZJ1GAapBBWMQBuqvnxsbDUTTVumdZQxkCdjvW8LjV79VB1hmnEgq1xcYwpnwC3rym1D3L67GD8teUbjEkX
+3sD6xve47VGCz9FiTiWhJcJnwEQ8hdLS1cizeCrkjXxp4P85xAz8dmC2hDXsnLvj4UbaYft6ap6FzgEHzqeVbYTU
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/R3Gq2ZJ1GAapBBWMQBuqvnxsbDUTTVumdZQxkCdjvW8LjV79VB1hmnEgq1xcYwpnwC3rym1D3L67GD8teUbjEkX?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/3sD6xve47VGCz9FiTiWhJcJnwEQ8hdLS1cizeCrkjXxp4P85xAz8dmC2hDXsnLvj4UbaYft6ap6FzgEHzqeVbYTU?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
-| Removed Minter | `7kekDfcdu1yf26T8AzwRSBoJ3aTcLdfvmqcoUUF4YCue` | [View](https://explorer.solana.com/address/7kekDfcdu1yf26T8AzwRSBoJ3aTcLdfvmqcoUUF4YCue?cluster=devnet) |
+| Removed Minter | `4sykWn5jo41WGo62viw6p4qzu359siQXaqSWUvm9EmqC` | [View](https://explorer.solana.com/address/4sykWn5jo41WGo62viw6p4qzu359siQXaqSWUvm9EmqC?cluster=devnet) |
 
 ---
 
@@ -365,20 +363,20 @@ R3Gq2ZJ1GAapBBWMQBuqvnxsbDUTTVumdZQxkCdjvW8LjV79VB1hmnEgq1xcYwpnwC3rym1D3L67GD8t
 
 **Operation:** `full_workflow`
 
-**Timestamp:** 2026-03-11T18:01:37.935Z
+**Timestamp:** 2026-03-11T18:08:07.509Z
 
 **Transaction:**
 ```
-5sVrSHMo2XdY67kahHKZpCJC4SthAyxgStm26PprbcRsXdBJvDpCSda2mhXgMBH6GmxyujLXeqYw5ZqbopBAz6kS
+4Jka3ufuN5RAejQ6ZyRn5JH2oqM8Uq9dww1owycjTsiWpz9Xs1hgGUyL5r2949U7LSzecnwXwanRjJPVFwn2EVFz
 ```
 
-[View on Explorer](https://explorer.solana.com/tx/5sVrSHMo2XdY67kahHKZpCJC4SthAyxgStm26PprbcRsXdBJvDpCSda2mhXgMBH6GmxyujLXeqYw5ZqbopBAz6kS?cluster=devnet)
+[View on Explorer](https://explorer.solana.com/tx/4Jka3ufuN5RAejQ6ZyRn5JH2oqM8Uq9dww1owycjTsiWpz9Xs1hgGUyL5r2949U7LSzecnwXwanRjJPVFwn2EVFz?cluster=devnet)
 
 **Accounts Involved:**
 
 | Label | Address | Explorer |
 |-------|---------|----------|
-| Workflow Mint | `B71rbHktgE21Rtmkd54XWgYBrJMbEu4CGvPFbBjdHJtR` | [View](https://explorer.solana.com/address/B71rbHktgE21Rtmkd54XWgYBrJMbEu4CGvPFbBjdHJtR?cluster=devnet) |
+| Workflow Mint | `8FDL1akJXT2A9i5W1AbM8RdmUH7GXLBSfoYkRj1dwMYm` | [View](https://explorer.solana.com/address/8FDL1akJXT2A9i5W1AbM8RdmUH7GXLBSfoYkRj1dwMYm?cluster=devnet) |
 | Total Steps | `8` | [View](https://explorer.solana.com/address/8?cluster=devnet) |
 
 ---
@@ -389,20 +387,20 @@ R3Gq2ZJ1GAapBBWMQBuqvnxsbDUTTVumdZQxkCdjvW8LjV79VB1hmnEgq1xcYwpnwC3rym1D3L67GD8t
 
 | # | Test | Status | Transaction |
 |---|------|--------|-------------|
-| 1 | Initialize SSS-2 Stablecoin | ✅ | [5oqBZsu6...](https://explorer.solana.com/tx/5oqBZsu6vXskXndKUsSuEie83ziqvc6wh8QbKKM6Tk3k7cTssnJmKPbmWSkEFF5hybiGtULzXamDCqpzKVf14JLW?cluster=devnet) |
-| 2 | Update Roles | ✅ | [25SwQUNy...](https://explorer.solana.com/tx/25SwQUNyxXiQyK3kUCuH8pnyf1RSrpEZ7uzCtf4Z9FEjT1Z2ufFYaF2Yi91qLzW9N11aYAC8y167aueH7BUxmPQJ?cluster=devnet) |
-| 3 | Add Minter | ✅ | [5fhocrf8...](https://explorer.solana.com/tx/5fhocrf8fPwcwr4ajCireLT2UpUqfg9xpTgZvfscxrYbiHXCKtazcyHQeqTodvQfYV6yLxk716MiW26KRiT6FVvK?cluster=devnet) |
-| 4 | Update Minter Quota | ✅ | [3NV6YTuX...](https://explorer.solana.com/tx/3NV6YTuXK2Ygz7eqZ1ypNhcNdBX1ahGZ1WjSJCynUHxhTDzn8qFZVcSUbjKCfCyKo6QYnZ1C425avR4MeeLvKiLr?cluster=devnet) |
-| 5 | Mint Tokens | ✅ | [5E1rwudV...](https://explorer.solana.com/tx/5E1rwudVzhVGFvdeh3pZFSK4S6cTkkBwsQgXAuhHH8S5G6uUYz1vUPWPv8CH48dC9GE4fkcnY4do3ciPFiFJwudG?cluster=devnet) |
-| 6 | Transfer Tokens | ✅ | [5sofjB2P...](https://explorer.solana.com/tx/5sofjB2PocyyG46G645w63Rc5SoJvYKdcEw8hyJ6knhUkHwSQzLSiCagZKBLQ442huCDrURvMMkrTDYZHxk5fgpS?cluster=devnet) |
-| 7 | Burn Tokens | ✅ | [5cGpBuZw...](https://explorer.solana.com/tx/5cGpBuZwVh4iRh6M3dWDqPU51TMikgXwY7dVAAvYELSovt9nttWaeWcWnjCvbMTyUoXuWczmAWoatddL8Vh6TKRk?cluster=devnet) |
-| 8 | Add to Blacklist | ✅ | [3Hc4JUSj...](https://explorer.solana.com/tx/3Hc4JUSjeUzRD2fkiWLMpugXDThka3E6Le9RYBFiCTDnV3PN6sHyQ2rYRxLpQKEG2QE9K9Mzd8pWRs2QthspVkuh?cluster=devnet) |
-| 9 | Remove from Blacklist | ✅ | [U4X6GUar...](https://explorer.solana.com/tx/U4X6GUarrwetqDDnLz1m8SkMiyNz7bAqHC4nZr8ag2UCawbSqPtvm3bgRhC2kJkp1SA1q3x94CSARowwnp3w4sX?cluster=devnet) |
-| 10 | Freeze Token Account | ✅ | [675d9dTy...](https://explorer.solana.com/tx/675d9dTyP9qCaWkWkbY4pETYRHvY3GxmYkZ6u6xKZPYhkyNgdNas3JQ7Uk55Jxa9jXAHZAUKbE4tehomS7XvVozo?cluster=devnet) |
-| 11 | Thaw Token Account | ✅ | [18ccCKpy...](https://explorer.solana.com/tx/18ccCKpyyKARV54jqYTCYad1Jfwg1HU7Z8FVAQSLxd8DDQH2khSt2P4gyC7c1zuSWpw1JcgWP2cV9h61iQ9f1um?cluster=devnet) |
-| 12 | Seize Tokens | ❌ | N/A |
-| 13 | Pause Stablecoin | ✅ | [vb6jaU5n...](https://explorer.solana.com/tx/vb6jaU5n4DcVWehoPVKN8SK2WJrntyAtxBhwehVu4dcvuUSfsHAgskJuncpf4CBSsgjdJ53gVY5xbqotZtDwwSr?cluster=devnet) |
-| 14 | Unpause Stablecoin | ✅ | [3Yns8UDT...](https://explorer.solana.com/tx/3Yns8UDTYEvzg3yf6FoBFT8Z8FTJLHgYicCZfxHdXfmQnRVP3Wedu8kEkK56ev4LVMPpvEhReqNgkJ1n2oyJVkCL?cluster=devnet) |
-| 15 | Transfer Authority | ✅ | [28Lsw7cP...](https://explorer.solana.com/tx/28Lsw7cPfVQ7cQ3CVQGpt11GgtmTSHEcfPSoUQJ1pdx5UFtZ2aUSRMpXRmpLexPHvtzgw1QSMm8XVacwaB9Hm1YX?cluster=devnet) |
-| 16 | Remove Minter | ✅ | [R3Gq2ZJ1...](https://explorer.solana.com/tx/R3Gq2ZJ1GAapBBWMQBuqvnxsbDUTTVumdZQxkCdjvW8LjV79VB1hmnEgq1xcYwpnwC3rym1D3L67GD8teUbjEkX?cluster=devnet) |
-| 17 | Full Workflow Integration | ✅ | [5sVrSHMo...](https://explorer.solana.com/tx/5sVrSHMo2XdY67kahHKZpCJC4SthAyxgStm26PprbcRsXdBJvDpCSda2mhXgMBH6GmxyujLXeqYw5ZqbopBAz6kS?cluster=devnet) |
+| 1 | Initialize SSS-2 Stablecoin | ✅ | [YGo5dFMC...](https://explorer.solana.com/tx/YGo5dFMCKM1ZFEDh76JRC6JczpKMZnyuYB34PPegwg5F9PWApaHspYCaQEgD2VrqwskGAJYjYbrCbs1AEUyGqyb?cluster=devnet) |
+| 2 | Update Roles | ✅ | [4erycNGh...](https://explorer.solana.com/tx/4erycNGh8YeAYyhMeiF2zmR9RzUJH5ygbWk8Z5dCU1X8EYRx1k9jEpXLnEM1NmKz3zdjquCCjzzJQf585mR8i9A1?cluster=devnet) |
+| 3 | Add Minter | ✅ | [5k3xwUYm...](https://explorer.solana.com/tx/5k3xwUYmdgkGfsJJWzfrLPDUemcP7kWRTjUUhu8zaPPsniSvgY6ouiuF7Ln23G86FSAFPKEZVtrXstByuJk1byWZ?cluster=devnet) |
+| 4 | Update Minter Quota | ✅ | [5rempUxL...](https://explorer.solana.com/tx/5rempUxLWKzTVoFieP6BNxhw7Xo6nYsKGHPusrB44eR68fiVDf9eTdXX7r3zfZCcyACRQH91a7GPngRoc7PKr8eU?cluster=devnet) |
+| 5 | Mint Tokens | ✅ | [5EcQJb6K...](https://explorer.solana.com/tx/5EcQJb6KTeNnKEFKHuS7CjMDR1TF9u3Tyw8a3ahmVooZbDt3rbgm7vMzo94obWFjVv7t1AG6CT8A414fwPDgdHy4?cluster=devnet) |
+| 6 | Transfer Tokens | ✅ | [2QTiAgxx...](https://explorer.solana.com/tx/2QTiAgxxiv5YQTSwQzPpgx4spSvkyLQ8xnz3HvUPrvEQjtBdAhjTS2fAeCquC5tVJjakf6U57NnEeUe2GMDN33AR?cluster=devnet) |
+| 7 | Burn Tokens | ✅ | [2j4QTa1Q...](https://explorer.solana.com/tx/2j4QTa1Q8asKKXEdNXdCKzdA3YJXX7B6wTyBsLwCmUzdgRE56evD89xqXgkWcrjSfWDwuk7hYwjqVQqdsNknwypb?cluster=devnet) |
+| 8 | Add to Blacklist | ✅ | [2sodFoth...](https://explorer.solana.com/tx/2sodFothRsvxqusrYhUHECQ75AnHEg6fLYt2N7HLa1hkvrL2NZhJPiomuXzbTCGfJRwdRgefydVMTNVVsvi9oYa?cluster=devnet) |
+| 9 | Remove from Blacklist | ✅ | [2fwmYg4G...](https://explorer.solana.com/tx/2fwmYg4GNcgfqfi9ZRrjQJZ3QBPqHqMhiCTg27trNUnZrcVGPp7EwpGC9qiJVhDFtrn1zWvTMSnBo4DZgc9e49J7?cluster=devnet) |
+| 10 | Freeze Token Account | ✅ | [2uGR1SZx...](https://explorer.solana.com/tx/2uGR1SZx8tUUnoEaFDfH3T4R6YG5TxatP8jnhQcpnMKNx4Z5zXWFDLpsDDNddTdiLHrAJALm14zBpTqr4wPMv28C?cluster=devnet) |
+| 11 | Thaw Token Account | ✅ | [2hnDtCHf...](https://explorer.solana.com/tx/2hnDtCHfztwbV4AGJvmjaz3T8mBXb2qDAXjmK4aviKW1KBenWwhQG27n2RpJ9FmPeDadmeyqUQSGLehrbTAWAR6m?cluster=devnet) |
+| 12 | Seize Tokens | ✅ | [2nBMmieF...](https://explorer.solana.com/tx/2nBMmieFMQDhn7DCpBWxSjeoKp6uYsFQP71cT834K7oobn63QQSWLkV2riA2kLmDqtQGPXnhFBbcadfqB8Ut9UrK?cluster=devnet) |
+| 13 | Pause Stablecoin | ✅ | [3JEM1TVx...](https://explorer.solana.com/tx/3JEM1TVxKNz9gAzj32qeEe8wVRXe9aBNa95XM6ZdC6FCzbHp9HVU6ACKH9HGJK73WYVejFPiysi2XNxL1w1BHhpg?cluster=devnet) |
+| 14 | Unpause Stablecoin | ✅ | [XMrTnWgr...](https://explorer.solana.com/tx/XMrTnWgrDQwMfSqq7drNLotDdDXN7sHZ4UbQDUWNAkXsx4JF46gPNzzL9ydvqV9US7fviBvNGezYtQgorariDgn?cluster=devnet) |
+| 15 | Transfer Authority | ✅ | [WV3hEqDF...](https://explorer.solana.com/tx/WV3hEqDF9JhhQHhGK5AtsiyjFsb2Xyg1oGhqYW6ZANK2jvDsqPGSU4QGzc9YPa3ZwCyP8MZ45n3B4Fi1NbXNgXH?cluster=devnet) |
+| 16 | Remove Minter | ✅ | [3sD6xve4...](https://explorer.solana.com/tx/3sD6xve47VGCz9FiTiWhJcJnwEQ8hdLS1cizeCrkjXxp4P85xAz8dmC2hDXsnLvj4UbaYft6ap6FzgEHzqeVbYTU?cluster=devnet) |
+| 17 | Full Workflow Integration | ✅ | [4Jka3ufu...](https://explorer.solana.com/tx/4Jka3ufuN5RAejQ6ZyRn5JH2oqM8Uq9dww1owycjTsiWpz9Xs1hgGUyL5r2949U7LSzecnwXwanRjJPVFwn2EVFz?cluster=devnet) |

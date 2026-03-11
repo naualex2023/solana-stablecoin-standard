@@ -198,16 +198,32 @@ await stable.compliance.blacklistRemove(blacklister, userPublicKey);
 
 #### Freeze/Thaw Operations
 
+There are two types of freeze/thaw operations depending on how the mint was configured:
+
+**Regular Freeze/Thaw (Keypair Authority)**
+For mints where the freeze authority is a regular keypair:
 ```typescript
 // Freeze token account
 await stable.compliance.freeze(tokenAccount, freezeAuthority);
 
+// Thaw token account
+await stable.compliance.thaw(tokenAccount, freezeAuthority);
+```
+
+**PDA-Based Freeze (For Seize Operations)**
+For mints with PDA-based freeze authority (used for seize capability):
+```typescript
+// Freeze using PDA authority - seizer must be authorized in config
+await stable.compliance.freezePda(mint, tokenAccount, seizer);
+
+// Thaw is handled automatically during seize operation
+```
+
+**Check Frozen Status**
+```typescript
 // Check if frozen
 const accountInfo = await getAccount(connection, tokenAccount);
 console.log(accountInfo.isFrozen);  // true
-
-// Thaw token account
-await stable.compliance.thaw(tokenAccount, freezeAuthority);
 ```
 
 #### Seizure Operations

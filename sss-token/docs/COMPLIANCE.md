@@ -336,6 +336,22 @@ async function logAuditEvent(event: AuditEvent): Promise<void> {
 
 ### Freeze Operation Workflow
 
+There are two types of freeze operations depending on mint configuration:
+
+**Regular Freeze (Keypair Authority)**
+For mints where the freeze authority is a regular keypair:
+```typescript
+await stable.compliance.freeze(tokenAccount, freezeAuthority);
+```
+
+**PDA-Based Freeze (For Seize Operations)**
+For mints with PDA-based freeze authority (SSS-2 with `enablePermanentDelegate: true`):
+```typescript
+// Freeze using PDA authority - seizer must be an authorized signer
+await stable.compliance.freezePda(mint, tokenAccount, seizer);
+```
+
+**Freeze Workflow:**
 ```
 1. Receive freeze request
    └─► Source: Compliance team, Legal, Law enforcement
@@ -345,7 +361,8 @@ async function logAuditEvent(event: AuditEvent): Promise<void> {
    └─► Document reason
 
 3. Execute freeze
-   └─► sss-token freeze <ACCOUNT>
+   └─► Regular: sss-token freeze <ACCOUNT>
+   └─► PDA-based: Use freezePda() with seizer authorization
 
 4. Log and notify
    └─► Create audit record

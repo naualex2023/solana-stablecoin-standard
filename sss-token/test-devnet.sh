@@ -9,8 +9,8 @@ echo "=============================================="
 echo "SSS Token Devnet Test Runner"
 echo "=============================================="
 
-# Wallet configuration
-WALLET_FILE="./admin_phantom_key_pc.json"
+# Wallet configuration (use default Solana wallet)
+WALLET_FILE="$HOME/.config/solana/id.json"
 
 # Check if wallet file exists
 if [ ! -f "$WALLET_FILE" ]; then

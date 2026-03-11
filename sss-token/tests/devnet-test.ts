@@ -14,6 +14,8 @@
 
 import { expect } from "chai";
 import * as fs from "fs";
+import * as path from "path";
+import * as os from "os";
 import {
   Keypair,
   PublicKey,
@@ -186,8 +188,8 @@ describe("SSS Token Devnet Tests", function () {
     // Initialize proof collector
     proofCollector = new ProofCollector();
 
-    // Load wallet
-    const walletPath = "./admin_phantom_key_pc.json";
+    // Load wallet (use default Solana wallet)
+    const walletPath = process.env.ANCHOR_WALLET || path.join(os.homedir(), ".config/solana/id.json");
     if (!fs.existsSync(walletPath)) {
       throw new Error(`Wallet file not found: ${walletPath}`);
     }

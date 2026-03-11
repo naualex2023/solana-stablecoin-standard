@@ -201,13 +201,14 @@ For regulated stablecoins requiring full compliance controls.
 
 | Document | Description |
 |----------|-------------|
-| [SDK.md](./SDK.md) | TypeScript SDK reference and examples |
-| [OPERATIONS.md](./OPERATIONS.md) | CLI-based operator runbook |
-| [SSS-1.md](./SSS-1.md) | Minimal stablecoin specification |
-| [SSS-2.md](./SSS-2.md) | Compliant stablecoin specification |
-| [COMPLIANCE.md](./COMPLIANCE.md) | Regulatory compliance guide |
-| [API.md](./API.md) | Backend API reference |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | System architecture details |
+| [docs/README.md](./sss-token/docs/README.md) | Documentation hub and quick start |
+| [docs/ARCHITECTURE.md](./sss-token/docs/ARCHITECTURE.md) | System architecture details |
+| [docs/SDK.md](./sss-token/docs/SDK.md) | TypeScript SDK reference and examples |
+| [docs/OPERATIONS.md](./sss-token/docs/OPERATIONS.md) | CLI-based operator runbook |
+| [docs/SSS-1.md](./sss-token/docs/SSS-1.md) | Minimal stablecoin specification |
+| [docs/SSS-2.md](./sss-token/docs/SSS-2.md) | Compliant stablecoin specification |
+| [docs/COMPLIANCE.md](./sss-token/docs/COMPLIANCE.md) | Regulatory compliance guide |
+| [docs/API.md](./sss-token/docs/API.md) | Backend API reference |
 
 ## Project Structure
 
@@ -239,4 +240,4 @@ sss-token/
 
 ## License
 
-MIT License - See [LICENSE](../LICENSE) for details.
+MIT License - See [LICENSE](./LICENSE) for details.

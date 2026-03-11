@@ -1,5 +1,173 @@
-npm error Missing script: "test-devnet"
-npm error
-npm error To see a list of scripts, run:
-npm error   npm run
-npm error A complete log of this run can be found in: /home/alex/.npm/_logs/2026-03-11T10_32_39_226Z-debug-0.log
+
+> test-devnet
+> ts-mocha -t 300000 tests/devnet-test.ts
+
+(node:358362) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/alex/source/repos/solana-stablecoin-standard/sss-token/tests/devnet-test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/alex/source/repos/solana-stablecoin-standard/sss-token/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+  SSS Token Devnet Tests
+
+🚀 Setting up Devnet Test Suite...
+
+Wallet: HhJFT5DBkwvdekU7uz1AqtrKeeFiApRWdbSQPzCrxhLD
+Balance: 5.45742396 SOL
+
+✅ Setup complete!
+
+    1. Initialize SSS-2 Stablecoin
+
+📝 Mint created: Dd7d2g5wCNCdCaVKXQRDqx7znpVyZDbbsgm6Sgcypka
+✅ Initialize tx: 22batgi4EdTD1PeubfwSB4LdvaRcBuyazgKYqovkFtrRSdrAPvsS1bcURpdNzXGKKymKMH2VSh9M1Xpw5ER8RHBJ
+   Explorer: https://explorer.solana.com/tx/22batgi4EdTD1PeubfwSB4LdvaRcBuyazgKYqovkFtrRSdrAPvsS1bcURpdNzXGKKymKMH2VSh9M1Xpw5ER8RHBJ?cluster=devnet
+      ✔ should create a new SSS-2 compliant stablecoin (8567ms)
+    2. Update Roles
+✅ Update roles tx: 2gEztjrMYqXztMSnDZShvcob1e9BG3xUdE4azdczcKi9pabTqgSDRRAvrs9iVKoovrFrP8nsMiJiiXQdKm1ijmS9
+   Explorer: https://explorer.solana.com/tx/2gEztjrMYqXztMSnDZShvcob1e9BG3xUdE4azdczcKi9pabTqgSDRRAvrs9iVKoovrFrP8nsMiJiiXQdKm1ijmS9?cluster=devnet
+      ✔ should assign blacklister, pauser, and seizer roles (4099ms)
+    3. Add Minter with Quota
+✅ Add minter tx: 4im5DrHM5sFYSLGG5e1o3Bnfu5W1kH3bWkno3UvGP81ecy3eQ3CEvHvDdZsNPUiFYBeurfbCKqQoStPhwyWhJVkM
+   Explorer: https://explorer.solana.com/tx/4im5DrHM5sFYSLGG5e1o3Bnfu5W1kH3bWkno3UvGP81ecy3eQ3CEvHvDdZsNPUiFYBeurfbCKqQoStPhwyWhJVkM?cluster=devnet
+      ✔ should add a minter with specified quota (3681ms)
+    4. Update Minter Quota
+✅ Update quota tx: 5ag5XyCefGqM2MfPjznYAci7eKscPcGzkUHYpmrQExDU5mpbgQq2f7YTKJbR9pD6NdU8ZvXGEZhLwQBMcv8Tp8Xp
+   Explorer: https://explorer.solana.com/tx/5ag5XyCefGqM2MfPjznYAci7eKscPcGzkUHYpmrQExDU5mpbgQq2f7YTKJbR9pD6NdU8ZvXGEZhLwQBMcv8Tp8Xp?cluster=devnet
+      ✔ should update the minter's quota (4508ms)
+    5. Mint Tokens
+✅ Mint tokens tx: 5PyzUfL9svUkgLNmXDMM4MiEC3MNADUrvJYj6NqvucHQQZVHdcbeQB4ZY8gz2echn7n5bR5LdtVHQ3goNHyHCEP1
+   Explorer: https://explorer.solana.com/tx/5PyzUfL9svUkgLNmXDMM4MiEC3MNADUrvJYj6NqvucHQQZVHdcbeQB4ZY8gz2echn7n5bR5LdtVHQ3goNHyHCEP1?cluster=devnet
+      ✔ should mint tokens to a user account (9010ms)
+    6. Transfer Tokens
+      1) should transfer tokens between accounts
+    7. Burn Tokens
+⚠️ Burn failed: Simulation failed. 
+Message: Transaction simulation failed: Error processing Instruction 0: custom program error: 0x1. 
+Logs: 
+[
+  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw invoke [1]",
+  "Program log: Instruction: BurnTokens",
+  "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [2]",
+  "Program log: Instruction: Burn",
+  "Program log: Error: insufficient funds",
+  "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 1114 of 192432 compute units",
+  "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb failed: custom program error: 0x1",
+  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw consumed 8682 of 200000 compute units",
+  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw failed: custom program error: 0x1"
+]. 
+Catch the `SendTransactionError` and call `getLogs()` on it for full details.
+      ✔ should burn tokens from an account (1934ms)
+    8. Add to Blacklist
+      2) should add an address to the blacklist
+    9. Remove from Blacklist
+      3) should remove an address from the blacklist
+    10. Freeze Token Account
+✅ Freeze tx: 4ZZweQxzxqB7TxUVKnGjPMJ2FmrKMbmJWFTwfYzYCJ9fFjHgqcVp7q92pemUGynoDjTtWSCiHtYakmoLw3VKFusE
+   Explorer: https://explorer.solana.com/tx/4ZZweQxzxqB7TxUVKnGjPMJ2FmrKMbmJWFTwfYzYCJ9fFjHgqcVp7q92pemUGynoDjTtWSCiHtYakmoLw3VKFusE?cluster=devnet
+      ✔ should freeze a token account (9812ms)
+    11. Thaw Token Account
+✅ Thaw tx: 4EMgnF5Aij2RGttmoaW7UcibunWiQmgDV6yXcHwnsBGeGzGrNERovy9AjdNqjQgTCoyKkxcpAsPasAuquSxTLuVp
+   Explorer: https://explorer.solana.com/tx/4EMgnF5Aij2RGttmoaW7UcibunWiQmgDV6yXcHwnsBGeGzGrNERovy9AjdNqjQgTCoyKkxcpAsPasAuquSxTLuVp?cluster=devnet
+      ✔ should thaw (unfreeze) a token account (20687ms)
+    12. Pause Stablecoin
+✅ Pause tx: V9BTsuWNfQ9thaoKbGaxnPudL9VwfGNrBmTtwHaDvGn1A9iQyXaYsE6D75XdPBLULoUJw98BF6rSFTHMj1MsPLS
+   Explorer: https://explorer.solana.com/tx/V9BTsuWNfQ9thaoKbGaxnPudL9VwfGNrBmTtwHaDvGn1A9iQyXaYsE6D75XdPBLULoUJw98BF6rSFTHMj1MsPLS?cluster=devnet
+      ✔ should pause all stablecoin operations (8805ms)
+    13. Unpause Stablecoin
+✅ Unpause tx: 66aigwnKKEr8nrHqAnumPdunc1CWUs5pbUt9gbdY3TrsGwfXcsWfotWiqYgJoTrGoBoMtyLLb13JS9mJqAi46HgY
+   Explorer: https://explorer.solana.com/tx/66aigwnKKEr8nrHqAnumPdunc1CWUs5pbUt9gbdY3TrsGwfXcsWfotWiqYgJoTrGoBoMtyLLb13JS9mJqAi46HgY?cluster=devnet
+      ✔ should unpause all stablecoin operations (4504ms)
+    14. Transfer Authority
+✅ Transfer authority tx: 2Ck4m7hDTEY2sEtEaEML7JdmXvEsKTc54C2xRpDgkw14m8HKDCu6UvpmhMeMiWNPYL9TPmZCn1ttkMZvFR3p6BpA
+   Explorer: https://explorer.solana.com/tx/2Ck4m7hDTEY2sEtEaEML7JdmXvEsKTc54C2xRpDgkw14m8HKDCu6UvpmhMeMiWNPYL9TPmZCn1ttkMZvFR3p6BpA?cluster=devnet
+   Authority restored to original
+      ✔ should transfer master authority to new keypair (9619ms)
+    15. Remove Minter
+✅ Remove minter tx: 2TWUFA248X5CAvkEyXiCLzndQHrPDa2Za8oVyhgfLVYDes4WyRsW98Ts1BojjHBHRLSsfUfGYoy5CcjCyNm31nbZ
+   Explorer: https://explorer.solana.com/tx/2TWUFA248X5CAvkEyXiCLzndQHrPDa2Za8oVyhgfLVYDes4WyRsW98Ts1BojjHBHRLSsfUfGYoy5CcjCyNm31nbZ?cluster=devnet
+      ✔ should remove a minter by setting quota to 0 (4507ms)
+    16. Full Workflow Integration
+
+🔄 Running full workflow integration test...
+  1. ✅ Initialize
+  2. ✅ Update roles
+  3. ✅ Add minter
+  4. ✅ Mint tokens
+  5. ✅ Pause
+  6. ✅ Unpause
+      4) should execute complete stablecoin lifecycle
+
+📄 Proof documentation saved to: ./DEVNET_PROOF.md
+
+
+  12 passing (2m)
+  4 failing
+
+  1) SSS Token Devnet Tests
+       6. Transfer Tokens
+         should transfer tokens between accounts:
+     Error: Simulation failed. 
+Message: Transaction simulation failed: Error processing Instruction 0: custom program error: 0x4. 
+Logs: 
+[
+  "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [1]",
+  "Program log: Instruction: Transfer",
+  "Program log: Error: owner does not match",
+  "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 1626 of 200000 compute units",
+  "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb failed: custom program error: 0x4"
+]. 
+Catch the `SendTransactionError` and call `getLogs()` on it for full details.
+      at Connection.sendEncodedTransaction (node_modules/@solana/web3.js/src/connection.ts:6053:13)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at Connection.sendRawTransaction (node_modules/@solana/web3.js/src/connection.ts:6009:20)
+      at Connection.sendTransaction (node_modules/@solana/web3.js/src/connection.ts:5997:12)
+      at sendAndConfirmTransaction (node_modules/@solana/web3.js/src/utils/send-and-confirm-transaction.ts:36:21)
+
+  2) SSS Token Devnet Tests
+       8. Add to Blacklist
+         should add an address to the blacklist:
+     Simulation failed. 
+Message: Transaction simulation failed: Error processing Instruction 0: custom program error: 0x1. 
+Logs: 
+[
+  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw invoke [1]",
+  "Program log: Instruction: AddToBlacklist",
+  "Program 11111111111111111111111111111111 invoke [2]",
+  "Transfer: insufficient lamports 0, need 1955760",
+  "Program 11111111111111111111111111111111 failed: custom program error: 0x1",
+  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw consumed 10264 of 200000 compute units",
+  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw failed: custom program error: 0x1"
+]. 
+Catch the `SendTransactionError` and call `getLogs()` on it for full details.
+  
+
+  3) SSS Token Devnet Tests
+       9. Remove from Blacklist
+         should remove an address from the blacklist:
+     Error: AnchorError caused by account: blacklist_entry. Error Code: AccountNotInitialized. Error Number: 3012. Error Message: The program expected this account to be already initialized.
+      at AnchorError.parse (sdk/node_modules/@coral-xyz/anchor/src/error.ts:168:14)
+      at translateError (sdk/node_modules/@coral-xyz/anchor/src/error.ts:277:35)
+      at MethodsBuilder.rpc [as _rpcFn] (sdk/node_modules/@coral-xyz/anchor/src/program/namespace/rpc.ts:35:29)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+  4) SSS Token Devnet Tests
+       16. Full Workflow Integration
+         should execute complete stablecoin lifecycle:
+     Simulation failed. 
+Message: Transaction simulation failed: Error processing Instruction 0: custom program error: 0x1. 
+Logs: 
+[
+  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw invoke [1]",
+  "Program log: Instruction: AddToBlacklist",
+  "Program 11111111111111111111111111111111 invoke [2]",
+  "Transfer: insufficient lamports 0, need 1955760",
+  "Program 11111111111111111111111111111111 failed: custom program error: 0x1",
+  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw consumed 11920 of 200000 compute units",
+  "Program Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw failed: custom program error: 0x1"
+]. 
+Catch the `SendTransactionError` and call `getLogs()` on it for full details.
+  
+
+
+

@@ -12,6 +12,10 @@ import {
   getOrCreateAssociatedTokenAccount,
   mintTo,
   TOKEN_2022_PROGRAM_ID,
+  ExtensionType,
+  getMintLen,
+  createInitializePermanentDelegateInstruction,
+  createInitializeMintInstruction,
 } from "@solana/spl-token";
 import { Program, AnchorProvider, Wallet } from "@coral-xyz/anchor";
 import BN from "bn.js";
@@ -21,6 +25,7 @@ import {
   findConfigPDA,
   findMinterInfoPDA,
   findBlacklistEntryPDA,
+  findPermanentDelegatePDA,
 } from "../src/index";
 
 describe("SSS Token SDK Tests", function () {
@@ -504,7 +509,8 @@ describe("SSS Token SDK Tests", function () {
   });
 
   describe("test_seize_tokens", () => {
-    // Skip: Requires Token-2022 permanent delegate extension to be set up with seizer as delegate
+    // Skip: Requires Token-2022 permanent delegate extension to be set up
+    // The standard createMint doesn't support extensions
     it.skip("should seize tokens from an account", async () => {
       const sourceUser = Keypair.generate();
       const destUser = Keypair.generate();
@@ -544,13 +550,22 @@ describe("SSS Token SDK Tests", function () {
       );
       await connection.confirmTransaction(mintTx, "confirmed");
 
-      // Seize tokens - use seizer keypair (assigned in test_pause_and_unpause)
+      // Freeze the source account first (required for seizure)
+      const freezeTx = await sdk.freezeTokenAccount(mint, sourceTokenAccount, authority);
+      await connection.confirmTransaction(freezeTx, "confirmed");
+
+      // Seize tokens - requires both seizer and freeze authority signers
       const seizeAmount = new BN(500_000);
-      const tx = await sdk.seize(mint, seizer, {
-        sourceToken: sourceTokenAccount,
-        destToken: destTokenAccount,
-        amount: seizeAmount,
-      });
+      const tx = await sdk.seize(
+        mint,
+        seizer,           // seizer signer
+        authority,        // freeze authority signer
+        {
+          sourceToken: sourceTokenAccount,
+          destToken: destTokenAccount,
+          amount: seizeAmount,
+        }
+      );
 
       console.log("Seize transaction:", tx);
       await connection.confirmTransaction(tx, "confirmed");

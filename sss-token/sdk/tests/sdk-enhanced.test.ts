@@ -4,12 +4,17 @@
  */
 
 import { expect } from "chai";
-import { Keypair, PublicKey, Connection, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { Keypair, PublicKey, Connection, LAMPORTS_PER_SOL, Transaction, SystemProgram, sendAndConfirmTransaction } from "@solana/web3.js";
 import {
   createMint,
   getAccount,
   getOrCreateAssociatedTokenAccount,
   TOKEN_2022_PROGRAM_ID,
+  ExtensionType,
+  getMintLen,
+  createInitializePermanentDelegateInstruction,
+  createInitializeMintInstruction,
+  getMint,
 } from "@solana/spl-token";
 import { AnchorProvider, Wallet } from "@coral-xyz/anchor";
 import BN from "bn.js";
@@ -18,7 +23,62 @@ import {
   Preset,
   PRESET_CONFIGS,
   SSSTokenClient,
+  findPermanentDelegatePDA,
+  SSS_TOKEN_PROGRAM_ID,
 } from "../src/index";
+
+/**
+ * Helper function to create a Token-2022 mint with the PermanentDelegate extension
+ * This allows the program's permanent delegate PDA to transfer tokens from any account
+ */
+async function createMintWithPermanentDelegate(
+  connection: Connection,
+  payer: Keypair,
+  mintAuthority: PublicKey,
+  freezeAuthority: PublicKey,
+  decimals: number,
+  programId: PublicKey
+): Promise<PublicKey> {
+  // Get the permanent delegate PDA for our program
+  const mintKeypair = Keypair.generate();
+  const { pda: permanentDelegate } = findPermanentDelegatePDA(mintKeypair.publicKey, programId);
+
+  // Calculate mint size with PermanentDelegate extension
+  const extensions = [ExtensionType.PermanentDelegate];
+  const mintLen = getMintLen(extensions);
+
+  // Calculate minimum balance for rent exemption
+  const lamports = await connection.getMinimumBalanceForRentExemption(mintLen);
+
+  // Build transaction to create mint with extension
+  const transaction = new Transaction().add(
+    SystemProgram.createAccount({
+      fromPubkey: payer.publicKey,
+      newAccountPubkey: mintKeypair.publicKey,
+      space: mintLen,
+      lamports,
+      programId: TOKEN_2022_PROGRAM_ID,
+    }),
+    createInitializePermanentDelegateInstruction(
+      mintKeypair.publicKey,
+      permanentDelegate, // Our program's PDA as the permanent delegate
+      TOKEN_2022_PROGRAM_ID
+    ),
+    createInitializeMintInstruction(
+      mintKeypair.publicKey,
+      decimals,
+      mintAuthority,
+      freezeAuthority,
+      TOKEN_2022_PROGRAM_ID
+    )
+  );
+
+  await sendAndConfirmTransaction(connection, transaction, [payer, mintKeypair], {
+    commitment: "confirmed",
+  });
+
+  return mintKeypair.publicKey;
+}
 
 describe("SolanaStablecoin Enhanced SDK Tests", function () {
   this.timeout(100000);
@@ -678,6 +738,135 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
       expect(Number(finalBalance.amount)).to.equal(500_000);
 
       console.log("Enhanced SDK workflow test completed successfully!");
+    });
+  });
+
+  describe("Seize with Permanent Delegate Extension", () => {
+    it("should create mint with permanent delegate and seize tokens from frozen account", async () => {
+      console.log("Starting seize test with permanent delegate extension...");
+
+      // 1. Create mint with PermanentDelegate extension
+      console.log("Step 1: Creating mint with permanent delegate extension...");
+      const programId = new PublicKey(SSS_TOKEN_PROGRAM_ID);
+      const seizeMint = await createMintWithPermanentDelegate(
+        connection,
+        payer,
+        authority.publicKey,  // mint authority
+        authority.publicKey,  // freeze authority
+        6,
+        programId
+      );
+      console.log("Mint with permanent delegate created:", seizeMint.toString());
+
+      // Verify the permanent delegate is set
+      const mintInfo = await getMint(connection, seizeMint, undefined, TOKEN_2022_PROGRAM_ID);
+      const { pda: expectedDelegate } = findPermanentDelegatePDA(seizeMint, programId);
+      console.log("Expected permanent delegate:", expectedDelegate.toString());
+      // Note: permanentDelegate property may not be typed in older @solana/spl-token versions
+      console.log("Mint info retrieved successfully");
+
+      // 2. Initialize the stablecoin config
+      console.log("Step 2: Initializing stablecoin config...");
+      const client = new SSSTokenClient({ provider });
+      const initTx = await client.initialize(seizeMint, authority, {
+        name: "Seize Test Stablecoin",
+        symbol: "SEIZ",
+        uri: "https://example.com/seize.json",
+        decimals: 6,
+        enablePermanentDelegate: true,
+        enableTransferHook: true,
+        defaultAccountFrozen: false,
+      });
+      await connection.confirmTransaction(initTx, "confirmed");
+
+      // 3. Set up roles
+      console.log("Step 3: Setting up roles...");
+      const rolesTx = await client.updateRoles(seizeMint, authority, {
+        newBlacklister: blacklister.publicKey,
+        newPauser: pauser.publicKey,
+        newSeizer: seizer.publicKey,
+      });
+      await connection.confirmTransaction(rolesTx, "confirmed");
+
+      // 4. Add minter and mint tokens to user
+      console.log("Step 4: Minting tokens to user...");
+      await client.addMinter(seizeMint, authority, {
+        minter: minter.publicKey,
+        quota: new BN(1_000_000_000),
+      });
+
+      const seizeUser = Keypair.generate();
+      const userTokenAccount = await getOrCreateAssociatedTokenAccount(
+        connection,
+        payer,
+        seizeMint,
+        seizeUser.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
+      );
+
+      await client.mintTokens(seizeMint, authority, minter.publicKey, userTokenAccount.address, {
+        amount: new BN(1_000_000),
+      });
+
+      const initialBalance = await getAccount(connection, userTokenAccount.address, undefined, TOKEN_2022_PROGRAM_ID);
+      console.log("User initial balance:", Number(initialBalance.amount));
+      expect(Number(initialBalance.amount)).to.equal(1_000_000);
+
+      // 5. Freeze the user's account (required before seizure)
+      console.log("Step 5: Freezing user account...");
+      const freezeTx = await client.freezeTokenAccount(seizeMint, userTokenAccount.address, authority);
+      await connection.confirmTransaction(freezeTx, "confirmed");
+
+      const frozenAccount = await getAccount(connection, userTokenAccount.address, undefined, TOKEN_2022_PROGRAM_ID);
+      expect(frozenAccount.isFrozen).to.be.true;
+      console.log("User account frozen");
+
+      // 6. Create destination account for seized tokens
+      const treasury = Keypair.generate();
+      const treasuryTokenAccount = await getOrCreateAssociatedTokenAccount(
+        connection,
+        payer,
+        seizeMint,
+        treasury.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
+      );
+
+      // 7. Seize tokens from frozen account
+      console.log("Step 6: Seizing tokens...");
+      const seizeAmount = new BN(500_000);
+      const seizeTx = await client.seize(
+        seizeMint,
+        seizer,     // seizer signer (authorized in config)
+        authority,  // freeze authority signer (to thaw the account)
+        {
+          sourceToken: userTokenAccount.address,
+          destToken: treasuryTokenAccount.address,
+          amount: seizeAmount,
+        }
+      );
+      await connection.confirmTransaction(seizeTx, "confirmed");
+      console.log("Seize transaction:", seizeTx);
+
+      // 8. Verify balances after seizure
+      const userFinalBalance = await getAccount(connection, userTokenAccount.address, undefined, TOKEN_2022_PROGRAM_ID);
+      const treasuryBalance = await getAccount(connection, treasuryTokenAccount.address, undefined, TOKEN_2022_PROGRAM_ID);
+
+      console.log("User final balance:", Number(userFinalBalance.amount));
+      console.log("Treasury balance:", Number(treasuryBalance.amount));
+
+      expect(Number(userFinalBalance.amount)).to.equal(500_000);
+      expect(Number(treasuryBalance.amount)).to.equal(500_000);
+
+      // Account should be thawed after seizure
+      expect(userFinalBalance.isFrozen).to.be.false;
+
+      console.log("Seize test with permanent delegate completed successfully!");
     });
   });
 });

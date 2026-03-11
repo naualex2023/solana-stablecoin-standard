@@ -724,7 +724,8 @@
       "docs": [
         "Seize tokens from a frozen account (SSS-2)",
         "Uses the permanent delegate PDA to transfer from frozen accounts",
-        "Note: This first thaws the account, then transfers, since permanent delegate cannot bypass the frozen check in Token-2022"
+        "Note: This first thaws the account using the freeze authority signer,",
+        "then transfers using the permanent delegate PDA"
       ],
       "discriminator": [
         129,
@@ -780,38 +781,10 @@
         {
           "name": "freeze_authority",
           "docs": [
-            "The freeze authority PDA - seeds: [\"freeze_authority\", mint.key()]",
+            "The freeze authority - must be the actual freeze authority set on the mint",
             "Used to thaw the frozen account before transfer"
           ],
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  114,
-                  101,
-                  101,
-                  122,
-                  101,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
+          "signer": true
         },
         {
           "name": "permanent_delegate",

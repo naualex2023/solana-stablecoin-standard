@@ -781,13 +781,18 @@ describe("SSS Token Devnet Tests", function () {
         await connection.confirmTransaction(freezeTx, "confirmed");
         console.log(`   Account frozen for seizure`);
 
-        // Seize tokens
+        // Seize tokens - need both seizer and freeze authority signers
         const seizeAmount = new BN(500_000); // 0.5 tokens
-        const tx = await sdk.seize(mint, payer, {
-          sourceToken: seizeUserTokenAccount.address,
-          destToken: seizeDestAccount.address,
-          amount: seizeAmount,
-        });
+        const tx = await sdk.seize(
+          mint,
+          payer, // seizer
+          payer, // freeze authority (same as freeze authority set on mint)
+          {
+            sourceToken: seizeUserTokenAccount.address,
+            destToken: seizeDestAccount.address,
+            amount: seizeAmount,
+          }
+        );
 
         await connection.confirmTransaction(tx, "confirmed");
         console.log(`✅ Seize tx: ${tx}`);

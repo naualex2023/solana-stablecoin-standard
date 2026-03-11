@@ -15,6 +15,7 @@ export const PDA_SEEDS = {
   MINTER: "minter",
   BLACKLIST: "blacklist",
   PERMANENT_DELEGATE: "permanent_delegate",
+  FREEZE_AUTHORITY: "freeze_authority",
 } as const;
 
 /**

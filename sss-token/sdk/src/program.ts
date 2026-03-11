@@ -32,7 +32,7 @@ import {
   SeizeParams,
   TransferAuthorityParams,
 } from "./types";
-import { findConfigPDA, findMinterInfoPDA, findBlacklistEntryPDA, findPermanentDelegatePDA } from "./pda";
+import { findConfigPDA, findMinterInfoPDA, findBlacklistEntryPDA, findPermanentDelegatePDA, findFreezeAuthorityPDA } from "./pda";
 
 /**
  * SSS Token SDK Client
@@ -407,6 +407,7 @@ export class SSSTokenClient {
 
   /**
    * Seize tokens from a frozen account using the permanent delegate PDA
+   * This operation first thaws the frozen account, then transfers tokens
    */
   async seize(
     mint: PublicKey,
@@ -415,6 +416,7 @@ export class SSSTokenClient {
   ): Promise<string> {
     const { pda: configPda } = findConfigPDA(mint, this.programId);
     const { pda: permanentDelegatePda } = findPermanentDelegatePDA(mint, this.programId);
+    const { pda: freezeAuthorityPda } = findFreezeAuthorityPDA(mint, this.programId);
 
     const tx = await this.program.methods
       .seize(params.amount)
@@ -424,6 +426,7 @@ export class SSSTokenClient {
         sourceToken: params.sourceToken,
         destToken: params.destToken,
         seizer: seizer.publicKey,
+        freezeAuthority: freezeAuthorityPda,
         permanentDelegate: permanentDelegatePda,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })

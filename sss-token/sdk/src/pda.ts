@@ -80,6 +80,24 @@ export function findPermanentDelegatePDA(
 }
 
 /**
+ * Find the Freeze Authority PDA for a given mint
+ * This PDA acts as the freeze authority for the mint, used in seizure operations
+ * @param mint - The mint public key
+ * @param programId - The program ID (defaults to SSS_TOKEN_PROGRAM_ID)
+ * @returns The freeze authority PDA and bump
+ */
+export function findFreezeAuthorityPDA(
+  mint: PublicKey,
+  programId: PublicKey = new PublicKey(SSS_TOKEN_PROGRAM_ID)
+): PDAResult {
+  const [pda, bump] = PublicKey.findProgramAddressSync(
+    [Buffer.from(PDA_SEEDS.FREEZE_AUTHORITY), mint.toBuffer()],
+    programId
+  );
+  return { pda, bump };
+}
+
+/**
  * Find all PDAs for a stablecoin configuration
  * @param mint - The mint public key
  * @param programId - The program ID (defaults to SSS_TOKEN_PROGRAM_ID)

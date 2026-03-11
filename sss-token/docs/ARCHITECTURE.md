@@ -21,6 +21,7 @@ The SSS Token system follows a layered architecture:
 │                                                                              │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────────────────┐ │
 │  │   Web Apps      │  │   Mobile Apps   │  │   Third-party Integrations  │ │
+│  │   (Frontend)    │  │                 │  │                             │ │
 │  └─────────────────┘  └─────────────────┘  └─────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────────────┘
                                       │
@@ -155,6 +156,34 @@ sss-token CLI Commands:
 ├── roles             Role management
 └── config            CLI configuration
 ```
+
+#### Frontend Web Application
+
+The frontend provides a web UI for stablecoin management:
+
+```
+Frontend Architecture:
+┌─────────────────────────────────────────────────────────────┐
+│                    Next.js 14 App Router                     │
+├─────────────────────────────────────────────────────────────┤
+│  Pages:                                                      │
+│  • / (Dashboard) - Overview stats, recent activity          │
+│  • /create - Create new stablecoin wizard                   │
+│  • /admin - Admin operations (mint, burn, freeze, etc.)     │
+│  • /holders - Token holder management                       │
+├─────────────────────────────────────────────────────────────┤
+│  Data Fetching Modes:                                        │
+│  • RPC Mode - Direct blockchain queries (default)           │
+│  • Indexer Mode - Backend API for aggregated data           │
+├─────────────────────────────────────────────────────────────┤
+│  Components:                                                 │
+│  • WalletProvider - Solana wallet adapter                   │
+│  • Navigation - App navigation bar                          │
+│  • useStablecoins - React hook for data fetching            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+See [frontend/README.md](../frontend/README.md) for detailed documentation.
 
 #### Backend Services
 

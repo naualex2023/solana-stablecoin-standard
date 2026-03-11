@@ -209,6 +209,7 @@ For regulated stablecoins requiring full compliance controls.
 | [docs/SSS-2.md](./sss-token/docs/SSS-2.md) | Compliant stablecoin specification |
 | [docs/COMPLIANCE.md](./sss-token/docs/COMPLIANCE.md) | Regulatory compliance guide |
 | [docs/API.md](./sss-token/docs/API.md) | Backend API reference |
+| [frontend/README.md](../frontend/README.md) | Frontend web UI guide |
 
 ## Project Structure
 

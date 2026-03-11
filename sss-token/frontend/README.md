@@ -44,7 +44,99 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 Create a `.env.local` file:
 
 ```env
+# Solana RPC endpoint
 NEXT_PUBLIC_RPC_URL=https://api.devnet.solana.com
+
+# Fetch mode: 'rpc' (direct) or 'indexer' (backend API)
+NEXT_PUBLIC_FETCH_MODE=rpc
+
+# Indexer URL (only needed if FETCH_MODE=indexer)
+# NEXT_PUBLIC_INDEXER_URL=https://api.your-indexer.com
+```
+
+## Data Fetching Modes
+
+The frontend supports two modes for fetching stablecoin data:
+
+### RPC Mode (Default)
+
+Fetches stablecoin data directly from Solana RPC using `getProgramAccounts`. This is the default mode and requires no backend infrastructure.
+
+**How it works:**
+1. Queries the SSS Token program for all `StablecoinConfig` accounts
+2. Decodes the Borsh-encoded account data
+3. Fetches mint supply for each stablecoin
+
+**Pros:**
+- No backend required
+- Works immediately with just an RPC endpoint
+- Real-time data from the blockchain
+
+**Cons:**
+- Slower for large numbers of stablecoins
+- No holder count (requires scanning all token accounts)
+- Rate limited by RPC provider
+
+**Configuration:**
+```env
+NEXT_PUBLIC_FETCH_MODE=rpc
+NEXT_PUBLIC_RPC_URL=https://api.devnet.solana.com
+```
+
+### Indexer Mode
+
+Fetches stablecoin data from a backend indexer API. This mode is recommended for production deployments with high traffic.
+
+**How it works:**
+1. Queries the indexer REST API for stablecoin list
+2. Indexer provides cached/aggregated data including holder counts
+3. Faster response times for end users
+
+**Pros:**
+- Faster response times
+- Includes holder count and aggregated stats
+- Reduced RPC rate limit issues
+
+**Cons:**
+- Requires running the backend indexer service
+- Data may have slight delay (depends on indexer sync)
+
+**Configuration:**
+```env
+NEXT_PUBLIC_FETCH_MODE=indexer
+NEXT_PUBLIC_INDEXER_URL=https://api.your-indexer.com
+```
+
+### Implementation Details
+
+The fetching logic is organized in `src/lib/`:
+
+| File | Purpose |
+|------|---------|
+| `constants.ts` | Program ID, discriminators, default RPC |
+| `types.ts` | TypeScript interfaces |
+| `fetch-rpc.ts` | Direct RPC fetching with Borsh decoding |
+| `fetch-indexer.ts` | Backend API client |
+| `fetch-stablecoins.ts` | Unified fetch with mode selection |
+
+**React Hook:**
+```typescript
+import { useStablecoins } from '@/hooks/useStablecoins';
+
+function MyComponent() {
+  const { stablecoins, loading, error, refetch } = useStablecoins();
+  
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  
+  return (
+    <ul>
+      {stablecoins.map(coin => (
+        <li key={coin.mint}>{coin.name} - {coin.supply}</li>
+      ))}
+    </ul>
+  );
+}
 ```
 
 ## Project Structure

@@ -173,9 +173,11 @@ start_infrastructure() {
         sleep 1
     done
     
+    # Wait for Redis (with authentication)
     log_info "Waiting for Redis..."
+    REDIS_PASSWORD="${REDIS_PASSWORD:-sss_redis_secret}"
     for i in {1..30}; do
-        if docker-compose exec -T redis redis-cli ping 2>/dev/null | grep -q PONG; then
+        if docker-compose exec -T redis redis-cli -a "$REDIS_PASSWORD" ping 2>/dev/null | grep -q PONG; then
             log_success "Redis is ready"
             break
         fi
@@ -279,7 +281,8 @@ run_tests() {
     fi
     
     log_info "Test 2: Checking Redis connection..."
-    if docker-compose exec -T redis redis-cli ping 2>/dev/null | grep -q PONG; then
+    REDIS_PASSWORD="${REDIS_PASSWORD:-sss_redis_secret}"
+    if docker-compose exec -T redis redis-cli -a "$REDIS_PASSWORD" ping 2>/dev/null | grep -q PONG; then
         log_success "Redis connection OK"
     else
         log_error "Redis connection failed"

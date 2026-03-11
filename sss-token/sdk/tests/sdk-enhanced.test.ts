@@ -790,10 +790,12 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
 
       // 4. Add minter and mint tokens to user
       console.log("Step 4: Minting tokens to user...");
-      await client.addMinter(seizeMint, authority, {
+      const addMinterTx = await client.addMinter(seizeMint, authority, {
         minter: minter.publicKey,
         quota: new BN(1_000_000_000),
       });
+      await connection.confirmTransaction(addMinterTx, "confirmed");
+      console.log("Minter added");
 
       const seizeUser = Keypair.generate();
       const userTokenAccount = await getOrCreateAssociatedTokenAccount(
@@ -806,10 +808,13 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
         undefined,
         TOKEN_2022_PROGRAM_ID
       );
+      console.log("User token account created:", userTokenAccount.address.toString());
 
-      await client.mintTokens(seizeMint, authority, minter.publicKey, userTokenAccount.address, {
+      const mintTokensTx = await client.mintTokens(seizeMint, authority, minter.publicKey, userTokenAccount.address, {
         amount: new BN(1_000_000),
       });
+      await connection.confirmTransaction(mintTokensTx, "confirmed");
+      console.log("Mint tokens tx:", mintTokensTx);
 
       const initialBalance = await getAccount(connection, userTokenAccount.address, undefined, TOKEN_2022_PROGRAM_ID);
       console.log("User initial balance:", Number(initialBalance.amount));

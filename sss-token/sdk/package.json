@@ -1,10 +1,23 @@
 {
-  "name": "@sss-token/sdk",
+  "name": "@stbr/sss-token",
   "version": "1.0.0",
-  "description": "TypeScript SDK for SSS Token Stablecoin Program",
+  "description": "TypeScript SDK for SSS Token Stablecoin Program - Solana Stablecoin Standard",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/naualex2023/solana-stablecoin-standard"
+  },
+  "keywords": [
+    "solana",
+    "stablecoin",
+    "token-2022",
+    "blockchain",
+    "sss-token",
+    "compliant-stablecoin"
+  ],
+  "author": "SSS Token Team",
   "scripts": {
     "build": "tsc",
     "test": "ts-mocha tests/**/*.test.ts --timeout 10000",

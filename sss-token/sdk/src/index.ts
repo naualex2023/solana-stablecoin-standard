@@ -27,6 +27,21 @@
 // Main SDK client
 export { SSSTokenClient } from "./program";
 
+// Enhanced SDK with namespaced API
+export {
+  SolanaStablecoin,
+  ComplianceAPI,
+  MintingAPI,
+  BurningAPI,
+  PauseAPI,
+  AuthorityAPI,
+} from "./stablecoin";
+
+export type {
+  CreateStablecoinOptions,
+  ConnectStablecoinOptions,
+} from "./stablecoin";
+
 // PDA utilities
 export {
   findConfigPDA,
@@ -73,7 +88,11 @@ export type {
   SSSTokenSDKConfig,
   PDAResult,
   SSSTokenInstruction,
+  PresetConfig,
 } from "./types";
+
+// Preset enum and configurations
+export { Preset, PRESET_CONFIGS } from "./types";
 
 // Constants
 export {

@@ -7,6 +7,57 @@ import BN from "bn.js";
 import { Program, Provider, AnchorProvider } from "@coral-xyz/anchor";
 
 /**
+ * Preset configurations for stablecoin standards
+ * 
+ * SSS_1: Minimal stablecoin (basic mint/burn, no compliance features)
+ * SSS_2: Compliant stablecoin (full compliance: blacklist, freeze, seize, pause)
+ */
+export enum Preset {
+  /**
+   * SSS-1: Minimal stablecoin standard
+   * - Basic mint/burn functionality
+   * - No permanent delegate
+   * - No transfer hook
+   * - Accounts not frozen by default
+   */
+  SSS_1 = "sss-1",
+  
+  /**
+   * SSS-2: Compliant stablecoin standard
+   * - Full compliance features
+   * - Permanent delegate enabled (for seizure)
+   * - Transfer hook enabled (for blacklist enforcement)
+   * - Accounts frozen by default (KYC required)
+   */
+  SSS_2 = "sss-2",
+}
+
+/**
+ * Preset configuration options
+ */
+export interface PresetConfig {
+  enablePermanentDelegate: boolean;
+  enableTransferHook: boolean;
+  defaultAccountFrozen: boolean;
+}
+
+/**
+ * Map of preset configurations
+ */
+export const PRESET_CONFIGS: Record<Preset, PresetConfig> = {
+  [Preset.SSS_1]: {
+    enablePermanentDelegate: false,
+    enableTransferHook: false,
+    defaultAccountFrozen: false,
+  },
+  [Preset.SSS_2]: {
+    enablePermanentDelegate: true,
+    enableTransferHook: true,
+    defaultAccountFrozen: true,
+  },
+};
+
+/**
  * StablecoinConfig account data
  */
 export interface StablecoinConfig {

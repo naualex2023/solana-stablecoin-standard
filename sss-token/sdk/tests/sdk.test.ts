@@ -554,12 +554,11 @@ describe("SSS Token SDK Tests", function () {
       const freezeTx = await sdk.freezeTokenAccount(mint, sourceTokenAccount, authority);
       await connection.confirmTransaction(freezeTx, "confirmed");
 
-      // Seize tokens - requires both seizer and freeze authority signers
+      // Seize tokens - requires seizer signer (freeze authority is a PDA)
       const seizeAmount = new BN(500_000);
       const tx = await sdk.seize(
         mint,
         seizer,           // seizer signer
-        authority,        // freeze authority signer
         {
           sourceToken: sourceTokenAccount,
           destToken: destTokenAccount,

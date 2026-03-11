@@ -1,14 +1,20 @@
-{
+/**
+ * Program IDL in camelCase format in order to be used in JS/TS.
+ *
+ * Note that this is only a type helper and is not the actual IDL. The original
+ * IDL can be found at `target/idl/sss_token.json`.
+ */
+export type SssToken = {
   "address": "Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw",
   "metadata": {
-    "name": "sss_token",
+    "name": "sssToken",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
   "instructions": [
     {
-      "name": "add_minter",
+      "name": "addMinter",
       "docs": [
         "Add a minter with specified quota"
       ],
@@ -52,7 +58,7 @@
           "name": "minter"
         },
         {
-          "name": "minter_info",
+          "name": "minterInfo",
           "writable": true,
           "pda": {
             "seeds": [
@@ -79,7 +85,7 @@
           }
         },
         {
-          "name": "master_authority",
+          "name": "masterAuthority",
           "writable": true,
           "signer": true,
           "relations": [
@@ -87,7 +93,7 @@
           ]
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -99,7 +105,7 @@
       ]
     },
     {
-      "name": "add_to_blacklist",
+      "name": "addToBlacklist",
       "docs": [
         "Add an address to the blacklist (SSS-2)"
       ],
@@ -151,7 +157,7 @@
           "name": "user"
         },
         {
-          "name": "blacklist_entry",
+          "name": "blacklistEntry",
           "writable": true,
           "pda": {
             "seeds": [
@@ -181,7 +187,7 @@
           }
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -193,7 +199,7 @@
       ]
     },
     {
-      "name": "burn_tokens",
+      "name": "burnTokens",
       "docs": [
         "Burn tokens from an account"
       ],
@@ -235,7 +241,7 @@
           "writable": true
         },
         {
-          "name": "token_account",
+          "name": "tokenAccount",
           "writable": true
         },
         {
@@ -243,7 +249,7 @@
           "signer": true
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         }
       ],
@@ -255,7 +261,7 @@
       ]
     },
     {
-      "name": "freeze_token_account",
+      "name": "freezeTokenAccount",
       "docs": [
         "Freeze a token account"
       ],
@@ -297,15 +303,15 @@
           "writable": true
         },
         {
-          "name": "token_account",
+          "name": "tokenAccount",
           "writable": true
         },
         {
-          "name": "freeze_authority",
+          "name": "freezeAuthority",
           "signer": true
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         }
       ],
@@ -360,11 +366,11 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         }
       ],
@@ -386,21 +392,21 @@
           "type": "u8"
         },
         {
-          "name": "enable_permanent_delegate",
+          "name": "enablePermanentDelegate",
           "type": "bool"
         },
         {
-          "name": "enable_transfer_hook",
+          "name": "enableTransferHook",
           "type": "bool"
         },
         {
-          "name": "default_account_frozen",
+          "name": "defaultAccountFrozen",
           "type": "bool"
         }
       ]
     },
     {
-      "name": "mint_tokens",
+      "name": "mintTokens",
       "docs": [
         "Mint tokens to a recipient account"
       ],
@@ -442,11 +448,11 @@
           "writable": true
         },
         {
-          "name": "mint_authority",
+          "name": "mintAuthority",
           "signer": true
         },
         {
-          "name": "minter_info",
+          "name": "minterInfo",
           "writable": true,
           "pda": {
             "seeds": [
@@ -476,11 +482,11 @@
           "name": "minter"
         },
         {
-          "name": "token_account",
+          "name": "tokenAccount",
           "writable": true
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         }
       ],
@@ -541,14 +547,14 @@
           ]
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         }
       ],
       "args": []
     },
     {
-      "name": "remove_from_blacklist",
+      "name": "removeFromBlacklist",
       "docs": [
         "Remove an address from the blacklist (SSS-2)",
         "The `close = blacklister` constraint on the account handles closing automatically"
@@ -601,7 +607,7 @@
           "name": "user"
         },
         {
-          "name": "blacklist_entry",
+          "name": "blacklistEntry",
           "writable": true,
           "pda": {
             "seeds": [
@@ -631,14 +637,14 @@
           }
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": []
     },
     {
-      "name": "remove_minter",
+      "name": "removeMinter",
       "docs": [
         "Remove a minter"
       ],
@@ -679,7 +685,7 @@
           "name": "mint"
         },
         {
-          "name": "minter_info",
+          "name": "minterInfo",
           "writable": true,
           "pda": {
             "seeds": [
@@ -709,7 +715,7 @@
           "name": "minter"
         },
         {
-          "name": "master_authority",
+          "name": "masterAuthority",
           "writable": true,
           "signer": true,
           "relations": [
@@ -724,7 +730,7 @@
       "docs": [
         "Seize tokens from a frozen account (SSS-2)",
         "Uses the permanent delegate PDA to transfer from frozen accounts",
-        "Note: This first thaws the account using the freeze authority signer,",
+        "Note: This first thaws the account using the freeze authority PDA,",
         "then transfers using the permanent delegate PDA"
       ],
       "discriminator": [
@@ -764,11 +770,11 @@
           "name": "mint"
         },
         {
-          "name": "source_token",
+          "name": "sourceToken",
           "writable": true
         },
         {
-          "name": "dest_token",
+          "name": "destToken",
           "writable": true
         },
         {
@@ -779,15 +785,45 @@
           ]
         },
         {
-          "name": "freeze_authority",
+          "name": "freezeAuthority",
           "docs": [
-            "The freeze authority - must be the actual freeze authority set on the mint",
+            "The freeze authority PDA - seeds: [\"freeze_authority\", mint.key()]",
+            "This PDA acts as the freeze authority for the mint",
+            "Must be set as the freeze authority when creating the mint",
             "Used to thaw the frozen account before transfer"
           ],
-          "signer": true
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  114,
+                  101,
+                  101,
+                  122,
+                  101,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
         },
         {
-          "name": "permanent_delegate",
+          "name": "permanentDelegate",
           "docs": [
             "The permanent delegate PDA - seeds: [\"permanent_delegate\", mint.key()]",
             "This PDA acts as the permanent delegate for the mint",
@@ -826,7 +862,7 @@
           }
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         }
       ],
@@ -838,7 +874,7 @@
       ]
     },
     {
-      "name": "thaw_token_account",
+      "name": "thawTokenAccount",
       "docs": [
         "Thaw a token account"
       ],
@@ -880,22 +916,22 @@
           "writable": true
         },
         {
-          "name": "token_account",
+          "name": "tokenAccount",
           "writable": true
         },
         {
-          "name": "freeze_authority",
+          "name": "freezeAuthority",
           "signer": true
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         }
       ],
       "args": []
     },
     {
-      "name": "transfer_authority",
+      "name": "transferAuthority",
       "docs": [
         "Transfer master authority"
       ],
@@ -937,7 +973,7 @@
           "name": "mint"
         },
         {
-          "name": "master_authority",
+          "name": "masterAuthority",
           "writable": true,
           "signer": true,
           "relations": [
@@ -947,7 +983,7 @@
       ],
       "args": [
         {
-          "name": "new_master_authority",
+          "name": "newMasterAuthority",
           "type": "pubkey"
         }
       ]
@@ -1002,14 +1038,14 @@
           ]
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         }
       ],
       "args": []
     },
     {
-      "name": "update_minter_quota",
+      "name": "updateMinterQuota",
       "docs": [
         "Update minter quota"
       ],
@@ -1050,7 +1086,7 @@
           "name": "mint"
         },
         {
-          "name": "minter_info",
+          "name": "minterInfo",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1080,7 +1116,7 @@
           "name": "minter"
         },
         {
-          "name": "master_authority",
+          "name": "masterAuthority",
           "writable": true,
           "signer": true,
           "relations": [
@@ -1090,13 +1126,13 @@
       ],
       "args": [
         {
-          "name": "new_quota",
+          "name": "newQuota",
           "type": "u64"
         }
       ]
     },
     {
-      "name": "update_roles",
+      "name": "updateRoles",
       "docs": [
         "Update roles (blacklister, pauser, seizer)"
       ],
@@ -1138,7 +1174,7 @@
           "name": "mint"
         },
         {
-          "name": "master_authority",
+          "name": "masterAuthority",
           "writable": true,
           "signer": true,
           "relations": [
@@ -1148,15 +1184,15 @@
       ],
       "args": [
         {
-          "name": "new_blacklister",
+          "name": "newBlacklister",
           "type": "pubkey"
         },
         {
-          "name": "new_pauser",
+          "name": "newPauser",
           "type": "pubkey"
         },
         {
-          "name": "new_seizer",
+          "name": "newSeizer",
           "type": "pubkey"
         }
       ]
@@ -1164,7 +1200,7 @@
   ],
   "accounts": [
     {
-      "name": "BlacklistEntry",
+      "name": "blacklistEntry",
       "discriminator": [
         218,
         179,
@@ -1177,7 +1213,7 @@
       ]
     },
     {
-      "name": "MinterInfo",
+      "name": "minterInfo",
       "discriminator": [
         158,
         4,
@@ -1190,7 +1226,7 @@
       ]
     },
     {
-      "name": "StablecoinConfig",
+      "name": "stablecoinConfig",
       "discriminator": [
         127,
         25,
@@ -1206,58 +1242,58 @@
   "errors": [
     {
       "code": 6000,
-      "name": "Unauthorized",
+      "name": "unauthorized",
       "msg": "Unauthorized access"
     },
     {
       "code": 6001,
-      "name": "InvalidAccount",
+      "name": "invalidAccount",
       "msg": "Invalid account"
     },
     {
       "code": 6002,
-      "name": "QuotaExceeded",
+      "name": "quotaExceeded",
       "msg": "Mint quota exceeded"
     },
     {
       "code": 6003,
-      "name": "AccountFrozen",
+      "name": "accountFrozen",
       "msg": "Account is frozen"
     },
     {
       "code": 6004,
-      "name": "TokenPaused",
+      "name": "tokenPaused",
       "msg": "Token is paused"
     },
     {
       "code": 6005,
-      "name": "ComplianceNotEnabled",
+      "name": "complianceNotEnabled",
       "msg": "Compliance module not enabled"
     },
     {
       "code": 6006,
-      "name": "PermanentDelegateNotEnabled",
+      "name": "permanentDelegateNotEnabled",
       "msg": "Permanent delegate not enabled"
     },
     {
       "code": 6007,
-      "name": "AlreadyBlacklisted",
+      "name": "alreadyBlacklisted",
       "msg": "Already in blacklist"
     },
     {
       "code": 6008,
-      "name": "NotBlacklisted",
+      "name": "notBlacklisted",
       "msg": "Not in blacklist"
     },
     {
       "code": 6009,
-      "name": "InvalidAmount",
+      "name": "invalidAmount",
       "msg": "Invalid amount"
     }
   ],
   "types": [
     {
-      "name": "BlacklistEntry",
+      "name": "blacklistEntry",
       "docs": [
         "Blacklist entry for SSS-2 compliance",
         "PDA seeds: [\"blacklist\", config.key(), user_address.key()]"
@@ -1285,7 +1321,7 @@
       }
     },
     {
-      "name": "MinterInfo",
+      "name": "minterInfo",
       "docs": [
         "Minter information with quota tracking",
         "PDA seeds: [\"minter\", config.key(), minter_authority.key()]"
@@ -1313,7 +1349,7 @@
       }
     },
     {
-      "name": "StablecoinConfig",
+      "name": "stablecoinConfig",
       "docs": [
         "Main configuration account for the stablecoin",
         "PDA seeds: [\"config\", mint.key()]"
@@ -1322,7 +1358,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "master_authority",
+            "name": "masterAuthority",
             "type": "pubkey"
           },
           {
@@ -1354,15 +1390,15 @@
             "type": "u8"
           },
           {
-            "name": "enable_permanent_delegate",
+            "name": "enablePermanentDelegate",
             "type": "bool"
           },
           {
-            "name": "enable_transfer_hook",
+            "name": "enableTransferHook",
             "type": "bool"
           },
           {
-            "name": "default_account_frozen",
+            "name": "defaultAccountFrozen",
             "type": "bool"
           },
           {
@@ -1381,4 +1417,4 @@
       }
     }
   ]
-}
+};

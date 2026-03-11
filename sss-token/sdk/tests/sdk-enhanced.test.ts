@@ -848,7 +848,6 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
       const seizeTx = await client.seize(
         seizeMint,
         seizer,     // seizer signer (authorized in config)
-        authority,  // freeze authority signer (to thaw the account)
         {
           sourceToken: userTokenAccount.address,
           destToken: treasuryTokenAccount.address,

@@ -152,19 +152,17 @@ export class ComplianceAPI {
   /**
    * Seize tokens from a frozen account
    * @param seizer - The seizer signer
-   * @param freezeAuthority - The freeze authority signer (must match mint's freeze authority)
    * @param sourceToken - Source token account (frozen)
    * @param destToken - Destination token account
    * @param amount - Amount to seize
    */
   async seize(
     seizer: Signer,
-    freezeAuthority: Signer,
     sourceToken: PublicKey,
     destToken: PublicKey,
     amount: BN | number
   ): Promise<string> {
-    return this.client.seize(this.mint, seizer, freezeAuthority, {
+    return this.client.seize(this.mint, seizer, {
       sourceToken,
       destToken,
       amount: typeof amount === "number" ? new BN(amount) : amount,

@@ -407,20 +407,19 @@ export class SSSTokenClient {
 
   /**
    * Seize tokens from a frozen account using the permanent delegate PDA
-   * This operation first thaws the frozen account using the freeze authority, then transfers tokens
+   * This operation first thaws the frozen account using the freeze authority PDA, then transfers tokens
    * @param mint - The mint public key
    * @param seizer - The seizer signer (must be authorized in config)
-   * @param freezeAuthority - The freeze authority signer (must match the mint's freeze authority)
    * @param params - Seize parameters including source, destination, and amount
    */
   async seize(
     mint: PublicKey,
     seizer: Signer,
-    freezeAuthority: Signer,
     params: SeizeParams
   ): Promise<string> {
     const { pda: configPda } = findConfigPDA(mint, this.programId);
     const { pda: permanentDelegatePda } = findPermanentDelegatePDA(mint, this.programId);
+    const { pda: freezeAuthorityPda } = findFreezeAuthorityPDA(mint, this.programId);
 
     const tx = await this.program.methods
       .seize(params.amount)
@@ -430,11 +429,11 @@ export class SSSTokenClient {
         sourceToken: params.sourceToken,
         destToken: params.destToken,
         seizer: seizer.publicKey,
-        freezeAuthority: freezeAuthority.publicKey,
+        freezeAuthority: freezeAuthorityPda,
         permanentDelegate: permanentDelegatePda,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
-      .signers([seizer, freezeAuthority])
+      .signers([seizer])
       .rpc();
 
     return tx;

@@ -333,7 +333,7 @@ pub mod sss_token {
 
     /// Seize tokens from a frozen account (SSS-2)
     /// Uses the permanent delegate PDA to transfer from frozen accounts
-    /// Note: This first thaws the account using the freeze authority signer,
+    /// Note: This first thaws the account using the freeze authority PDA,
     /// then transfers using the permanent delegate PDA
     pub fn seize(ctx: Context<Seize>, amount: u64) -> Result<()> {
         let config = &ctx.accounts.config;
@@ -345,16 +345,24 @@ pub mod sss_token {
         require!(amount > 0, StablecoinError::InvalidAmount);
 
         let permanent_delegate_bump = ctx.bumps.permanent_delegate;
+        let freeze_authority_bump = ctx.bumps.freeze_authority;
         let mint_key = ctx.accounts.mint.key();
 
-        // Step 1: Thaw the source account using the freeze authority signer
+        // Step 1: Thaw the source account using the freeze authority PDA
+        let freeze_authority_seeds = &[
+            b"freeze_authority".as_ref(),
+            mint_key.as_ref(),
+            &[freeze_authority_bump],
+        ];
+        let freeze_authority_signer = &[&freeze_authority_seeds[..]];
+
         let thaw_accounts = ThawAccountCpi {
             account: ctx.accounts.source_token.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
             authority: ctx.accounts.freeze_authority.to_account_info(),
         };
         let thaw_program = ctx.accounts.token_program.to_account_info();
-        let thaw_ctx = CpiContext::new(thaw_program, thaw_accounts);
+        let thaw_ctx = CpiContext::new_with_signer(thaw_program, thaw_accounts, freeze_authority_signer);
         token_2022::thaw_account(thaw_ctx)?;
 
         msg!("Thawed account {} for seizure", ctx.accounts.source_token.key());
@@ -721,9 +729,16 @@ pub struct Seize<'info> {
 
     pub seizer: Signer<'info>,
 
-    /// The freeze authority - must be the actual freeze authority set on the mint
+    /// The freeze authority PDA - seeds: ["freeze_authority", mint.key()]
+    /// This PDA acts as the freeze authority for the mint
+    /// Must be set as the freeze authority when creating the mint
     /// Used to thaw the frozen account before transfer
-    pub freeze_authority: Signer<'info>,
+    #[account(
+        seeds = [b"freeze_authority", mint.key().as_ref()],
+        bump
+    )]
+    /// CHECK: This is the freeze authority PDA that signs via seeds
+    pub freeze_authority: UncheckedAccount<'info>,
 
     /// The permanent delegate PDA - seeds: ["permanent_delegate", mint.key()]
     /// This PDA acts as the permanent delegate for the mint

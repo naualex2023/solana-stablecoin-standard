@@ -22,6 +22,9 @@ import {
   Connection,
   LAMPORTS_PER_SOL,
   TransactionSignature,
+  Transaction,
+  SystemProgram,
+  sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import {
   createMint,
@@ -29,6 +32,10 @@ import {
   getMint,
   getOrCreateAssociatedTokenAccount,
   TOKEN_2022_PROGRAM_ID,
+  ExtensionType,
+  getMintLen,
+  createInitializePermanentDelegateInstruction,
+  createInitializeMintInstruction,
 } from "@solana/spl-token";
 import { Program, AnchorProvider, Wallet, Idl } from "@coral-xyz/anchor";
 import BN from "bn.js";
@@ -36,7 +43,71 @@ import {
   SSSTokenClient,
   SSS_TOKEN_PROGRAM_ID,
   findConfigPDA,
+  findPermanentDelegatePDA,
+  findFreezeAuthorityPDA,
 } from "../sdk/src/index";
+
+/**
+ * Helper function to create a Token-2022 mint with the PermanentDelegate extension
+ * This allows the program's permanent delegate PDA to transfer tokens from any account
+ * 
+ * IMPORTANT: The freeze authority is set to the program's freeze authority PDA,
+ * which allows the seize instruction to thaw frozen accounts using PDA signing.
+ */
+async function createMintWithPermanentDelegate(
+  connection: Connection,
+  payer: Keypair,
+  mintAuthority: PublicKey,
+  decimals: number,
+  programId: PublicKey
+): Promise<PublicKey> {
+  // Generate mint keypair first to derive PDAs
+  const mintKeypair = Keypair.generate();
+  
+  // Derive both PDAs from the mint address
+  const { pda: permanentDelegate } = findPermanentDelegatePDA(mintKeypair.publicKey, programId);
+  const { pda: freezeAuthority } = findFreezeAuthorityPDA(mintKeypair.publicKey, programId);
+
+  // Calculate mint size with PermanentDelegate extension
+  const extensions = [ExtensionType.PermanentDelegate];
+  const mintLen = getMintLen(extensions);
+
+  // Calculate minimum balance for rent exemption
+  const lamports = await connection.getMinimumBalanceForRentExemption(mintLen);
+
+  // Build transaction to create mint with extension
+  const transaction = new Transaction().add(
+    SystemProgram.createAccount({
+      fromPubkey: payer.publicKey,
+      newAccountPubkey: mintKeypair.publicKey,
+      space: mintLen,
+      lamports,
+      programId: TOKEN_2022_PROGRAM_ID,
+    }),
+    createInitializePermanentDelegateInstruction(
+      mintKeypair.publicKey,
+      permanentDelegate, // Our program's PDA as the permanent delegate
+      TOKEN_2022_PROGRAM_ID
+    ),
+    createInitializeMintInstruction(
+      mintKeypair.publicKey,
+      decimals,
+      mintAuthority,
+      freezeAuthority, // Program's PDA as freeze authority (for seize operation)
+      TOKEN_2022_PROGRAM_ID
+    )
+  );
+
+  await sendAndConfirmTransaction(connection, transaction, [payer, mintKeypair], {
+    commitment: "confirmed",
+  });
+
+  console.log("Created mint with permanent delegate:", mintKeypair.publicKey.toString());
+  console.log("  Permanent delegate PDA:", permanentDelegate.toString());
+  console.log("  Freeze authority PDA:", freezeAuthority.toString());
+  
+  return mintKeypair.publicKey;
+}
 
 // NOTE: For seizure to work properly, the mint must be created with the Token-2022
 // PermanentDelegate extension initialized with our program's permanent delegate PDA.
@@ -738,12 +809,56 @@ describe("SSS Token Devnet Tests", function () {
       const testName = "Seize Tokens";
 
       try {
+        // Create a special mint with PermanentDelegate extension for seizure
+        // This is required because seize needs:
+        // 1. Permanent delegate to transfer tokens from any account
+        // 2. PDA-based freeze authority to thaw during seize
+        console.log("\n   Creating mint with permanent delegate extension...");
+        const programId = new PublicKey(SSS_TOKEN_PROGRAM_ID);
+        const seizeMint = await createMintWithPermanentDelegate(
+          connection,
+          payer,
+          payer.publicKey, // mint authority
+          6,
+          programId
+        );
+        console.log(`   Seize mint created: ${seizeMint.toString()}`);
+
+        // Initialize stablecoin config for the seize mint
+        const initTx = await sdk.initialize(seizeMint, payer, {
+          name: "Seize Test USD",
+          symbol: "SUSD",
+          uri: "https://example.com/susd.json",
+          decimals: 6,
+          enablePermanentDelegate: true,
+          enableTransferHook: true,
+          defaultAccountFrozen: false,
+        });
+        await connection.confirmTransaction(initTx, "confirmed");
+        console.log(`   Seize mint initialized`);
+
+        // Set up roles with payer as seizer
+        const rolesTx = await sdk.updateRoles(seizeMint, payer, {
+          newBlacklister: payer.publicKey,
+          newPauser: payer.publicKey,
+          newSeizer: payer.publicKey,
+        });
+        await connection.confirmTransaction(rolesTx, "confirmed");
+        console.log(`   Roles configured`);
+
+        // Add minter for the seize mint
+        const seizeMinter = Keypair.generate();
+        await sdk.addMinter(seizeMint, payer, {
+          minter: seizeMinter.publicKey,
+          quota: new BN(1_000_000_000),
+        });
+
         // Create a user with tokens to seize
         const seizeUser = Keypair.generate();
         const seizeUserTokenAccount = await getOrCreateAssociatedTokenAccount(
           connection,
           payer,
-          mint,
+          seizeMint,
           seizeUser.publicKey,
           undefined,
           undefined,
@@ -753,45 +868,50 @@ describe("SSS Token Devnet Tests", function () {
 
         // Mint some tokens to this account
         await sdk.mintTokens(
-          mint,
+          seizeMint,
           payer,
-          minter.publicKey,
+          seizeMinter.publicKey,
           seizeUserTokenAccount.address,
           { amount: new BN(1_000_000) }
         );
+        console.log(`   Minted 1,000,000 tokens to user account`);
         
         // Create destination account for seized tokens
         const seizeDestAccount = await getOrCreateAssociatedTokenAccount(
           connection,
           payer,
-          mint,
-          payer.publicKey, // seized tokens go to payer
+          seizeMint,
+          payer.publicKey, // seized tokens go to payer (treasury)
           undefined,
           undefined,
           undefined,
           TOKEN_2022_PROGRAM_ID
         );
 
-        // Freeze the user's account first (required for seizure)
-        // Note: For seize to work, the mint must have PDA-based freeze authority
-        // Since this mint was created with keypair freeze authority, we use regular freeze
-        const freezeTx = await sdk.freezeTokenAccount(
-          mint,
+        // Freeze the user's account using PDA-based freeze
+        // This is required because the mint's freeze authority is the program's PDA
+        console.log(`   Freezing user account with PDA authority...`);
+        const freezeTx = await sdk.freezeTokenAccountPda(
+          seizeMint,
           seizeUserTokenAccount.address,
-          payer
+          payer // seizer signs for the PDA
         );
         await connection.confirmTransaction(freezeTx, "confirmed");
         console.log(`   Account frozen for seizure`);
 
+        // Verify account is frozen
+        const frozenAccount = await getAccount(
+          connection,
+          seizeUserTokenAccount.address,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+        expect(frozenAccount.isFrozen).to.be.true;
+
         // Seize tokens - seizer must be authorized in config.seizer role
-        // Note: Seize requires the mint to be created with:
-        // 1. Freeze authority set to the program's freeze authority PDA
-        // 2. Permanent delegate extension set to the program's permanent delegate PDA
-        // The standard createMint doesn't support these extensions, so this test
-        // may fail on devnet unless the mint is properly configured.
         const seizeAmount = new BN(500_000); // 0.5 tokens
         const tx = await sdk.seize(
-          mint,
+          seizeMint,
           payer, // seizer (must match config.seizer)
           {
             sourceToken: seizeUserTokenAccount.address,
@@ -804,7 +924,31 @@ describe("SSS Token Devnet Tests", function () {
         console.log(`✅ Seize tx: ${tx}`);
         console.log(`   Explorer: ${explorerLink(tx)}`);
 
+        // Verify balances after seizure
+        const userFinalBalance = await getAccount(
+          connection,
+          seizeUserTokenAccount.address,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+        const treasuryBalance = await getAccount(
+          connection,
+          seizeDestAccount.address,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        console.log(`   User final balance: ${Number(userFinalBalance.amount)}`);
+        console.log(`   Treasury balance: ${Number(treasuryBalance.amount)}`);
+
+        expect(Number(userFinalBalance.amount)).to.equal(500_000);
+        expect(Number(treasuryBalance.amount)).to.equal(500_000);
+
+        // Account should be thawed after seizure
+        expect(userFinalBalance.isFrozen).to.be.false;
+
         addProof(testName, "seize", tx, [
+          { label: "Seize Mint", address: seizeMint.toString() },
           { label: "Source Account", address: seizeUserTokenAccount.address.toString() },
           { label: "Destination Account", address: seizeDestAccount.address.toString() },
           { label: "Amount Seized", address: "500,000 (0.5 tokens)" },
@@ -813,10 +957,7 @@ describe("SSS Token Devnet Tests", function () {
       } catch (error: any) {
         addProof(testName, "seize", undefined, [], "failed", error.message);
         // Don't throw - continue tests
-        // Note: Seize requires Token-2022 extensions (permanent delegate, PDA freeze authority)
-        // which are not set up with standard createMint
         console.log(`⚠️ Seize failed: ${error.message}`);
-        console.log(`   Note: Seize requires mint with PDA freeze authority and permanent delegate extensions`);
       }
     });
   });

@@ -9,18 +9,18 @@ echo "=============================================="
 echo "SSS Token Devnet Test Runner"
 echo "=============================================="
 
-# Load environment variables
-export $(cat .env.devnet | grep -v '^#' | xargs)
+# Wallet configuration
+WALLET_FILE="./admin_phantom_key_pc.json"
 
 # Check if wallet file exists
-if [ ! -f "$ANCHOR_WALLET" ]; then
-    echo "ERROR: Wallet file not found: $ANCHOR_WALLET"
+if [ ! -f "$WALLET_FILE" ]; then
+    echo "ERROR: Wallet file not found: $WALLET_FILE"
     echo "Please ensure your wallet keyfile exists at the specified path."
     exit 1
 fi
 
 # Get wallet address
-WALLET_ADDRESS=$(solana-keygen pubkey $ANCHOR_WALLET)
+WALLET_ADDRESS=$(solana-keygen pubkey $WALLET_FILE)
 echo ""
 echo "Wallet: $WALLET_ADDRESS"
 

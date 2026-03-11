@@ -9,20 +9,29 @@ echo "=============================================="
 echo "SSS Token Devnet Deployment"
 echo "=============================================="
 
-# Load environment variables
-export $(cat .env.devnet | grep -v '^#' | xargs)
+# Wallet configuration
+WALLET_FILE="./admin_phantom_key_pc.json"
 
 # Check if wallet file exists
-if [ ! -f "$ANCHOR_WALLET" ]; then
-    echo "ERROR: Wallet file not found: $ANCHOR_WALLET"
+if [ ! -f "$WALLET_FILE" ]; then
+    echo "ERROR: Wallet file not found: $WALLET_FILE"
     echo "Please ensure your wallet keyfile exists at the specified path."
     exit 1
 fi
 
-# Set Solana config to devnet
+# Get wallet address
+WALLET_ADDRESS=$(solana-keygen pubkey $WALLET_FILE)
+echo ""
+echo "Using wallet: $WALLET_ADDRESS"
+
+# Set environment variables
+export ANCHOR_WALLET=$WALLET_FILE
+export ANCHOR_PROVIDER_URL=https://api.devnet.solana.com
+
+# Set Solana config to devnet with our wallet
 echo ""
 echo "Configuring Solana CLI for devnet..."
-solana config set --url devnet
+solana config set --url devnet --keypair $WALLET_FILE
 
 # Check balance
 echo ""

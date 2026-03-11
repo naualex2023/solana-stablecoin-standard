@@ -27,6 +27,12 @@ SSS Token is a Solana Program (smart contract) combined with TypeScript SDK, CLI
 | Pause Capability | ✅ | ❌ |
 | Audit Trail | ✅ | ❌ |
 
+## Live Demo
+
+**🌐 Web Interface**: https://solana-stablecoin-standard-amber.vercel.app/
+
+The live demo showcases the SSS Token frontend deployed on Vercel, connected to Solana devnet.
+
 ## Quick Start
 
 ### Prerequisites

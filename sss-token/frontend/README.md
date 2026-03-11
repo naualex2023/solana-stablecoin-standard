@@ -232,6 +232,18 @@ npm run build
 npm start
 ```
 
+## Live Demo
+
+A live demo of the frontend is deployed on Vercel:
+
+**🌐 https://solana-stablecoin-standard-amber.vercel.app/**
+
+The demo connects to Solana devnet and showcases:
+- Dashboard with stablecoin overview
+- Create stablecoin wizard
+- Admin operations panel
+- Token holders table
+
 ## Deploy to Vercel
 
 ### One-Click Deploy

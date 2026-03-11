@@ -183,6 +183,8 @@ Frontend Architecture:
 └─────────────────────────────────────────────────────────────┘
 ```
 
+**Live Demo**: https://solana-stablecoin-standard-amber.vercel.app/
+
 See [frontend/README.md](../frontend/README.md) for detailed documentation.
 
 #### Backend Services

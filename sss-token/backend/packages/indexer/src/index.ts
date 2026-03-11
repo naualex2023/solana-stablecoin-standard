@@ -85,15 +85,19 @@ async function getStartSlot(): Promise<number> {
 
 /**
  * Fetch signatures for a slot range
+ * Note: getSignaturesForAddress doesn't support endSlot filtering directly.
+ * The 'until' param expects a signature string, not a slot number.
+ * We filter by endSlot client-side after fetching.
  */
 async function fetchSignatures(startSlot: number, endSlot: number) {
   try {
     const signatures = await connection.getSignaturesForAddress(programId, {
       minContextSlot: startSlot,
-      until: endSlot.toString(),
       limit: 1000,
     });
-    return signatures;
+    
+    // Filter by endSlot client-side since 'until' expects a signature, not a slot
+    return signatures.filter(sig => sig.slot <= endSlot);
   } catch (error) {
     log.error({ error, startSlot, endSlot }, 'Failed to fetch signatures');
     return [];

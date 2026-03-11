@@ -2,34 +2,38 @@
 > @sss-backend/webhook-service@1.0.0 dev /home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/packages/webhook-service
 > ts-node-dev --respawn --transpile-only src/index.ts
 
-[INFO] 09:36:27 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+[INFO] 09:45:03 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
 Redis config: { host: 'localhost', port: 6379, hasPassword: true }
 Redis connected
 Redis ready
-[2026-03-11 09:36:27.705 +0300] [32mINFO[39m: [36mInitializing webhook service...[39m
+[2026-03-11 09:45:03.826 +0300] [32mINFO[39m: [36mInitializing webhook service...[39m
     service: "webhook-service"
-[2026-03-11 09:36:27.705 +0300] [32mINFO[39m: [36mDatabase initialized[39m
+[2026-03-11 09:45:03.827 +0300] [32mINFO[39m: [36mDatabase initialized[39m
     service: "webhook-service"
-[2026-03-11 09:36:27.707 +0300] [32mINFO[39m: [36mRedis initialized[39m
+[2026-03-11 09:45:03.829 +0300] [32mINFO[39m: [36mRedis initialized[39m
     service: "webhook-service"
-[2026-03-11 09:36:27.710 +0300] [32mINFO[39m: [36mBackground jobs started[39m
+[2026-03-11 09:45:03.831 +0300] [32mINFO[39m: [36mBackground jobs started[39m
     service: "webhook-service"
     schedule: "*/5 * * * *"
-[2026-03-11 09:36:27.749 +0300] [32mINFO[39m: [36mEvent listener started[39m
+[2026-03-11 09:45:03.855 +0300] [32mINFO[39m: [36mEvent listener started[39m
     service: "webhook-service"
-[2026-03-11 09:36:27.749 +0300] [32mINFO[39m: [36mWebhook service initialized[39m
+[2026-03-11 09:45:03.855 +0300] [32mINFO[39m: [36mWebhook service initialized[39m
     service: "webhook-service"
-[2026-03-11 09:36:27.750 +0300] [32mINFO[39m: [36mWebhook service listening[39m
+[2026-03-11 09:45:03.857 +0300] [32mINFO[39m: [36mWebhook service listening[39m
     service: "webhook-service"
     port: 3003
-[2026-03-11 09:36:31.855 +0300] [32mINFO[39m: [36mRequest[39m
+[2026-03-11 09:45:07.999 +0300] [32mINFO[39m: [36mRequest[39m
     service: "webhook-service"
     method: "GET"
     path: "/health"
-[2026-03-11 09:36:46.090 +0300] [32mINFO[39m: [36mRequest[39m
+New database connection established
+[2026-03-11 09:50:00.150 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
     service: "webhook-service"
-    method: "GET"
-    path: "/"
+    count: 0
+New database connection established
+[2026-03-11 09:55:00.442 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+    service: "webhook-service"
+    count: 0
  ELIFECYCLE  Command failed.
-[2026-03-11 09:37:15.017 +0300] [32mINFO[39m: [36mShutting down webhook service...[39m
+[2026-03-11 09:55:21.021 +0300] [32mINFO[39m: [36mShutting down webhook service...[39m
     service: "webhook-service"

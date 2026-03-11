@@ -224,10 +224,11 @@ start_infrastructure() {
         sleep 1
     done
     
-    # Wait for Redis
+    # Wait for Redis (with authentication)
     log_info "Waiting for Redis..."
+    REDIS_PASSWORD="${REDIS_PASSWORD:-sss_redis_secret}"
     for i in {1..30}; do
-        if docker-compose exec -T redis redis-cli ping 2>/dev/null | grep -q PONG; then
+        if docker-compose exec -T redis redis-cli -a "$REDIS_PASSWORD" ping 2>/dev/null | grep -q PONG; then
             log_success "Redis is ready"
             break
         fi
@@ -241,6 +242,16 @@ start_infrastructure() {
 
 start_backend_services() {
     log_step "Starting backend services..."
+    
+    # Load environment variables from .env file
+    if [ -f "$BACKEND_DIR/.env" ]; then
+        log_info "Loading environment from .env file..."
+        set -a
+        source "$BACKEND_DIR/.env"
+        set +a
+    else
+        log_warning "No .env file found at $BACKEND_DIR/.env"
+    fi
     
     # Indexer
     if is_running "$PID_DIR/indexer.pid"; then

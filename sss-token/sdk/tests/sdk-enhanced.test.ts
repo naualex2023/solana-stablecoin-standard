@@ -606,15 +606,17 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
 
       // 1. Set up roles
       console.log("Step 1: Update roles");
-      await stable.authority.updateRoles(authority, {
+      const rolesTx = await stable.authority.updateRoles(authority, {
         blacklister: blacklister.publicKey,
         pauser: pauser.publicKey,
         seizer: seizer.publicKey,
       });
+      await connection.confirmTransaction(rolesTx, "confirmed");
 
       // 2. Add minter
       console.log("Step 2: Add minter");
-      await stable.minting.addMinter(authority, minter.publicKey, new BN(1_000_000_000));
+      const addMinterTx = await stable.minting.addMinter(authority, minter.publicKey, new BN(1_000_000_000));
+      await connection.confirmTransaction(addMinterTx, "confirmed");
 
       // 3. Mint tokens
       console.log("Step 3: Mint tokens");
@@ -630,12 +632,13 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
         TOKEN_2022_PROGRAM_ID
       );
 
-      await stable.minting.mintTokens(
+      const mintTokensTx = await stable.minting.mintTokens(
         authority,
         minter.publicKey,
         userTokenAccount.address,
         new BN(1_000_000)
       );
+      await connection.confirmTransaction(mintTokensTx, "confirmed");
 
       // 4. Verify balance
       const accountInfo = await getAccount(connection, userTokenAccount.address, undefined, TOKEN_2022_PROGRAM_ID);
@@ -643,12 +646,14 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
 
       // 5. Blacklist user
       console.log("Step 5: Blacklist user");
-      await stable.compliance.blacklistAdd(blacklister, workflowUser.publicKey, "Test blacklist");
+      const blacklistTx = await stable.compliance.blacklistAdd(blacklister, workflowUser.publicKey, "Test blacklist");
+      await connection.confirmTransaction(blacklistTx, "confirmed");
       expect(await stable.compliance.isBlacklisted(workflowUser.publicKey)).to.be.true;
 
       // 6. Remove from blacklist
       console.log("Step 6: Remove from blacklist");
-      await stable.compliance.blacklistRemove(blacklister, workflowUser.publicKey);
+      const unblacklistTx = await stable.compliance.blacklistRemove(blacklister, workflowUser.publicKey);
+      await connection.confirmTransaction(unblacklistTx, "confirmed");
       expect(await stable.compliance.isBlacklisted(workflowUser.publicKey)).to.be.false;
 
       // 7. Pause

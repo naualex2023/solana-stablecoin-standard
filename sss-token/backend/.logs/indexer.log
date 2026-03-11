@@ -2,34 +2,674 @@
 > @sss-backend/indexer@1.0.0 dev /home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/packages/indexer
 > ts-node-dev --respawn --transpile-only src/index.ts
 
-[INFO] 09:09:34 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
-Redis config: { host: 'localhost', port: 6379, hasPassword: false }
+[INFO] 09:36:21 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+Redis config: { host: 'localhost', port: 6379, hasPassword: true }
 Redis connected
-Redis connection error: NOAUTH Authentication required.
-[2026-03-11 09:09:35.350 +0300] [32mINFO[39m: [36mInitializing indexer service...[39m
+Redis ready
+New database connection established
+[2026-03-11 09:36:21.811 +0300] [32mINFO[39m: [36mInitializing indexer service...[39m
     service: "indexer"
-[2026-03-11 09:09:35.351 +0300] [32mINFO[39m: [36mConfiguration[39m
+[2026-03-11 09:36:21.812 +0300] [32mINFO[39m: [36mConfiguration[39m
     service: "indexer"
     rpcUrl: "http://localhost:8899"
     programId: "Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw"
-[2026-03-11 09:09:35.351 +0300] [32mINFO[39m: [36mDatabase initialized[39m
+[2026-03-11 09:36:21.812 +0300] [32mINFO[39m: [36mDatabase initialized[39m
     service: "indexer"
-[2026-03-11 09:09:35.353 +0300] [32mINFO[39m: [36mRedis initialized[39m
+[2026-03-11 09:36:21.814 +0300] [32mINFO[39m: [36mRedis initialized[39m
     service: "indexer"
-[2026-03-11 09:09:35.354 +0300] [32mINFO[39m: [36mSolana connection established[39m
+[2026-03-11 09:36:21.815 +0300] [32mINFO[39m: [36mSolana connection established[39m
     service: "indexer"
-[2026-03-11 09:09:35.418 +0300] [32mINFO[39m: [36mConnected to Solana node[39m
+[2026-03-11 09:36:21.873 +0300] [32mINFO[39m: [36mConnected to Solana node[39m
     service: "indexer"
     version: {
       "feature-set": 2142755730,
       "solana-core": "2.3.13"
     }
-[2026-03-11 09:09:35.418 +0300] [32mINFO[39m: [36mSubscribing to real-time logs...[39m
+[2026-03-11 09:36:21.873 +0300] [32mINFO[39m: [36mSubscribing to real-time logs...[39m
     service: "indexer"
-[2026-03-11 09:09:35.422 +0300] [32mINFO[39m: [36mSubscribed to program logs[39m
+[2026-03-11 09:36:21.878 +0300] [32mINFO[39m: [36mSubscribed to program logs[39m
     service: "indexer"
-[2026-03-11 09:09:35.452 +0300] [31mERROR[39m: [36mFatal error[39m
+[2026-03-11 09:36:21.921 +0300] [32mINFO[39m: [36mStarting indexing[39m
     service: "indexer"
-    stack: "Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n    at /home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/node_modules/.pnpm/pg-pool@3.13.0_pg@8.20.0/node_modules/pg-pool/index.js:45:11\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at getLatestEventSlot (/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/packages/shared/src/database.ts:158:18)\n    at getStartSlot (/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/packages/indexer/src/index.ts:76:22)\n    at startIndexing (/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/packages/indexer/src/index.ts:199:21)\n    at main (/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/packages/indexer/src/index.ts:292:5)"
-    error: "SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"
+    startSlot: 0
+[2026-03-11 09:36:21.924 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 0
+    endSlot: 68
+[2026-03-11 09:36:21.927 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 0
+    endSlot: 68
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:22.932 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 69
+    endSlot: 70
+[2026-03-11 09:36:22.934 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 69
+    endSlot: 70
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:23.938 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 71
+    endSlot: 73
+[2026-03-11 09:36:23.940 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 71
+    endSlot: 73
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:24.944 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 74
+    endSlot: 75
+[2026-03-11 09:36:24.945 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 74
+    endSlot: 75
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:25.949 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 76
+    endSlot: 77
+[2026-03-11 09:36:25.950 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 76
+    endSlot: 77
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:26.954 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 78
+    endSlot: 80
+[2026-03-11 09:36:26.955 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 78
+    endSlot: 80
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:27.959 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 81
+    endSlot: 82
+[2026-03-11 09:36:27.961 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 81
+    endSlot: 82
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:28.965 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 83
+    endSlot: 85
+[2026-03-11 09:36:28.966 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 83
+    endSlot: 85
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:29.970 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 86
+    endSlot: 87
+[2026-03-11 09:36:29.971 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 86
+    endSlot: 87
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:30.974 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 88
+    endSlot: 90
+[2026-03-11 09:36:30.976 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 88
+    endSlot: 90
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:31.980 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 91
+    endSlot: 92
+[2026-03-11 09:36:31.981 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 91
+    endSlot: 92
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:32.984 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 93
+    endSlot: 95
+[2026-03-11 09:36:32.986 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 93
+    endSlot: 95
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:33.989 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 96
+    endSlot: 97
+[2026-03-11 09:36:33.992 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 96
+    endSlot: 97
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:34.996 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 98
+    endSlot: 100
+[2026-03-11 09:36:34.997 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 98
+    endSlot: 100
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:36.001 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 101
+    endSlot: 102
+[2026-03-11 09:36:36.002 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 101
+    endSlot: 102
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:37.006 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 103
+    endSlot: 105
+[2026-03-11 09:36:37.007 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 103
+    endSlot: 105
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:38.013 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 106
+    endSlot: 107
+[2026-03-11 09:36:38.016 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 106
+    endSlot: 107
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:39.021 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 108
+    endSlot: 110
+[2026-03-11 09:36:39.023 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 108
+    endSlot: 110
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:40.027 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 111
+    endSlot: 112
+[2026-03-11 09:36:40.029 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 111
+    endSlot: 112
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:41.034 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 113
+    endSlot: 114
+[2026-03-11 09:36:41.036 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 113
+    endSlot: 114
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:42.039 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 115
+    endSlot: 117
+[2026-03-11 09:36:42.041 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 115
+    endSlot: 117
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:43.046 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 118
+    endSlot: 119
+[2026-03-11 09:36:43.047 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 118
+    endSlot: 119
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:44.051 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 120
+    endSlot: 122
+[2026-03-11 09:36:44.052 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 120
+    endSlot: 122
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:45.057 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 123
+    endSlot: 124
+[2026-03-11 09:36:45.058 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 123
+    endSlot: 124
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:46.071 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 125
+    endSlot: 127
+[2026-03-11 09:36:46.074 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 125
+    endSlot: 127
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:47.093 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 128
+    endSlot: 129
+[2026-03-11 09:36:47.095 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 128
+    endSlot: 129
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:48.097 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 130
+    endSlot: 132
+[2026-03-11 09:36:48.099 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 130
+    endSlot: 132
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:49.104 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 133
+    endSlot: 134
+[2026-03-11 09:36:49.105 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 133
+    endSlot: 134
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:50.110 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 135
+    endSlot: 137
+[2026-03-11 09:36:50.113 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 135
+    endSlot: 137
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:51.118 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 138
+    endSlot: 139
+[2026-03-11 09:36:51.119 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 138
+    endSlot: 139
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:52.125 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 140
+    endSlot: 142
+[2026-03-11 09:36:52.126 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 140
+    endSlot: 142
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:53.131 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 143
+    endSlot: 144
+[2026-03-11 09:36:53.132 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 143
+    endSlot: 144
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:54.135 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 145
+    endSlot: 146
+[2026-03-11 09:36:54.136 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 145
+    endSlot: 146
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:55.139 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 147
+    endSlot: 149
+[2026-03-11 09:36:55.141 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 147
+    endSlot: 149
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:56.144 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 150
+    endSlot: 151
+[2026-03-11 09:36:56.145 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 150
+    endSlot: 151
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:57.150 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 152
+    endSlot: 154
+[2026-03-11 09:36:57.151 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 152
+    endSlot: 154
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:58.155 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 155
+    endSlot: 156
+[2026-03-11 09:36:58.156 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 155
+    endSlot: 156
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:36:59.160 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 157
+    endSlot: 159
+[2026-03-11 09:36:59.161 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 157
+    endSlot: 159
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:00.164 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 160
+    endSlot: 161
+[2026-03-11 09:37:00.166 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 160
+    endSlot: 161
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:01.171 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 162
+    endSlot: 164
+[2026-03-11 09:37:01.173 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 162
+    endSlot: 164
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:02.175 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 165
+    endSlot: 166
+[2026-03-11 09:37:02.177 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 165
+    endSlot: 166
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:03.181 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 167
+    endSlot: 169
+[2026-03-11 09:37:03.182 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 167
+    endSlot: 169
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:04.188 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 170
+    endSlot: 171
+[2026-03-11 09:37:04.190 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 170
+    endSlot: 171
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:05.195 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 172
+    endSlot: 174
+[2026-03-11 09:37:05.196 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 172
+    endSlot: 174
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:06.199 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 175
+    endSlot: 176
+[2026-03-11 09:37:06.200 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 175
+    endSlot: 176
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:07.204 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 177
+    endSlot: 178
+[2026-03-11 09:37:07.208 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 177
+    endSlot: 178
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:08.212 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 179
+    endSlot: 181
+[2026-03-11 09:37:08.214 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 179
+    endSlot: 181
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:09.219 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 182
+    endSlot: 183
+[2026-03-11 09:37:09.220 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 182
+    endSlot: 183
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:10.224 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 184
+    endSlot: 186
+[2026-03-11 09:37:10.225 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 184
+    endSlot: 186
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:11.228 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 187
+    endSlot: 188
+[2026-03-11 09:37:11.230 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 187
+    endSlot: 188
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:12.234 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 189
+    endSlot: 191
+[2026-03-11 09:37:12.235 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 189
+    endSlot: 191
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:13.239 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 192
+    endSlot: 193
+[2026-03-11 09:37:13.241 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 192
+    endSlot: 193
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
+[2026-03-11 09:37:14.244 +0300] [34mDEBUG[39m: [36mProcessing slot range[39m
+    service: "indexer"
+    startSlot: 194
+    endSlot: 196
+[2026-03-11 09:37:14.245 +0300] [31mERROR[39m: [36mFailed to fetch signatures[39m
+    service: "indexer"
+    startSlot: 194
+    endSlot: 196
+    error: {
+      "code": -32602,
+      "name": "SolanaJSONRPCError"
+    }
  ELIFECYCLE  Command failed.
+[2026-03-11 09:37:15.017 +0300] [32mINFO[39m: [36mShutting down indexer...[39m
+    service: "indexer"
+[2026-03-11 09:37:15.018 +0300] [32mINFO[39m: [36mShutdown complete[39m
+    service: "indexer"

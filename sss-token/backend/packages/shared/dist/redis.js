@@ -112,7 +112,19 @@ function getRedis() {
  */
 async function closeRedis() {
     if (redis) {
-        await redis.quit();
+        // Only quit if connection is open, otherwise just clean up
+        if (redis.status === 'ready' || redis.status === 'connecting') {
+            try {
+                await redis.quit();
+            }
+            catch (error) {
+                // Connection might already be closed, just disconnect
+                redis.disconnect(false);
+            }
+        }
+        else {
+            redis.disconnect(false);
+        }
         redis = null;
     }
 }

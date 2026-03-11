@@ -773,6 +773,8 @@ describe("SSS Token Devnet Tests", function () {
         );
 
         // Freeze the user's account first (required for seizure)
+        // Note: For seize to work, the mint must have PDA-based freeze authority
+        // Since this mint was created with keypair freeze authority, we use regular freeze
         const freezeTx = await sdk.freezeTokenAccount(
           mint,
           seizeUserTokenAccount.address,
@@ -781,12 +783,16 @@ describe("SSS Token Devnet Tests", function () {
         await connection.confirmTransaction(freezeTx, "confirmed");
         console.log(`   Account frozen for seizure`);
 
-        // Seize tokens - need both seizer and freeze authority signers
+        // Seize tokens - seizer must be authorized in config.seizer role
+        // Note: Seize requires the mint to be created with:
+        // 1. Freeze authority set to the program's freeze authority PDA
+        // 2. Permanent delegate extension set to the program's permanent delegate PDA
+        // The standard createMint doesn't support these extensions, so this test
+        // may fail on devnet unless the mint is properly configured.
         const seizeAmount = new BN(500_000); // 0.5 tokens
         const tx = await sdk.seize(
           mint,
-          payer, // seizer
-          payer, // freeze authority (same as freeze authority set on mint)
+          payer, // seizer (must match config.seizer)
           {
             sourceToken: seizeUserTokenAccount.address,
             destToken: seizeDestAccount.address,
@@ -807,7 +813,10 @@ describe("SSS Token Devnet Tests", function () {
       } catch (error: any) {
         addProof(testName, "seize", undefined, [], "failed", error.message);
         // Don't throw - continue tests
+        // Note: Seize requires Token-2022 extensions (permanent delegate, PDA freeze authority)
+        // which are not set up with standard createMint
         console.log(`⚠️ Seize failed: ${error.message}`);
+        console.log(`   Note: Seize requires mint with PDA freeze authority and permanent delegate extensions`);
       }
     });
   });

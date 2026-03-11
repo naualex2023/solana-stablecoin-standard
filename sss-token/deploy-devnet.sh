@@ -2,6 +2,7 @@
 
 # SSS Token Devnet Deployment Script
 # This script deploys the SSS Token and Transfer Hook programs to Solana devnet
+# Uses the original deployer wallet (id.json) for program upgrades
 
 set -e
 
@@ -9,29 +10,34 @@ echo "=============================================="
 echo "SSS Token Devnet Deployment"
 echo "=============================================="
 
-# Wallet configuration
-WALLET_FILE="./admin_phantom_key_pc.json"
+# Deployment wallet (original authority for existing programs)
+DEPLOY_WALLET="$HOME/.config/solana/id.json"
 
-# Check if wallet file exists
-if [ ! -f "$WALLET_FILE" ]; then
-    echo "ERROR: Wallet file not found: $WALLET_FILE"
-    echo "Please ensure your wallet keyfile exists at the specified path."
+# Test wallet (your Phantom wallet)
+TEST_WALLET="./admin_phantom_key_pc.json"
+
+# Check if deploy wallet exists
+if [ ! -f "$DEPLOY_WALLET" ]; then
+    echo "ERROR: Deploy wallet not found: $DEPLOY_WALLET"
     exit 1
 fi
 
-# Get wallet address
-WALLET_ADDRESS=$(solana-keygen pubkey $WALLET_FILE)
-echo ""
-echo "Using wallet: $WALLET_ADDRESS"
+# Get wallet addresses
+DEPLOY_ADDRESS=$(solana-keygen pubkey $DEPLOY_WALLET)
+TEST_ADDRESS=$(solana-keygen pubkey $TEST_WALLET 2>/dev/null || echo "N/A")
 
-# Set environment variables
-export ANCHOR_WALLET=$WALLET_FILE
+echo ""
+echo "Deploy wallet: $DEPLOY_ADDRESS"
+echo "Test wallet: $TEST_ADDRESS"
+
+# Set environment variables for deployment
+export ANCHOR_WALLET=$DEPLOY_WALLET
 export ANCHOR_PROVIDER_URL=https://api.devnet.solana.com
 
-# Set Solana config to devnet with our wallet
+# Set Solana config to devnet with deploy wallet
 echo ""
 echo "Configuring Solana CLI for devnet..."
-solana config set --url devnet --keypair $WALLET_FILE
+solana config set --url devnet --keypair $DEPLOY_WALLET
 
 # Check balance
 echo ""
@@ -57,16 +63,26 @@ fi
 echo ""
 echo "Building programs for devnet..."
 echo "This may take a few minutes..."
-anchor build --provider.cluster devnet
+anchor build --provider.cluster devnet --provider.wallet $DEPLOY_WALLET
 
 # Deploy programs
 echo ""
 echo "Deploying SSS Token program..."
-anchor deploy --provider.cluster devnet --program-name sss-token
+anchor deploy --provider.cluster devnet --provider.wallet $DEPLOY_WALLET --program-name sss-token || {
+    echo ""
+    echo "⚠️  SSS Token deployment failed."
+    echo "   Check if you have sufficient SOL and the correct authority."
+    echo ""
+}
 
 echo ""
 echo "Deploying Transfer Hook program..."
-anchor deploy --provider.cluster devnet --program-name transfer-hook
+anchor deploy --provider.cluster devnet --provider.wallet $DEPLOY_WALLET --program-name transfer-hook || {
+    echo ""
+    echo "⚠️  Transfer Hook deployment failed."
+    echo "   Check if you have sufficient SOL and the correct authority."
+    echo ""
+}
 
 # Get program IDs
 SSS_TOKEN_ID=$(cat target/deploy/sss_token-keypair.json | solana-keygen pubkey)

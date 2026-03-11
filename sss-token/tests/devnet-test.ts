@@ -173,14 +173,14 @@ describe("SSS Token Devnet Tests", function () {
   const minter = Keypair.generate();
   const user1 = Keypair.generate();
   const user2 = Keypair.generate();
-  const seizer = Keypair.generate();
-  const blacklister = Keypair.generate();
-  const pauser = Keypair.generate();
   const newAuthority = Keypair.generate();
 
   // Shared mint for tests
   let mint: PublicKey;
   let mintAuthority: Keypair;
+  
+  // Track user1's token account for transfer
+  let user1TokenAccount: PublicKey;
 
   before(async () => {
     console.log("\n🚀 Setting up Devnet Test Suite...\n");
@@ -313,9 +313,9 @@ describe("SSS Token Devnet Tests", function () {
 
       try {
         const tx = await sdk.updateRoles(mint, payer, {
-          newBlacklister: blacklister.publicKey,
-          newPauser: pauser.publicKey,
-          newSeizer: seizer.publicKey,
+          newBlacklister: payer.publicKey,
+          newPauser: payer.publicKey,
+          newSeizer: payer.publicKey,
         });
 
         await connection.confirmTransaction(tx, "confirmed");
@@ -324,14 +324,14 @@ describe("SSS Token Devnet Tests", function () {
 
         // Verify
         const config = await sdk.getConfig(mint);
-        expect(config.blacklister.toString()).to.equal(blacklister.publicKey.toString());
-        expect(config.pauser.toString()).to.equal(pauser.publicKey.toString());
-        expect(config.seizer.toString()).to.equal(seizer.publicKey.toString());
+        expect(config.blacklister.toString()).to.equal(payer.publicKey.toString());
+        expect(config.pauser.toString()).to.equal(payer.publicKey.toString());
+        expect(config.seizer.toString()).to.equal(payer.publicKey.toString());
 
         addProof(testName, "update_roles", tx, [
-          { label: "Blacklister", address: blacklister.publicKey.toString() },
-          { label: "Pauser", address: pauser.publicKey.toString() },
-          { label: "Seizer", address: seizer.publicKey.toString() },
+          { label: "Blacklister", address: payer.publicKey.toString() },
+          { label: "Pauser", address: payer.publicKey.toString() },
+          { label: "Seizer", address: payer.publicKey.toString() },
         ], "success");
       } catch (error: any) {
         addProof(testName, "update_roles", undefined, [], "failed", error.message);
@@ -407,25 +407,25 @@ describe("SSS Token Devnet Tests", function () {
       const testName = "Mint Tokens";
 
       try {
-        // Create user token account
-        const userTokenAccount = await getOrCreateAssociatedTokenAccount(
+        // Create payer's token account (so payer can transfer)
+        const payerTokenAccount = await getOrCreateAssociatedTokenAccount(
           connection,
           payer,
           mint,
-          user1.publicKey,
+          payer.publicKey,
           undefined,
           undefined,
           undefined,
           TOKEN_2022_PROGRAM_ID
         );
 
-        const amount = new BN(1_000_000); // 1 token
+        const amount = new BN(2_000_000); // 2 tokens
 
         const tx = await sdk.mintTokens(
           mint,
           payer,
           minter.publicKey,
-          userTokenAccount.address,
+          payerTokenAccount.address,
           { amount }
         );
 
@@ -436,16 +436,19 @@ describe("SSS Token Devnet Tests", function () {
         // Verify balance
         const account = await getAccount(
           connection,
-          userTokenAccount.address,
+          payerTokenAccount.address,
           undefined,
           TOKEN_2022_PROGRAM_ID
         );
         expect(Number(account.amount)).to.equal(amount.toNumber());
+        
+        // Store for later tests
+        user1TokenAccount = payerTokenAccount.address;
 
         addProof(testName, "mint_tokens", tx, [
-          { label: "Recipient", address: user1.publicKey.toString() },
-          { label: "Token Account", address: userTokenAccount.address.toString() },
-          { label: "Amount", address: "1,000,000 (1 token)" },
+          { label: "Recipient", address: payer.publicKey.toString() },
+          { label: "Token Account", address: payerTokenAccount.address.toString() },
+          { label: "Amount", address: "2,000,000 (2 tokens)" },
         ], "success");
       } catch (error: any) {
         addProof(testName, "mint_tokens", undefined, [], "failed", error.message);
@@ -459,12 +462,12 @@ describe("SSS Token Devnet Tests", function () {
       const testName = "Transfer Tokens";
 
       try {
-        // Get user1's token account
-        const user1TokenAccount = await getOrCreateAssociatedTokenAccount(
+        // Get payer's token account
+        const payerTokenAccount = await getOrCreateAssociatedTokenAccount(
           connection,
           payer,
           mint,
-          user1.publicKey,
+          payer.publicKey,
           undefined,
           undefined,
           undefined,
@@ -483,14 +486,14 @@ describe("SSS Token Devnet Tests", function () {
           TOKEN_2022_PROGRAM_ID
         );
 
-        // Transfer using SPL Token
+        // Transfer using SPL Token - payer owns the source account
         const { transfer } = await import("@solana/spl-token");
         const tx = await transfer(
           connection,
           payer,
-          user1TokenAccount.address,
+          payerTokenAccount.address,
           user2TokenAccount.address,
-          payer.publicKey,
+          payer.publicKey, // payer is the owner
           500_000, // 0.5 tokens
           [],
           undefined,
@@ -511,7 +514,7 @@ describe("SSS Token Devnet Tests", function () {
         expect(Number(user2Account.amount)).to.equal(500_000);
 
         addProof(testName, "transfer", tx, [
-          { label: "Sender", address: user1.publicKey.toString() },
+          { label: "Sender", address: payer.publicKey.toString() },
           { label: "Recipient", address: user2.publicKey.toString() },
           { label: "Amount", address: "500,000 (0.5 tokens)" },
         ], "success");
@@ -523,16 +526,16 @@ describe("SSS Token Devnet Tests", function () {
   });
 
   describe("7. Burn Tokens", () => {
-    it("should burn tokens from an account", async () => {
+    it("should burn tokens from payer's account", async () => {
       const testName = "Burn Tokens";
 
       try {
-        // Get user2's token account (has 0.5 tokens from transfer)
-        const user2TokenAccount = await getOrCreateAssociatedTokenAccount(
+        // Get payer's token account (has tokens from mint)
+        const payerTokenAccount = await getOrCreateAssociatedTokenAccount(
           connection,
           payer,
           mint,
-          user2.publicKey,
+          payer.publicKey,
           undefined,
           undefined,
           undefined,
@@ -543,8 +546,8 @@ describe("SSS Token Devnet Tests", function () {
 
         const tx = await sdk.burnTokens(
           mint,
-          user2TokenAccount.address,
-          payer, // payer is token account owner (via payer funding)
+          payerTokenAccount.address,
+          payer, // payer owns this account
           { amount: burnAmount }
         );
 
@@ -553,7 +556,7 @@ describe("SSS Token Devnet Tests", function () {
         console.log(`   Explorer: ${explorerLink(tx)}`);
 
         addProof(testName, "burn_tokens", tx, [
-          { label: "Token Account", address: user2TokenAccount.address.toString() },
+          { label: "Token Account", address: payerTokenAccount.address.toString() },
           { label: "Amount Burned", address: "250,000 (0.25 tokens)" },
         ], "success");
       } catch (error: any) {
@@ -571,7 +574,7 @@ describe("SSS Token Devnet Tests", function () {
       try {
         const reason = "Suspicious activity - Devnet test";
 
-        const tx = await sdk.addToBlacklist(mint, blacklister, {
+        const tx = await sdk.addToBlacklist(mint, payer, {
           user: user2.publicKey,
           reason,
         });
@@ -600,7 +603,7 @@ describe("SSS Token Devnet Tests", function () {
       const testName = "Remove from Blacklist";
 
       try {
-        const tx = await sdk.removeFromBlacklist(mint, blacklister, {
+        const tx = await sdk.removeFromBlacklist(mint, payer, {
           user: user2.publicKey,
         });
 
@@ -724,12 +727,86 @@ describe("SSS Token Devnet Tests", function () {
     });
   });
 
-  describe("12. Pause Stablecoin", () => {
+  describe("12. Seize Tokens", () => {
+    it("should seize tokens from a frozen account", async () => {
+      const testName = "Seize Tokens";
+
+      try {
+        // Create a user with tokens to seize
+        const seizeUser = Keypair.generate();
+        const seizeUserTokenAccount = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          seizeUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        // Mint some tokens to this account
+        await sdk.mintTokens(
+          mint,
+          payer,
+          minter.publicKey,
+          seizeUserTokenAccount.address,
+          { amount: new BN(1_000_000) }
+        );
+        
+        // Create destination account for seized tokens
+        const seizeDestAccount = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          payer.publicKey, // seized tokens go to payer
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        // Freeze the user's account first (required for seizure)
+        const freezeTx = await sdk.freezeTokenAccount(
+          mint,
+          seizeUserTokenAccount.address,
+          payer
+        );
+        await connection.confirmTransaction(freezeTx, "confirmed");
+        console.log(`   Account frozen for seizure`);
+
+        // Seize tokens
+        const seizeAmount = new BN(500_000); // 0.5 tokens
+        const tx = await sdk.seize(mint, payer, {
+          sourceToken: seizeUserTokenAccount.address,
+          destToken: seizeDestAccount.address,
+          amount: seizeAmount,
+        });
+
+        await connection.confirmTransaction(tx, "confirmed");
+        console.log(`✅ Seize tx: ${tx}`);
+        console.log(`   Explorer: ${explorerLink(tx)}`);
+
+        addProof(testName, "seize", tx, [
+          { label: "Source Account", address: seizeUserTokenAccount.address.toString() },
+          { label: "Destination Account", address: seizeDestAccount.address.toString() },
+          { label: "Amount Seized", address: "500,000 (0.5 tokens)" },
+          { label: "Seizer", address: payer.publicKey.toString() },
+        ], "success");
+      } catch (error: any) {
+        addProof(testName, "seize", undefined, [], "failed", error.message);
+        // Don't throw - continue tests
+        console.log(`⚠️ Seize failed: ${error.message}`);
+      }
+    });
+  });
+
+  describe("13. Pause Stablecoin", () => {
     it("should pause all stablecoin operations", async () => {
       const testName = "Pause Stablecoin";
 
       try {
-        const tx = await sdk.pause(mint, pauser);
+        const tx = await sdk.pause(mint, payer);
 
         await connection.confirmTransaction(tx, "confirmed");
         console.log(`✅ Pause tx: ${tx}`);
@@ -747,12 +824,12 @@ describe("SSS Token Devnet Tests", function () {
     });
   });
 
-  describe("13. Unpause Stablecoin", () => {
+  describe("14. Unpause Stablecoin", () => {
     it("should unpause all stablecoin operations", async () => {
       const testName = "Unpause Stablecoin";
 
       try {
-        const tx = await sdk.unpause(mint, pauser);
+        const tx = await sdk.unpause(mint, payer);
 
         await connection.confirmTransaction(tx, "confirmed");
         console.log(`✅ Unpause tx: ${tx}`);
@@ -770,7 +847,7 @@ describe("SSS Token Devnet Tests", function () {
     });
   });
 
-  describe("14. Transfer Authority", () => {
+  describe("15. Transfer Authority", () => {
     it("should transfer master authority to new keypair", async () => {
       const testName = "Transfer Authority";
 
@@ -804,7 +881,7 @@ describe("SSS Token Devnet Tests", function () {
     });
   });
 
-  describe("15. Remove Minter", () => {
+  describe("16. Remove Minter", () => {
     it("should remove a minter by setting quota to 0", async () => {
       const testName = "Remove Minter";
 
@@ -831,7 +908,7 @@ describe("SSS Token Devnet Tests", function () {
     });
   });
 
-  describe("16. Full Workflow Integration", () => {
+  describe("17. Full Workflow Integration", () => {
     it("should execute complete stablecoin lifecycle", async () => {
       const testName = "Full Workflow Integration";
 
@@ -868,9 +945,9 @@ describe("SSS Token Devnet Tests", function () {
 
         // 2. Update roles
         const rolesTx = await sdk.updateRoles(workflowMint, payer, {
-          newBlacklister: blacklister.publicKey,
-          newPauser: pauser.publicKey,
-          newSeizer: seizer.publicKey,
+          newBlacklister: payer.publicKey,
+          newPauser: payer.publicKey,
+          newSeizer: payer.publicKey,
         });
         await connection.confirmTransaction(rolesTx, "confirmed");
         signatures.push(rolesTx);
@@ -911,19 +988,19 @@ describe("SSS Token Devnet Tests", function () {
         console.log("  4. ✅ Mint tokens");
 
         // 5. Pause
-        const pauseTx = await sdk.pause(workflowMint, pauser);
+        const pauseTx = await sdk.pause(workflowMint, payer);
         await connection.confirmTransaction(pauseTx, "confirmed");
         signatures.push(pauseTx);
         console.log("  5. ✅ Pause");
 
         // 6. Unpause
-        const unpauseTx = await sdk.unpause(workflowMint, pauser);
+        const unpauseTx = await sdk.unpause(workflowMint, payer);
         await connection.confirmTransaction(unpauseTx, "confirmed");
         signatures.push(unpauseTx);
         console.log("  6. ✅ Unpause");
 
         // 7. Blacklist
-        const blacklistTx = await sdk.addToBlacklist(workflowMint, blacklister, {
+        const blacklistTx = await sdk.addToBlacklist(workflowMint, payer, {
           user: workflowUser.publicKey,
           reason: "Test blacklist",
         });
@@ -932,7 +1009,7 @@ describe("SSS Token Devnet Tests", function () {
         console.log("  7. ✅ Blacklist");
 
         // 8. Unblacklist
-        const unblacklistTx = await sdk.removeFromBlacklist(workflowMint, blacklister, {
+        const unblacklistTx = await sdk.removeFromBlacklist(workflowMint, payer, {
           user: workflowUser.publicKey,
         });
         await connection.confirmTransaction(unblacklistTx, "confirmed");

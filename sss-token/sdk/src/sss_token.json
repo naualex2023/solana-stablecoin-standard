@@ -257,7 +257,7 @@
     {
       "name": "freeze_token_account",
       "docs": [
-        "Freeze a token account using the freeze authority keypair"
+        "Freeze a token account"
       ],
       "discriminator": [
         138,
@@ -302,110 +302,7 @@
         },
         {
           "name": "freeze_authority",
-          "docs": [
-            "The freeze authority - must be the mint's freeze authority"
-          ],
           "signer": true
-        },
-        {
-          "name": "token_program",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "freeze_token_account_pda",
-      "docs": [
-        "Freeze a token account using PDA-based freeze authority",
-        "This is for mints where the freeze authority is set to the program's PDA"
-      ],
-      "discriminator": [
-        88,
-        161,
-        46,
-        246,
-        38,
-        36,
-        189,
-        166
-      ],
-      "accounts": [
-        {
-          "name": "config",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "mint",
-          "writable": true
-        },
-        {
-          "name": "token_account",
-          "writable": true
-        },
-        {
-          "name": "seizer",
-          "docs": [
-            "The freezer signer - must be the authorized seizer role",
-            "This is mapped to the `seizer` field in config via has_one constraint"
-          ],
-          "signer": true,
-          "relations": [
-            "config"
-          ]
-        },
-        {
-          "name": "freeze_authority",
-          "docs": [
-            "The freeze authority PDA - seeds: [\"freeze_authority\", mint.key()]"
-          ],
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  114,
-                  101,
-                  101,
-                  122,
-                  101,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
         },
         {
           "name": "token_program",
@@ -973,7 +870,7 @@
     {
       "name": "thaw_token_account",
       "docs": [
-        "Thaw a token account using the freeze authority keypair"
+        "Thaw a token account"
       ],
       "discriminator": [
         199,
@@ -1018,9 +915,6 @@
         },
         {
           "name": "freeze_authority",
-          "docs": [
-            "The freeze authority - must be the mint's freeze authority"
-          ],
           "signer": true
         },
         {

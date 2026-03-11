@@ -48,6 +48,7 @@ export {
   findMinterInfoPDA,
   findBlacklistEntryPDA,
   findPermanentDelegatePDA,
+  findFreezeAuthorityPDA,
   findAllPDAs,
 } from "./pda";
 

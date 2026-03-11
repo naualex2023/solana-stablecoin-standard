@@ -24,24 +24,30 @@ import {
   PRESET_CONFIGS,
   SSSTokenClient,
   findPermanentDelegatePDA,
+  findFreezeAuthorityPDA,
   SSS_TOKEN_PROGRAM_ID,
 } from "../src/index";
 
 /**
  * Helper function to create a Token-2022 mint with the PermanentDelegate extension
  * This allows the program's permanent delegate PDA to transfer tokens from any account
+ * 
+ * IMPORTANT: The freeze authority is set to the program's freeze authority PDA,
+ * which allows the seize instruction to thaw frozen accounts using PDA signing.
  */
 async function createMintWithPermanentDelegate(
   connection: Connection,
   payer: Keypair,
   mintAuthority: PublicKey,
-  freezeAuthority: PublicKey,
   decimals: number,
   programId: PublicKey
 ): Promise<PublicKey> {
-  // Get the permanent delegate PDA for our program
+  // Generate mint keypair first to derive PDAs
   const mintKeypair = Keypair.generate();
+  
+  // Derive both PDAs from the mint address
   const { pda: permanentDelegate } = findPermanentDelegatePDA(mintKeypair.publicKey, programId);
+  const { pda: freezeAuthority } = findFreezeAuthorityPDA(mintKeypair.publicKey, programId);
 
   // Calculate mint size with PermanentDelegate extension
   const extensions = [ExtensionType.PermanentDelegate];
@@ -68,7 +74,7 @@ async function createMintWithPermanentDelegate(
       mintKeypair.publicKey,
       decimals,
       mintAuthority,
-      freezeAuthority,
+      freezeAuthority, // Program's PDA as freeze authority (for seize operation)
       TOKEN_2022_PROGRAM_ID
     )
   );
@@ -77,6 +83,10 @@ async function createMintWithPermanentDelegate(
     commitment: "confirmed",
   });
 
+  console.log("Created mint with permanent delegate:", mintKeypair.publicKey.toString());
+  console.log("  Permanent delegate PDA:", permanentDelegate.toString());
+  console.log("  Freeze authority PDA:", freezeAuthority.toString());
+  
   return mintKeypair.publicKey;
 }
 
@@ -751,8 +761,7 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
       const seizeMint = await createMintWithPermanentDelegate(
         connection,
         payer,
-        authority.publicKey,  // mint authority
-        authority.publicKey,  // freeze authority
+        authority.publicKey,  // mint authority (freeze authority is derived as PDA)
         6,
         programId
       );
@@ -821,8 +830,9 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
       expect(Number(initialBalance.amount)).to.equal(1_000_000);
 
       // 5. Freeze the user's account (required before seizure)
-      console.log("Step 5: Freezing user account...");
-      const freezeTx = await client.freezeTokenAccount(seizeMint, userTokenAccount.address, authority);
+      // Note: Using freezeTokenAccountPda since the mint's freeze authority is a PDA
+      console.log("Step 5: Freezing user account with PDA authority...");
+      const freezeTx = await client.freezeTokenAccountPda(seizeMint, userTokenAccount.address, seizer);
       await connection.confirmTransaction(freezeTx, "confirmed");
 
       const frozenAccount = await getAccount(connection, userTokenAccount.address, undefined, TOKEN_2022_PROGRAM_ID);

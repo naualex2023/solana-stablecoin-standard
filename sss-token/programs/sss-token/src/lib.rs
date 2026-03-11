@@ -207,7 +207,7 @@ pub mod sss_token {
         Ok(())
     }
 
-    /// Freeze a token account
+    /// Freeze a token account using the freeze authority keypair
     pub fn freeze_token_account(ctx: Context<FreezeTokenAccount>) -> Result<()> {
         let cpi_accounts = FreezeAccountCpi {
             account: ctx.accounts.token_account.to_account_info(),
@@ -222,7 +222,34 @@ pub mod sss_token {
         Ok(())
     }
 
-    /// Thaw a token account
+    /// Freeze a token account using PDA-based freeze authority
+    /// This is for mints where the freeze authority is set to the program's PDA
+    pub fn freeze_token_account_pda(ctx: Context<FreezeTokenAccountPda>) -> Result<()> {
+        let freeze_authority_bump = ctx.bumps.freeze_authority;
+        let mint_key = ctx.accounts.mint.key();
+
+        // Sign with the freeze authority PDA
+        let freeze_authority_seeds = &[
+            b"freeze_authority".as_ref(),
+            mint_key.as_ref(),
+            &[freeze_authority_bump],
+        ];
+        let freeze_authority_signer = &[&freeze_authority_seeds[..]];
+
+        let cpi_accounts = FreezeAccountCpi {
+            account: ctx.accounts.token_account.to_account_info(),
+            mint: ctx.accounts.mint.to_account_info(),
+            authority: ctx.accounts.freeze_authority.to_account_info(),
+        };
+        let cpi_program = ctx.accounts.token_program.to_account_info();
+        let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, freeze_authority_signer);
+        token_2022::freeze_account(cpi_ctx)?;
+
+        msg!("Frozen account {} using PDA authority", ctx.accounts.token_account.key());
+        Ok(())
+    }
+
+    /// Thaw a token account using the freeze authority keypair
     pub fn thaw_token_account(ctx: Context<ThawTokenAccount>) -> Result<()> {
         let cpi_accounts = ThawAccountCpi {
             account: ctx.accounts.token_account.to_account_info(),
@@ -499,6 +526,7 @@ pub struct FreezeTokenAccount<'info> {
     #[account(mut)]
     pub token_account: InterfaceAccount<'info, TokenAccount>,
 
+    /// The freeze authority - must be the mint's freeze authority
     pub freeze_authority: Signer<'info>,
 
     pub token_program: Program<'info, Token2022>,
@@ -518,7 +546,38 @@ pub struct ThawTokenAccount<'info> {
     #[account(mut)]
     pub token_account: InterfaceAccount<'info, TokenAccount>,
 
+    /// The freeze authority - must be the mint's freeze authority
     pub freeze_authority: Signer<'info>,
+
+    pub token_program: Program<'info, Token2022>,
+}
+
+#[derive(Accounts)]
+pub struct FreezeTokenAccountPda<'info> {
+    #[account(
+        seeds = [b"config", mint.key().as_ref()],
+        bump = config.bump,
+        has_one = seizer @ StablecoinError::Unauthorized
+    )]
+    pub config: Account<'info, StablecoinConfig>,
+
+    #[account(mut)]
+    pub mint: InterfaceAccount<'info, Mint>,
+
+    #[account(mut)]
+    pub token_account: InterfaceAccount<'info, TokenAccount>,
+
+    /// The freezer signer - must be the authorized seizer role
+    /// This is mapped to the `seizer` field in config via has_one constraint
+    pub seizer: Signer<'info>,
+
+    /// The freeze authority PDA - seeds: ["freeze_authority", mint.key()]
+    #[account(
+        seeds = [b"freeze_authority", mint.key().as_ref()],
+        bump
+    )]
+    /// CHECK: This is the freeze authority PDA that signs via seeds
+    pub freeze_authority: UncheckedAccount<'info>,
 
     pub token_program: Program<'info, Token2022>,
 }

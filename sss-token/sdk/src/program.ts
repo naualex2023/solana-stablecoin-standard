@@ -148,7 +148,10 @@ export class SSSTokenClient {
   }
 
   /**
-   * Freeze a token account
+   * Freeze a token account using the freeze authority keypair
+   * @param mint - The mint public key
+   * @param tokenAccount - The token account to freeze
+   * @param freezeAuthority - The freeze authority signer (must match mint's freeze authority)
    */
   async freezeTokenAccount(
     mint: PublicKey,
@@ -173,7 +176,10 @@ export class SSSTokenClient {
   }
 
   /**
-   * Thaw (unfreeze) a token account
+   * Thaw (unfreeze) a token account using the freeze authority keypair
+   * @param mint - The mint public key
+   * @param tokenAccount - The token account to thaw
+   * @param freezeAuthority - The freeze authority signer (must match mint's freeze authority)
    */
   async thawTokenAccount(
     mint: PublicKey,
@@ -508,5 +514,36 @@ export class SSSTokenClient {
    */
   async getAssociatedTokenAddress(mint: PublicKey, owner: PublicKey): Promise<PublicKey> {
     return await getAssociatedTokenAddress(mint, owner);
+  }
+
+  /**
+   * Freeze a token account using PDA-based freeze authority (for mints with PDA freeze authority)
+   * This is used for mints created with the freeze authority set to the program's PDA
+   * @param mint - The mint public key
+   * @param tokenAccount - The token account to freeze
+   * @param seizer - The seizer signer (must be authorized in config.seizer role)
+   */
+  async freezeTokenAccountPda(
+    mint: PublicKey,
+    tokenAccount: PublicKey,
+    seizer: Signer
+  ): Promise<string> {
+    const { pda: configPda } = findConfigPDA(mint, this.programId);
+    const { pda: freezeAuthorityPda } = findFreezeAuthorityPDA(mint, this.programId);
+
+    const tx = await this.program.methods
+      .freezeTokenAccountPda()
+      .accounts({
+        config: configPda,
+        mint: mint,
+        tokenAccount: tokenAccount,
+        seizer: seizer.publicKey,
+        freezeAuthority: freezeAuthorityPda,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([seizer])
+      .rpc();
+
+    return tx;
   }
 }

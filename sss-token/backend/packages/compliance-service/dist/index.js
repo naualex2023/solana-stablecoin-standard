@@ -164,6 +164,53 @@ app.delete('/api/v1/blacklist/:address', async (req, res) => {
     }
 });
 // ============================================
+// Seize Endpoint (SSS-2)
+// ============================================
+// Seize tokens from a frozen account
+app.post('/api/v1/seize', async (req, res) => {
+    try {
+        const { mintAddress, sourceToken, destToken, amount } = req.body;
+        if (!mintAddress || !sourceToken || !destToken || !amount) {
+            return res.status(shared_1.HTTP_STATUS.BAD_REQUEST).json({
+                success: false,
+                error: {
+                    code: shared_1.ERROR_CODES.VALIDATION_ERROR,
+                    message: 'Missing required fields: mintAddress, sourceToken, destToken, amount',
+                },
+            });
+        }
+        // Verify source token account is frozen (TODO: Check on-chain state)
+        // Create audit log for seize request
+        await (0, shared_1.createAuditLog)({
+            action: 'seize_request_created',
+            entityType: 'seize_request',
+            entityId: `${sourceToken}-${Date.now()}`,
+            details: { mintAddress, sourceToken, destToken, amount },
+        });
+        log.info({ mintAddress, sourceToken, destToken, amount }, 'Seize request created');
+        // TODO: Execute actual seize transaction using the SDK
+        // The seize operation uses the permanent delegate PDA to transfer from frozen accounts
+        // PDA seeds: ["permanent_delegate", mint.key()]
+        res.status(shared_1.HTTP_STATUS.CREATED).json({
+            success: true,
+            data: {
+                status: 'pending',
+                mintAddress,
+                sourceToken,
+                destToken,
+                amount,
+            },
+        });
+    }
+    catch (error) {
+        log.error({ error }, 'Failed to create seize request');
+        res.status(shared_1.HTTP_STATUS.INTERNAL_ERROR).json({
+            success: false,
+            error: { code: shared_1.ERROR_CODES.INTERNAL_ERROR, message: 'Internal server error' },
+        });
+    }
+});
+// ============================================
 // Screening Endpoints
 // ============================================
 // Check if address is sanctioned

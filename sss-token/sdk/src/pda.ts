@@ -62,6 +62,24 @@ export function findBlacklistEntryPDA(
 }
 
 /**
+ * Find the Permanent Delegate PDA for a given mint
+ * This PDA acts as the permanent delegate for the mint, allowing seizure from frozen accounts
+ * @param mint - The mint public key
+ * @param programId - The program ID (defaults to SSS_TOKEN_PROGRAM_ID)
+ * @returns The permanent delegate PDA and bump
+ */
+export function findPermanentDelegatePDA(
+  mint: PublicKey,
+  programId: PublicKey = new PublicKey(SSS_TOKEN_PROGRAM_ID)
+): PDAResult {
+  const [pda, bump] = PublicKey.findProgramAddressSync(
+    [Buffer.from(PDA_SEEDS.PERMANENT_DELEGATE), mint.toBuffer()],
+    programId
+  );
+  return { pda, bump };
+}
+
+/**
  * Find all PDAs for a stablecoin configuration
  * @param mint - The mint public key
  * @param programId - The program ID (defaults to SSS_TOKEN_PROGRAM_ID)

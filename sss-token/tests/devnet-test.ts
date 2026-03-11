@@ -38,6 +38,12 @@ import {
   findConfigPDA,
 } from "../sdk/src/index";
 
+// NOTE: For seizure to work properly, the mint must be created with the Token-2022
+// PermanentDelegate extension initialized with our program's permanent delegate PDA.
+// The standard createMint function doesn't support extensions, so seizure tests
+// will fail unless the mint is created with the proper extension.
+// See: https://spl.solana.com/token-2022/extensions#permanent-delegate
+
 // Proof documentation interface
 interface ProofEntry {
   test: string;

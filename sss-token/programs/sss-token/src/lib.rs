@@ -332,6 +332,7 @@ pub mod sss_token {
     }
 
     /// Seize tokens from a frozen account (SSS-2)
+    /// Uses the permanent delegate PDA to transfer from frozen accounts
     pub fn seize(ctx: Context<Seize>, amount: u64) -> Result<()> {
         let config = &ctx.accounts.config;
 
@@ -339,18 +340,31 @@ pub mod sss_token {
             config.enable_permanent_delegate,
             StablecoinError::PermanentDelegateNotEnabled
         );
+        require!(amount > 0, StablecoinError::InvalidAmount);
+
+        // Get the bump for the permanent delegate PDA
+        let bump = ctx.bumps.permanent_delegate;
+        let mint_key = ctx.accounts.mint.key();
+        
+        // Signer seeds for the permanent delegate PDA
+        let signer_seeds = &[
+            b"permanent_delegate".as_ref(),
+            mint_key.as_ref(),
+            &[bump],
+        ];
+        let signer = &[&signer_seeds[..]];
 
         let cpi_accounts = TransferChecked {
             from: ctx.accounts.source_token.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
             to: ctx.accounts.dest_token.to_account_info(),
-            authority: ctx.accounts.seizer.to_account_info(),
+            authority: ctx.accounts.permanent_delegate.to_account_info(),
         };
         let cpi_program = ctx.accounts.token_program.to_account_info();
-        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+        let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
         token_2022::transfer_checked(cpi_ctx, amount, config.decimals)?;
 
-        msg!("Seized {} tokens from {}", amount, ctx.accounts.source_token.key());
+        msg!("Seized {} tokens from {} using permanent delegate", amount, ctx.accounts.source_token.key());
         Ok(())
     }
 
@@ -693,6 +707,16 @@ pub struct Seize<'info> {
     pub dest_token: InterfaceAccount<'info, TokenAccount>,
 
     pub seizer: Signer<'info>,
+
+    /// The permanent delegate PDA - seeds: ["permanent_delegate", mint.key()]
+    /// This PDA acts as the permanent delegate for the mint
+    /// Must be set as the permanent delegate when creating the mint
+    #[account(
+        seeds = [b"permanent_delegate", mint.key().as_ref()],
+        bump
+    )]
+    /// CHECK: This is the permanent delegate PDA that signs via seeds
+    pub permanent_delegate: UncheckedAccount<'info>,
 
     pub token_program: Program<'info, Token2022>,
 }

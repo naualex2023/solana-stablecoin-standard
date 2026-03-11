@@ -205,6 +205,60 @@ app.delete('/api/v1/blacklist/:address', async (req: Request, res: Response) => 
 });
 
 // ============================================
+// Seize Endpoint (SSS-2)
+// ============================================
+
+// Seize tokens from a frozen account
+app.post('/api/v1/seize', async (req: Request, res: Response) => {
+  try {
+    const { mintAddress, sourceToken, destToken, amount } = req.body;
+
+    if (!mintAddress || !sourceToken || !destToken || !amount) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        success: false,
+        error: {
+          code: ERROR_CODES.VALIDATION_ERROR,
+          message: 'Missing required fields: mintAddress, sourceToken, destToken, amount',
+        },
+      });
+    }
+
+    // Verify source token account is frozen (TODO: Check on-chain state)
+    
+    // Create audit log for seize request
+    await createAuditLog({
+      action: 'seize_request_created',
+      entityType: 'seize_request',
+      entityId: `${sourceToken}-${Date.now()}`,
+      details: { mintAddress, sourceToken, destToken, amount },
+    });
+
+    log.info({ mintAddress, sourceToken, destToken, amount }, 'Seize request created');
+
+    // TODO: Execute actual seize transaction using the SDK
+    // The seize operation uses the permanent delegate PDA to transfer from frozen accounts
+    // PDA seeds: ["permanent_delegate", mint.key()]
+
+    res.status(HTTP_STATUS.CREATED).json({
+      success: true,
+      data: {
+        status: 'pending',
+        mintAddress,
+        sourceToken,
+        destToken,
+        amount,
+      },
+    });
+  } catch (error) {
+    log.error({ error }, 'Failed to create seize request');
+    res.status(HTTP_STATUS.INTERNAL_ERROR).json({
+      success: false,
+      error: { code: ERROR_CODES.INTERNAL_ERROR, message: 'Internal server error' },
+    });
+  }
+});
+
+// ============================================
 // Screening Endpoints
 // ============================================
 

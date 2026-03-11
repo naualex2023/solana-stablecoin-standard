@@ -722,7 +722,8 @@
     {
       "name": "seize",
       "docs": [
-        "Seize tokens from a frozen account (SSS-2)"
+        "Seize tokens from a frozen account (SSS-2)",
+        "Uses the permanent delegate PDA to transfer from frozen accounts"
       ],
       "discriminator": [
         129,
@@ -774,6 +775,45 @@
           "relations": [
             "config"
           ]
+        },
+        {
+          "name": "permanent_delegate",
+          "docs": [
+            "The permanent delegate PDA - seeds: [\"permanent_delegate\", mint.key()]",
+            "This PDA acts as the permanent delegate for the mint",
+            "Must be set as the permanent delegate when creating the mint"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  109,
+                  97,
+                  110,
+                  101,
+                  110,
+                  116,
+                  95,
+                  100,
+                  101,
+                  108,
+                  101,
+                  103,
+                  97,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
         },
         {
           "name": "token_program",

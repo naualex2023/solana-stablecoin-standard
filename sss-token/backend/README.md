@@ -13,32 +13,40 @@ Backend services for the SSS Token standard, providing REST APIs for mint/burn o
          │                       │                       │
          └───────────────────────┼───────────────────────┘
                                  │
-                    ┌────────────┴────────────┐
-                    │        Indexer          │
-                    │   (Event Listener)      │
-                    └────────────┬────────────┘
-                                 │
          ┌───────────────────────┼───────────────────────┐
          │                       │                       │
 ┌────────┴────────┐     ┌────────┴────────┐     ┌────────┴────────┐
-│    PostgreSQL   │     │      Redis      │     │    Solana RPC   │
-│    (Events)     │     │   (Pub/Sub)     │     │   (Blockchain)  │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
+│    Indexer      │     │   Indexer API   │     │    Solana RPC   │
+│ (WebSocket)     │     │   (Port 3004)   │     │   (Blockchain)  │
+│ Events → DB     │     │   REST Queries  │     │                 │
+└────────┬────────┘     └────────┬────────┘     └─────────────────┘
+         │                       │
+         └───────────┬───────────┘
+                     │
+         ┌───────────┴───────────┐
+         │                       │
+┌────────┴────────┐     ┌────────┴────────┐
+│    PostgreSQL   │     │      Redis      │
+│    (Events)     │     │   (Pub/Sub)     │
+└─────────────────┘     └─────────────────┘
 ```
 
 ## Services
 
 ### 1. Indexer
-Listens for on-chain events and stores them in PostgreSQL for querying.
+WebSocket listener that captures on-chain events from the SSS Token program and stores them in PostgreSQL. Runs in background, no HTTP port.
 
-### 2. Mint/Burn Service
-REST API for creating and managing mint/burn requests with idempotency support.
+### 2. Indexer API
+REST API for querying indexed events and statistics. Port 3004.
 
-### 3. Compliance Service
-Manages blacklist entries and OFAC sanctions screening.
+### 3. Mint/Burn Service
+REST API for creating and managing mint/burn requests with idempotency support. Port 3001.
 
-### 4. Webhook Service
-Delivers event notifications to registered webhook endpoints.
+### 4. Compliance Service
+Manages blacklist entries and OFAC sanctions screening. Port 3002.
+
+### 5. Webhook Service
+Delivers event notifications to registered webhook endpoints. Port 3003.
 
 ## Quick Start
 
@@ -146,6 +154,37 @@ docker-compose up -d
 | `/api/v1/subscriptions/:id` | DELETE | Delete subscription |
 | `/api/v1/deliveries` | GET | List webhook deliveries |
 | `/health` | GET | Health check |
+
+### Indexer API (Port 3004)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/events` | GET | Get recent events (paginated) |
+| `/events/mint/:mintAddress` | GET | Get events by mint address |
+| `/events/type/:type` | GET | Get events by instruction type |
+| `/stats` | GET | Get indexing statistics |
+| `/stablecoins` | GET | Get list of indexed stablecoins |
+| `/health` | GET | Health check |
+
+**Event Types:** Initialize, UpdateRoles, AddMinter, RemoveMinter, UpdateMinterQuota, MintTokens, BurnTokens, Pause, Unpause, AddToBlacklist, RemoveFromBlacklist, FreezeTokenAccount, ThawTokenAccount, FreezeTokenAccountPda, Seize, TransferAuthority
+
+**Example Responses:**
+
+```bash
+# Get stats
+curl http://localhost:3004/stats
+# {"success":true,"data":{"totalEvents":43,"eventsByType":{...},"totalStablecoins":9,"latestSlot":"448"}}
+
+# Get recent events
+curl http://localhost:3004/events?limit=5
+# {"success":true,"data":[...],"pagination":{"total":43,"limit":5,"offset":0,"hasMore":true}}
+
+# Get events by mint
+curl http://localhost:3004/events/mint/ET969JEvTdWpC68J9zig2fVPawFCaiCu8vaF9B8qc7Tt
+
+# Get mint events only
+curl http://localhost:3004/events/type/MintTokens
+```
 
 ## Configuration
 

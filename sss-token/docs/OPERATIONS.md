@@ -447,6 +447,81 @@ sss-token minters info <ADDRESS>
 # - Remaining capacity
 ```
 
+### Backend Services Monitoring
+
+The backend consists of multiple microservices that can be monitored via health endpoints:
+
+| Service | Port | Health Endpoint |
+|---------|------|-----------------|
+| mint-burn-service | 3001 | `GET /health` |
+| compliance-service | 3002 | `GET /health` |
+| webhook-service | 3003 | `GET /health` |
+| indexer-api | 3004 | `GET /health` |
+
+#### Indexer API Monitoring
+
+```bash
+# Check indexer API health
+curl http://localhost:3004/health
+
+# Get indexing statistics
+curl http://localhost:3004/stats
+
+# Response example:
+# {
+#   "success": true,
+#   "data": {
+#     "totalEvents": 43,
+#     "eventsByType": { "Initialize": 9, "MintTokens": 4, ... },
+#     "totalStablecoins": 9,
+#     "latestSlot": "448"
+#   }
+# }
+
+# Query recent events
+curl http://localhost:3004/events?limit=10
+
+# Query events by mint
+curl http://localhost:3004/events/mint/<MINT_ADDRESS>
+
+# Query events by type
+curl http://localhost:3004/events/type/MintTokens
+
+# Get list of indexed stablecoins
+curl http://localhost:3004/stablecoins
+```
+
+#### Localnet Development
+
+```bash
+# Start localnet backend services
+cd sss-token/backend
+./start-localnet.sh
+
+# This starts:
+# - PostgreSQL (docker)
+# - Redis (docker)
+# - Indexer (WebSocket listener)
+# - Indexer API (REST API on port 3004)
+
+# View indexer logs
+tail -f .logs-localnet/indexer.log
+
+# View indexer API logs
+tail -f .logs-localnet/indexer-api.log
+```
+
+#### Devnet Deployment
+
+```bash
+# Start devnet backend services
+cd sss-token/backend
+./start-devnet.sh
+
+# Uses .env.devnet configuration
+# Connects to Solana devnet RPC
+```
+
 ## Incident Response
 
 ### P0: Security Exploit

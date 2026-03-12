@@ -24,7 +24,8 @@ The SSS Token backend consists of microservices:
 | mint-burn-service | 3001 | Mint/burn operations |
 | compliance-service | 3002 | Compliance operations |
 | webhook-service | 3003 | Webhook delivery |
-| indexer | 3004 | Event indexing |
+| indexer | - | WebSocket listener for on-chain events |
+| indexer-api | 3004 | REST API for querying indexed data |
 
 ## Authentication
 
@@ -554,70 +555,65 @@ function verifyWebhook(
 
 ## Indexer Service
 
-Port: 3004
+The Indexer consists of two components:
+- **Indexer** - WebSocket listener that captures on-chain events and stores them in PostgreSQL
+- **Indexer API** - REST API for querying indexed data (Port: 3004)
 
 ### Get Events
 
 ```http
-GET /api/v1/events?mint=MINT_ADDRESS&type=mint&from=2024-01-01&to=2024-01-15&page=1&limit=100
-Authorization: Bearer <token>
+GET /events?limit=10&offset=0
 ```
 
 **Response:**
 ```json
 {
   "success": true,
-  "data": {
-    "events": [
-      {
-        "event_id": "evt_abc123",
-        "event_type": "mint",
-        "mint": "MINT_ADDRESS",
-        "data": { ... },
-        "transaction_signature": "5Kt...",
-        "slot": 123456789,
-        "timestamp": "2024-01-15T10:30:00Z"
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "limit": 100,
-      "total": 500
+  "data": [
+    {
+      "id": 43,
+      "signature": "5Yi91ugfvsUJuSNp6Hin8yQ4A8epRxtpC4FeKpWsrBodbE3P3p4uAfuYuZZ75eEssTw9KCzC7HEQHviybCxsxGEf",
+      "slot": "448",
+      "block_time": "2024-01-15T10:30:00.000Z",
+      "instruction_type": "Seize",
+      "mint_address": "MINT_ADDRESS",
+      "data": {
+        "fee": 10000,
+        "logs": ["..."],
+        "success": true,
+        "accounts": ["..."],
+        "instruction": { "raw": "...", "discriminator": "..." }
+      },
+      "created_at": "2024-01-15T10:30:01.540Z"
     }
+  ],
+  "pagination": {
+    "total": 43,
+    "limit": 10,
+    "offset": 0,
+    "hasMore": true
   }
 }
 ```
 
-### Get Transaction
+### Get Events by Mint
 
 ```http
-GET /api/v1/transactions/:signature
-Authorization: Bearer <token>
+GET /events/mint/:mintAddress?limit=10&offset=0
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "signature": "5Kt...",
-    "slot": 123456789,
-    "block_time": 1705312800,
-    "events": [
-      {
-        "event_type": "mint",
-        "data": { ... }
-      }
-    ]
-  }
-}
+### Get Events by Type
+
+```http
+GET /events/type/:instructionType?limit=10&offset=0
 ```
+
+**Available Types:** Initialize, UpdateRoles, AddMinter, RemoveMinter, UpdateMinterQuota, MintTokens, BurnTokens, Pause, Unpause, AddToBlacklist, RemoveFromBlacklist, FreezeTokenAccount, ThawTokenAccount, FreezeTokenAccountPda, Seize, TransferAuthority
 
 ### Get Statistics
 
 ```http
-GET /api/v1/stats?mint=MINT_ADDRESS&period=24h
-Authorization: Bearer <token>
+GET /stats
 ```
 
 **Response:**
@@ -625,19 +621,64 @@ Authorization: Bearer <token>
 {
   "success": true,
   "data": {
-    "period": "24h",
-    "mint": "MINT_ADDRESS",
-    "total_supply": 10000000000,
-    "holders": 5000,
-    "transactions": {
-      "mint": 150,
-      "burn": 50,
-      "transfer": 5000
+    "totalEvents": 43,
+    "eventsByType": {
+      "Initialize": 9,
+      "UpdateRoles": 5,
+      "AddMinter": 5,
+      "MintTokens": 4,
+      "AddToBlacklist": 3,
+      "Unpause": 2,
+      "FreezeTokenAccount": 2,
+      "Pause": 2,
+      "RemoveFromBlacklist": 2,
+      "BurnTokens": 2,
+      "TransferAuthority": 2,
+      "ThawTokenAccount": 1,
+      "RemoveMinter": 1,
+      "Seize": 1,
+      "FreezeTokenAccountPda": 1,
+      "UpdateMinterQuota": 1
     },
-    "compliance": {
-      "blacklisted": 25,
-      "frozen": 10
+    "totalStablecoins": 9,
+    "latestSlot": "448"
+  }
+}
+```
+
+### Get Stablecoins List
+
+```http
+GET /stablecoins
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "mint_address": "MINT_ADDRESS",
+      "event_count": 15,
+      "last_event": "2024-01-15T10:30:00.000Z"
     }
+  ]
+}
+```
+
+### Health Check
+
+```http
+GET /health
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "status": "healthy",
+    "timestamp": "2024-01-15T10:30:00.000Z"
   }
 }
 ```

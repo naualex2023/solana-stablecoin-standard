@@ -204,18 +204,32 @@ Backend Architecture:
 └───────────────┘    └───────────────┘    └───────────────┘
         │                     │                     │
         └─────────────────────┼─────────────────────┘
-                              ▼
-                    ┌───────────────┐
-                    │ Indexer       │
-                    │ :3004         │
-                    └───────────────┘
                               │
+        ┌─────────────────────┼─────────────────────┐
+        ▼                                           ▼
+┌───────────────┐                         ┌───────────────┐
+│ Indexer       │                         │ Indexer API   │
+│ (WebSocket)   │                         │ (REST API)    │
+│ Events → DB   │                         │ :3004         │
+└───────────────┘                         └───────────────┘
+        │                                           │
+        └─────────────────────┬─────────────────────┘
                               ▼
                     ┌───────────────┐
                     │ PostgreSQL    │
                     │ Redis         │
                     └───────────────┘
 ```
+
+**Microservices:**
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| Mint-Burn Service | 3001 | Off-chain mint/burn request management |
+| Compliance Service | 3002 | Blacklist, OFAC sanctions sync |
+| Webhook Service | 3003 | Event webhook delivery |
+| Indexer | - | WebSocket listener for on-chain events |
+| Indexer API | 3004 | REST API for querying indexed data |
 
 ## Data Flows
 

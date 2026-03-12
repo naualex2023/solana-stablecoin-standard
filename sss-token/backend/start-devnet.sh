@@ -20,7 +20,14 @@ PROJECT_ROOT="$(dirname "$BACKEND_DIR")"
 PID_DIR="$BACKEND_DIR/.pids-devnet"
 LOG_DIR="$BACKEND_DIR/.logs-devnet"
 
-# Devnet RPC endpoints (can be overridden via env)
+# Load existing .env.devnet if it exists (allows persistent configuration)
+if [ -f "$BACKEND_DIR/.env.devnet" ]; then
+    set -a
+    source "$BACKEND_DIR/.env.devnet"
+    set +a
+fi
+
+# Devnet RPC endpoints (can be overridden via env or .env.devnet file)
 SOLANA_RPC_URL="${SOLANA_RPC_URL:-https://api.devnet.solana.com}"
 SOLANA_WS_URL="${SOLANA_WS_URL:-wss://api.devnet.solana.com}"
 SSS_PROGRAM_ID="${SSS_PROGRAM_ID:-Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw}"

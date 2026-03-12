@@ -41,3 +41,15 @@ New database connection established
 [2026-03-12 10:35:00.887 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
     service: "webhook-service"
     count: 0
+New database connection established
+[2026-03-12 10:40:00.178 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+    service: "webhook-service"
+    count: 0
+New database connection established
+[2026-03-12 10:45:00.504 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+    service: "webhook-service"
+    count: 0
+New database connection established
+[2026-03-12 10:50:00.831 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+    service: "webhook-service"
+    count: 0

@@ -182,37 +182,51 @@ async function processTransaction(signature) {
         // Find instructions that call our program
         for (const ix of instructions) {
             // Check if this instruction is for our program
-            // In parsed transactions, programIdIndex is the index in accountKeys
-            const programIdIndex = ix.programIdIndex;
-            // Get the program ID from accountKeys
-            const programKey = accountKeys[programIdIndex];
-            const ixProgramStr = typeof programKey === 'string'
-                ? programKey
-                : programKey?.pubkey?.toString?.() || programKey?.toString?.() || '';
+            // In parsed transactions, programId is a string directly
+            // In compiled transactions, programIdIndex is the index in accountKeys
+            let ixProgramStr;
+            let accounts;
+            if (ix.programId) {
+                // Parsed transaction format - programId can be a PublicKey object or string
+                // Convert to string if needed
+                ixProgramStr = typeof ix.programId === 'string'
+                    ? ix.programId
+                    : ix.programId?.toString?.() || '';
+                accounts = ix.accounts || [];
+            }
+            else if (ix.programIdIndex !== undefined) {
+                // Compiled transaction format - need to look up from accountKeys
+                const programKey = accountKeys[ix.programIdIndex];
+                ixProgramStr = typeof programKey === 'string'
+                    ? programKey
+                    : programKey?.pubkey?.toString?.() || programKey?.toString?.() || '';
+                // Extract accounts from instruction - ix.accounts contains indices into accountKeys
+                const accountIndices = ix.accounts || [];
+                accounts = accountIndices.map((idx) => {
+                    const acc = accountKeys[idx];
+                    if (typeof acc === 'string')
+                        return acc;
+                    return acc?.pubkey?.toString?.() || acc?.toString?.() || '';
+                });
+            }
+            else {
+                // Unknown format
+                continue;
+            }
             if (ixProgramStr !== PROGRAM_ID) {
                 continue;
             }
-            // Extract accounts from instruction - ix.accounts contains indices into accountKeys
-            const accountIndices = ix.accounts || [];
-            const accounts = accountIndices.map((idx) => {
-                const acc = accountKeys[idx];
-                if (typeof acc === 'string')
-                    return acc;
-                return acc?.pubkey?.toString?.() || acc?.toString?.() || '';
-            });
             // Determine mint address based on instruction type
-            // For Initialize: accounts[0] is mint (the token mint being configured)
-            // For MintTokens: accounts[0] is mint, accounts[1] is mintAuthority, accounts[2] is recipient
-            // For most instructions: accounts[0] is the mint/stablecoin config
+            // For Initialize: accounts[0] is the stablecoin config PDA
+            // For MintTokens: accounts[0] is stablecoin config, accounts[1] is mint authority, etc.
+            // For most instructions: accounts[0] is the stablecoin config
             let mintAddress = accounts[0] || '';
             // Log for debugging
             log.debug({
                 signature,
                 instructionType,
-                accountIndices,
                 accounts,
-                programIdIndex,
-                ixProgramStr
+                programId: ixProgramStr
             }, 'Parsed instruction accounts');
             // Parse instruction data if available
             let instructionData = {};

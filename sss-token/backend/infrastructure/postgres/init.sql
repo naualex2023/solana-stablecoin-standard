@@ -10,11 +10,11 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ============================================
 CREATE TABLE IF NOT EXISTS events (
     id SERIAL PRIMARY KEY,
-    signature VARCHAR(88) UNIQUE NOT NULL,
+    signature VARCHAR(128) UNIQUE NOT NULL,
     slot BIGINT NOT NULL,
     block_time TIMESTAMP WITH TIME ZONE NOT NULL,
-    instruction_type VARCHAR(50) NOT NULL,
-    mint_address VARCHAR(44) NOT NULL,
+    instruction_type VARCHAR(100) NOT NULL,
+    mint_address VARCHAR(64) NOT NULL,
     data JSONB NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

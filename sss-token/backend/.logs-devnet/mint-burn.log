@@ -33,10 +33,7 @@ Error: listen EADDRINUSE: address already in use :::3001
     service: "mint-burn-service"
     method: "GET"
     path: "/health"
-rno: -98,
-  syscall: 'listen',
-  address: '::',
-  port: 3001
-}
-
-Node.js v24.10.0
+[2026-03-12 13:40:57.298 +0300] [32mINFO[39m: [36mRequest[39m
+    service: "mint-burn-service"
+    method: "GET"
+    path: "/health"

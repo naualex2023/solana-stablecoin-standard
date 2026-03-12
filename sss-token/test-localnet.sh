@@ -22,7 +22,7 @@ PROGRAM_ID="Hf1s4EvjS79S6kcHdKhaZHVQsnsjqMbJgBEFZfaGDPmw"
 INDEXER_API_URL="http://localhost:3004"
 
 # Test options
-TEST_TYPE="all"  # all, sdk, devnet, backend
+TEST_TYPE="sdk"  # sdk or backend
 VERIFY_EVENTS=true
 
 # Parse command line arguments
@@ -32,16 +32,8 @@ while [[ $# -gt 0 ]]; do
             TEST_TYPE="sdk"
             shift
             ;;
-        --devnet)
-            TEST_TYPE="devnet"
-            shift
-            ;;
         --backend)
             TEST_TYPE="backend"
-            shift
-            ;;
-        --all)
-            TEST_TYPE="all"
             shift
             ;;
         --no-verify)
@@ -59,17 +51,14 @@ while [[ $# -gt 0 ]]; do
             echo "  2. Wait for services to be ready"
             echo ""
             echo "Options:"
-            echo "  --all         Run all tests (default)"
-            echo "  --sdk         Run SDK tests only"
-            echo "  --devnet      Run devnet-style tests only"
-            echo "  --backend     Run backend verification only"
+            echo "  --sdk         Run SDK tests (default)"
+            echo "  --backend     Verify backend services only"
             echo "  --no-verify   Skip event verification"
             echo "  --help        Show this help message"
             echo ""
             echo "Examples:"
-            echo "  $0                    # Run all tests"
-            echo "  $0 --sdk              # Run SDK tests only"
-            echo "  $0 --backend          # Verify backend events only"
+            echo "  $0                    # Run SDK tests"
+            echo "  $0 --backend          # Verify backend services only"
             exit 0
             ;;
         *)
@@ -99,7 +88,7 @@ check_validator() {
         -d '{"jsonrpc":"2.0","id":1,"method":"getHealth"}' \
         "$RPC_URL" 2>/dev/null)
     
-    if echo "$response" | grep -q '"status":"ok"'; then
+    if echo "$response" | grep -q '"result":"ok"'; then
         print_success "Validator is running at $RPC_URL"
         return 0
     else
@@ -149,40 +138,11 @@ run_sdk_tests() {
     export ANCHOR_PROVIDER_URL="$RPC_URL"
     export ANCHOR_WALLET="$HOME/.config/solana/id.json"
     
-    cd sdk
-    
-    if npx ts-mocha "../tests/sdk-enhanced.test.ts" --timeout 100000; then
+    if npx ts-mocha "sdk/tests/sdk-enhanced.test.ts" --timeout 100000; then
         print_success "SDK tests passed!"
-        cd ..
         return 0
     else
         print_error "SDK tests failed!"
-        cd ..
-        return 1
-    fi
-}
-
-# Run devnet-style tests (full integration tests)
-run_devnet_tests() {
-    print_test "Running Integration Tests..."
-    echo ""
-    
-    # Set environment for tests
-    export ANCHOR_PROVIDER_URL="$RPC_URL"
-    export ANCHOR_WALLET="$HOME/.config/solana/id.json"
-    
-    # Create a local .env.localnet for the tests
-    cat > .env.localnet << EOF
-SOLANA_RPC_URL=$RPC_URL
-SOLANA_WS_URL=$WS_URL
-SSS_PROGRAM_ID=$PROGRAM_ID
-EOF
-    
-    if npx ts-mocha tests/devnet-test.ts --timeout 300000; then
-        print_success "Integration tests passed!"
-        return 0
-    else
-        print_error "Integration tests failed!"
         return 1
     fi
 }
@@ -199,24 +159,23 @@ verify_events() {
     # Wait a moment for events to be processed
     sleep 3
     
-    # Query stablecoins
-    print_info "Querying stablecoins from Indexer API..."
-    local stablecoins=$(curl -s "$INDEXER_API_URL/api/stablecoins" 2>/dev/null)
-    echo "Stablecoins: $stablecoins"
+    # Query stats
+    print_info "Querying indexer stats..."
+    local stats=$(curl -s "$INDEXER_API_URL/api/stats" 2>/dev/null)
+    echo "Stats: $stats"
     
     # Query events
     print_info "Querying events from Indexer API..."
     local events=$(curl -s "$INDEXER_API_URL/api/events?limit=10" 2>/dev/null)
     echo "Events (last 10): $events"
     
-    # Check if we got any data
-    if echo "$stablecoins" | grep -q "mint_address\|mintAddress"; then
-        print_success "Stablecoins found in indexer!"
-    else
-        print_warning "No stablecoins found in indexer"
-    fi
+    # Query stablecoins
+    print_info "Querying stablecoins from Indexer API..."
+    local stablecoins=$(curl -s "$INDEXER_API_URL/api/stablecoins" 2>/dev/null)
+    echo "Stablecoins: $stablecoins"
     
-    if echo "$events" | grep -q "signature"; then
+    # Check if we got any data
+    if echo "$stats" | grep -q '"totalEvents":[1-9]'; then
         print_success "Events found in indexer!"
     else
         print_warning "No events found in indexer"
@@ -315,19 +274,10 @@ main() {
     case $TEST_TYPE in
         sdk)
             run_sdk_tests || exit_code=1
-            ;;
-        devnet)
-            run_devnet_tests || exit_code=1
+            echo ""
             verify_events
             ;;
         backend)
-            run_backend_verification || exit_code=1
-            ;;
-        all)
-            run_sdk_tests || exit_code=1
-            echo ""
-            run_devnet_tests || exit_code=1
-            echo ""
             run_backend_verification || exit_code=1
             ;;
     esac

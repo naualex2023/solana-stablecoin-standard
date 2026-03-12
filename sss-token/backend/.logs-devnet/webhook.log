@@ -134,3 +134,19 @@ New database connection established
 [2026-03-12 13:25:00.699 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
     service: "webhook-service"
     count: 0
+New database connection established
+[2026-03-12 13:30:01.019 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+    service: "webhook-service"
+    count: 0
+New database connection established
+[2026-03-12 13:35:00.405 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+    service: "webhook-service"
+    count: 0
+New database connection established
+[2026-03-12 13:40:00.706 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+    service: "webhook-service"
+    count: 0
+[2026-03-12 13:40:57.397 +0300] [32mINFO[39m: [36mRequest[39m
+    service: "webhook-service"
+    method: "GET"
+    path: "/health"

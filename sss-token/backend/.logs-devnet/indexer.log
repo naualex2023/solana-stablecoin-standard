@@ -124,3 +124,34 @@ Redis ready
     service: "indexer"
     signature: "4kRWFW4xRaR8VossawvpqZHM6RypUcthhWFeyQG12bv6cWSC47UDVFjpNh8RMJX2kcHcMZHK55LcR7otUvcJx79V"
     error: {}
+[2026-03-12 13:43:51.609 +0300] [34mDEBUG[39m: [36mReceived real-time log[39m
+    service: "indexer"
+    signature: "3eM3v1QktMsJLSK56LVMWfjP6j2xKGPSRHFvtBGP3c1Xi184vXuyKWj4BpwmEHQwypXvUDnJGurqG61aQn3R1Gwk"
+[2026-03-12 13:43:55.785 +0300] [34mDEBUG[39m: [36mReceived real-time log[39m
+    service: "indexer"
+    signature: "44N6KDbZzmo3M8bzJECggPWdHYaDReCZrpmrtFEPtiPpX2EL4jnSFJwXzKqxrrG7MeEFGUFNN3DgGsssxE9jxbFW"
+[2026-03-12 13:43:59.569 +0300] [34mDEBUG[39m: [36mReceived real-time log[39m
+    service: "indexer"
+    signature: "3Vw8NbwNokLUhtVw9GKYr9zf9gzbpvrMSCndm9XTkjZ881TXonUMJ96pRk7gDGW9Stdb6CdTpb48g65tmN6R7gSH"
+[2026-03-12 13:44:03.665 +0300] [34mDEBUG[39m: [36mReceived real-time log[39m
+    service: "indexer"
+    signature: "2JQdVD3pbAZcaYQvdHktt2Du7vLkF1DxveKKFWBbDz9o9juod9o3wFUw7uvq5SSsDsQHvdTDB8FGWuEsNMfZziPS"
+[2026-03-12 13:44:11.038 +0300] [34mDEBUG[39m: [36mReceived real-time log[39m
+    service: "indexer"
+    signature: "nnvoxEtKNFApKu82hZcv9aKfw4VVRTm8iSEocjopEivzJbmEeiQwUyyXumADfAk48arZCtBdD2dQWt1mKqSBNx3"
+[2026-03-12 13:44:26.602 +0300] [34mDEBUG[39m: [36mReceived real-time log[39m
+    service: "indexer"
+    signature: "3mHcamgdVhDf7pmhPZDfL35jDT285jBRYMPFdDFuoLrnwNoRAD3DkMVxuLGNhLFRzNDZggRXKsB4hPWAgHsXLxSH"
+[2026-03-12 13:44:30.493 +0300] [34mDEBUG[39m: [36mReceived real-time log[39m
+    service: "indexer"
+    signature: "4LPvEhNv77HGjTXwEn99sC6BZBKBn4pBUs3CyHj1udS57eWDtvsm15h5LJMEwS4BYw6ZHtGBM8tn4KqXLCENGmWw"
+[2026-03-12 13:44:36.432 +0300] [34mDEBUG[39m: [36mReceived real-time log[39m
+    service: "indexer"
+    signature: "sAtv4rQS48wmg6jx3bnuCy1BPvuTCaCQaG9t9gkr8LKF1Goob1rZLZh5ei2YpJ7xUA5yfa9NduXJtc1SgEkEZsS"
+[2026-03-12 13:44:45.456 +0300] [34mDEBUG[39m: [36mReceived real-time log[39m
+    service: "indexer"
+    signature: "5zMtHizCRTnDJpHThhXu27tV9K4E2hjnxa6dbhaM9iyNozLmTgVT4qXymKTBuSu97NrgTSBYDNRDipQbEvwD8bc2"
+[2026-03-12 13:44:49.157 +0300] [32mINFO[39m: [36mShutting down indexer...[39m
+    service: "indexer"
+[2026-03-12 13:44:49.159 +0300] [32mINFO[39m: [36mShutdown complete[39m
+    service: "indexer"

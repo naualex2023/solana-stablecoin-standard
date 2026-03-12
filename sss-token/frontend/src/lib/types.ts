@@ -36,7 +36,7 @@ export interface IndexerStablecoin {
   mint: string;
   name: string;
   symbol: string;
-  supply: string;
+  supply?: string; // Optional - frontend fetches from RPC
   holderCount: number;
   paused: boolean;
   features: {

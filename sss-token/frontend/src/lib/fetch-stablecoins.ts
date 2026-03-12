@@ -3,7 +3,7 @@
  * Can fetch from RPC directly or from indexer backend
  */
 
-import { Connection } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { FetchMode, DEFAULT_RPC_URL } from './constants';
 import { StablecoinWithSupply, FetchResult } from './types';
 import { fetchStablecoinsFromRPC, fetchStablecoinByMint } from './fetch-rpc';
@@ -55,16 +55,30 @@ export function createConnection(rpcUrl?: string): Connection {
 export async function fetchStablecoins(config?: Partial<FetchConfig>): Promise<FetchResult> {
   const mode = config?.mode || getFetchMode();
   const indexerUrl = config?.indexerUrl || getIndexerUrl();
+  const connection = createConnection(config?.rpcUrl);
 
   try {
     let stablecoins: StablecoinWithSupply[];
 
     if (mode === 'indexer' && indexerUrl) {
-      // Use indexer backend
+      // Use indexer backend for metadata
       stablecoins = await fetchStablecoinsFromIndexer(indexerUrl);
+      
+      // Fetch supply from RPC for each stablecoin (indexer doesn't track live supply)
+      stablecoins = await Promise.all(
+        stablecoins.map(async (coin) => {
+          try {
+            const mintPubkey = new PublicKey(coin.mint);
+            const mintInfo = await connection.getTokenSupply(mintPubkey);
+            return { ...coin, supply: BigInt(mintInfo.value.amount) };
+          } catch (error) {
+            console.warn(`Failed to fetch supply for ${coin.mint}:`, error);
+            return coin; // Keep default supply (0)
+          }
+        })
+      );
     } else {
       // Use direct RPC
-      const connection = createConnection(config?.rpcUrl);
       stablecoins = await fetchStablecoinsFromRPC(connection);
     }
 

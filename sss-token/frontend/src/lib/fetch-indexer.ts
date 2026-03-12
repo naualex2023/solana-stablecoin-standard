@@ -7,6 +7,7 @@ import { StablecoinWithSupply, IndexerStablecoin } from './types';
 
 /**
  * Transform indexer response to our internal type
+ * Note: supply is fetched separately from RPC, defaults to 0 here
  */
 function transformIndexerResponse(data: IndexerStablecoin): StablecoinWithSupply {
   return {
@@ -25,7 +26,7 @@ function transformIndexerResponse(data: IndexerStablecoin): StablecoinWithSupply
     blacklister: '',
     pauser: '',
     seizer: '',
-    supply: BigInt(data.supply),
+    supply: data.supply != null ? BigInt(data.supply) : BigInt(0),
     holderCount: data.holderCount,
   };
 }

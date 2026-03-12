@@ -47,7 +47,36 @@ Delivers event notifications to registered webhook endpoints.
 - Node.js 20+
 - pnpm
 
-### Development Setup
+### Option 1: Devnet Testing (Recommended for Testing)
+
+Use the devnet testing script to connect to Solana Devnet:
+
+```bash
+# Start all services configured for devnet
+./start-devnet.sh
+
+# Or run in background
+./start-devnet.sh --detach
+
+# Check status
+./start-devnet.sh --status
+
+# View logs
+./start-devnet.sh --logs indexer
+
+# Stop all services
+./start-devnet.sh --stop
+```
+
+The script will:
+1. Start PostgreSQL and Redis via Docker
+2. Configure environment for Solana Devnet
+3. Build and start all backend services
+4. Services connect to `https://api.devnet.solana.com` by default
+
+### Option 2: Local Development (Local Validator)
+
+For development with a local Solana validator:
 
 1. Copy environment variables:
 ```bash
@@ -72,6 +101,11 @@ cd packages/shared && pnpm build
 5. Start services:
 ```bash
 pnpm dev
+```
+
+Or use the full development script:
+```bash
+./start-dev.sh
 ```
 
 ### Production Deployment

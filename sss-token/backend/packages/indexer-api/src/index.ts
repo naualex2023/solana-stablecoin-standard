@@ -150,10 +150,11 @@ app.get('/api/events/:signature', async (req: Request, res: Response) => {
 // Stablecoins API (Aggregated from events)
 // ============================================
 
-// List all stablecoins (aggregated from CreateStablecoin events)
+// List all stablecoins (aggregated from Initialize events)
 app.get('/api/stablecoins', async (req: Request, res: Response) => {
   try {
-    // Get unique stablecoins from CreateStablecoin events
+    // Get unique stablecoins from Initialize events
+    // Note: Anchor instruction name is "Initialize", not "CreateStablecoin"
     const result = await pool.query(`
       SELECT DISTINCT ON (mint_address)
         mint_address as address,
@@ -165,25 +166,26 @@ app.get('/api/stablecoins', async (req: Request, res: Response) => {
         data->'features'->>'defaultAccountFrozen' as "defaultAccountFrozen",
         created_at,
         (
-          SELECT COUNT(DISTINCT (data->>'recipient')) 
+          SELECT COUNT(DISTINCT (data->'accounts'->>2))
           FROM events e2 
           WHERE e2.mint_address = events.mint_address 
-          AND e2.instruction_type IN ('Mint', 'Transfer')
+          AND e2.instruction_type = 'MintTokens'
         ) as "holderCount",
         (
-          SELECT COALESCE(SUM((data->>'amount')::bigint), 0)
+          SELECT COUNT(*)::text
           FROM events e3
           WHERE e3.mint_address = events.mint_address
-          AND e3.instruction_type = 'Mint'
-        ) -
+          AND e3.instruction_type = 'MintTokens'
+        ) as "mintCount",
         (
-          SELECT COALESCE(SUM((data->>'amount')::bigint), 0)
+          SELECT COUNT(*)::text
           FROM events e4
           WHERE e4.mint_address = events.mint_address
-          AND e4.instruction_type = 'Burn'
-        ) as supply
+          AND e4.instruction_type = 'BurnTokens'
+        ) as "burnCount"
       FROM events
-      WHERE instruction_type = 'CreateStablecoin'
+      WHERE instruction_type = 'Initialize'
+      AND mint_address != ''
       ORDER BY mint_address, created_at DESC
     `);
 
@@ -191,8 +193,8 @@ app.get('/api/stablecoins', async (req: Request, res: Response) => {
     const stablecoins = result.rows.map(row => ({
       address: row.address,
       mint: row.mint,
-      name: row.name || 'Unknown',
-      symbol: row.symbol || 'UNK',
+      name: row.name || 'SSS Stablecoin',
+      symbol: row.symbol || 'SSS',
       decimals: 6,
       paused: false, // Would need to track from Pause events
       features: {
@@ -200,7 +202,8 @@ app.get('/api/stablecoins', async (req: Request, res: Response) => {
         transferHook: row.enableTransferHook === 'true',
         defaultAccountFrozen: row.defaultAccountFrozen === 'true',
       },
-      supply: row.supply || '0',
+      mintCount: parseInt(row.mintCount) || 0,
+      burnCount: parseInt(row.burnCount) || 0,
       holderCount: parseInt(row.holderCount) || 0,
       createdAt: row.created_at,
     }));
@@ -220,10 +223,10 @@ app.get('/api/stablecoins/:mint', async (req: Request, res: Response) => {
   try {
     const { mint } = req.params;
 
-    // Get stablecoin info
+    // Get stablecoin info from Initialize event
     const createEvent = await pool.query(
       `SELECT * FROM events 
-       WHERE mint_address = $1 AND instruction_type = 'CreateStablecoin'
+       WHERE mint_address = $1 AND instruction_type = 'Initialize'
        ORDER BY created_at DESC LIMIT 1`,
       [mint]
     );
@@ -237,21 +240,19 @@ app.get('/api/stablecoins/:mint', async (req: Request, res: Response) => {
 
     const row = createEvent.rows[0];
 
-    // Get holder count
+    // Get holder count (recipient is typically accounts[2] in MintTokens)
     const holderResult = await pool.query(`
-      SELECT COUNT(DISTINCT (data->>'recipient')) as count
+      SELECT COUNT(DISTINCT (data->'accounts'->>2)) as count
       FROM events
       WHERE mint_address = $1
-      AND instruction_type IN ('Mint', 'Transfer')
+      AND instruction_type = 'MintTokens'
     `, [mint]);
 
-    // Get supply (sum of mints - sum of burns)
-    const supplyResult = await pool.query(`
+    // Get mint/burn counts
+    const mintBurnResult = await pool.query(`
       SELECT 
-        COALESCE((SELECT SUM((data->>'amount')::bigint) FROM events 
-                  WHERE mint_address = $1 AND instruction_type = 'Mint'), 0) -
-        COALESCE((SELECT SUM((data->>'amount')::bigint) FROM events 
-                  WHERE mint_address = $1 AND instruction_type = 'Burn'), 0) as supply
+        (SELECT COUNT(*) FROM events WHERE mint_address = $1 AND instruction_type = 'MintTokens') as mint_count,
+        (SELECT COUNT(*) FROM events WHERE mint_address = $1 AND instruction_type = 'BurnTokens') as burn_count
     `, [mint]);
 
     // Check if paused
@@ -267,8 +268,8 @@ app.get('/api/stablecoins/:mint', async (req: Request, res: Response) => {
     const stablecoin = {
       address: mint,
       mint: mint,
-      name: row.data?.name || 'Unknown',
-      symbol: row.data?.symbol || 'UNK',
+      name: row.data?.name || 'SSS Stablecoin',
+      symbol: row.data?.symbol || 'SSS',
       decimals: 6,
       paused: isPaused,
       features: {
@@ -276,10 +277,11 @@ app.get('/api/stablecoins/:mint', async (req: Request, res: Response) => {
         transferHook: row.data?.features?.transferHook || false,
         defaultAccountFrozen: row.data?.features?.defaultAccountFrozen || false,
       },
-      supply: supplyResult.rows[0]?.supply || '0',
+      mintCount: parseInt(mintBurnResult.rows[0]?.mint_count) || 0,
+      burnCount: parseInt(mintBurnResult.rows[0]?.burn_count) || 0,
       holderCount: parseInt(holderResult.rows[0]?.count) || 0,
       createdAt: row.created_at,
-      createdBy: row.data?.creator || row.data?.accounts?.[0],
+      createdBy: row.data?.accounts?.[0],
     };
 
     res.json(stablecoin);
@@ -305,9 +307,8 @@ app.get('/api/stablecoins/:mint/transactions', async (req: Request, res: Respons
         slot,
         block_time,
         instruction_type,
-        data->>'amount' as amount,
-        data->>'recipient' as recipient,
-        data->>'authority' as authority,
+        data->'accounts' as accounts,
+        data->'instruction' as instruction,
         created_at
        FROM events
        WHERE mint_address = $1
@@ -347,36 +348,22 @@ app.get('/api/stablecoins/:mint/holders', async (req: Request, res: Response) =>
   try {
     const { mint } = req.params;
 
-    // Aggregate balances from Mint, Transfer, and Burn events
+    // Get unique recipients from MintTokens events
     const result = await pool.query(`
-      WITH balances AS (
-        SELECT 
-          data->>'recipient' as holder,
-          SUM(CASE 
-            WHEN instruction_type = 'Mint' THEN (data->>'amount')::bigint
-            WHEN instruction_type = 'Transfer' THEN (data->>'amount')::bigint
-            ELSE 0 
-          END) as received,
-          SUM(CASE 
-            WHEN instruction_type = 'Burn' THEN (data->>'amount')::bigint
-            ELSE 0 
-          END) as burned
-        FROM events
-        WHERE mint_address = $1
-        AND instruction_type IN ('Mint', 'Burn', 'Transfer')
-        GROUP BY data->>'recipient'
-      )
-      SELECT 
-        holder as address,
-        (received - burned) as balance
-      FROM balances
-      WHERE (received - burned) > 0
-      ORDER BY balance DESC
+      SELECT DISTINCT 
+        data->'accounts'->>2 as address
+      FROM events
+      WHERE mint_address = $1
+      AND instruction_type = 'MintTokens'
+      AND data->'accounts'->>2 IS NOT NULL
     `, [mint]);
 
     res.json({
       success: true,
-      data: result.rows,
+      data: result.rows.filter(row => row.address).map(row => ({
+        address: row.address,
+        balance: '0', // Would need to calculate from events
+      })),
     });
   } catch (error) {
     log.error({ error }, 'Failed to get holders');
@@ -404,11 +391,12 @@ app.get('/api/stats', async (req: Request, res: Response) => {
       ORDER BY count DESC
     `);
 
-    // Total stablecoins
+    // Total stablecoins (using Initialize instruction)
     const stablecoinsResult = await pool.query(`
       SELECT COUNT(DISTINCT mint_address) as count
       FROM events
-      WHERE instruction_type = 'CreateStablecoin'
+      WHERE instruction_type = 'Initialize'
+      AND mint_address != ''
     `);
 
     // Latest block processed

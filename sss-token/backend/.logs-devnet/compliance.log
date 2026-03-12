@@ -1,9 +1,9 @@
 Redis config: { host: 'localhost', port: 6379, hasPassword: true }
-[2026-03-12 10:11:14.359 +0300] [32mINFO[39m: [36mInitializing compliance service...[39m
+[2026-03-12 11:24:43.610 +0300] [32mINFO[39m: [36mInitializing compliance service...[39m
     service: "compliance-service"
-[2026-03-12 10:11:14.360 +0300] [32mINFO[39m: [36mDatabase initialized[39m
+[2026-03-12 11:24:43.610 +0300] [32mINFO[39m: [36mDatabase initialized[39m
     service: "compliance-service"
-[2026-03-12 10:11:14.362 +0300] [32mINFO[39m: [36mRedis initialized[39m
+[2026-03-12 11:24:43.613 +0300] [32mINFO[39m: [36mRedis initialized[39m
     service: "compliance-service"
 /home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/node_modules/.pnpm/node-cron@3.0.3/node_modules/node-cron/src/convert-expression/month-names-conversion.js:10
             expression = expression.replace(new RegExp(items[i], 'gi'), parseInt(i, 10) + 1);

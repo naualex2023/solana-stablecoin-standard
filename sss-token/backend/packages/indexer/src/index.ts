@@ -226,24 +226,42 @@ async function processTransaction(signature: string) {
     // Find instructions that call our program
     for (const ix of instructions) {
       // Check if this instruction is for our program
-      const ixProgramId = ix.programId || (typeof ix.programIdIndex === 'number' ? accountKeys[ix.programIdIndex] : null);
+      // In parsed transactions, programIdIndex is the index in accountKeys
+      const programIdIndex = ix.programIdIndex;
       
-      if (!ixProgramId) continue;
-      
-      const ixProgramStr = typeof ixProgramId === 'string' ? ixProgramId : ixProgramId.toString?.() || ixProgramId.pubkey?.toString?.();
+      // Get the program ID from accountKeys
+      const programKey = accountKeys[programIdIndex];
+      const ixProgramStr = typeof programKey === 'string' 
+        ? programKey 
+        : programKey?.pubkey?.toString?.() || programKey?.toString?.() || '';
       
       if (ixProgramStr !== PROGRAM_ID) {
         continue;
       }
 
-      // Extract accounts from instruction
-      const accounts = (ix.accounts || []).map((idx: number) => {
+      // Extract accounts from instruction - ix.accounts contains indices into accountKeys
+      const accountIndices = ix.accounts || [];
+      const accounts = accountIndices.map((idx: number) => {
         const acc = accountKeys[idx];
-        return typeof acc === 'string' ? acc : acc?.pubkey?.toString?.() || acc?.toString?.() || '';
+        if (typeof acc === 'string') return acc;
+        return acc?.pubkey?.toString?.() || acc?.toString?.() || '';
       });
 
-      // Mint address is typically the first account
-      const mintAddress = accounts[0] || '';
+      // Determine mint address based on instruction type
+      // For Initialize: accounts[0] is mint (the token mint being configured)
+      // For MintTokens: accounts[0] is mint, accounts[1] is mintAuthority, accounts[2] is recipient
+      // For most instructions: accounts[0] is the mint/stablecoin config
+      let mintAddress = accounts[0] || '';
+      
+      // Log for debugging
+      log.debug({ 
+        signature, 
+        instructionType, 
+        accountIndices, 
+        accounts,
+        programIdIndex,
+        ixProgramStr 
+      }, 'Parsed instruction accounts');
 
       // Parse instruction data if available
       let instructionData: any = {};

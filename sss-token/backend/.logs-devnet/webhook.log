@@ -1,55 +1,60 @@
 Redis config: { host: 'localhost', port: 6379, hasPassword: true }
 Redis connected
 Redis ready
-[2026-03-12 10:11:16.405 +0300] [32mINFO[39m: [36mInitializing webhook service...[39m
+[2026-03-12 11:24:45.642 +0300] [32mINFO[39m: [36mInitializing webhook service...[39m
     service: "webhook-service"
-[2026-03-12 10:11:16.405 +0300] [32mINFO[39m: [36mDatabase initialized[39m
+[2026-03-12 11:24:45.643 +0300] [32mINFO[39m: [36mDatabase initialized[39m
     service: "webhook-service"
-[2026-03-12 10:11:16.408 +0300] [32mINFO[39m: [36mRedis initialized[39m
+[2026-03-12 11:24:45.646 +0300] [32mINFO[39m: [36mRedis initialized[39m
     service: "webhook-service"
-[2026-03-12 10:11:16.411 +0300] [32mINFO[39m: [36mBackground jobs started[39m
+[2026-03-12 11:24:45.649 +0300] [32mINFO[39m: [36mBackground jobs started[39m
     service: "webhook-service"
     schedule: "*/5 * * * *"
-[2026-03-12 10:11:16.438 +0300] [32mINFO[39m: [36mEvent listener started[39m
+[2026-03-12 11:24:45.686 +0300] [32mINFO[39m: [36mEvent listener started[39m
     service: "webhook-service"
-[2026-03-12 10:11:16.439 +0300] [32mINFO[39m: [36mWebhook service initialized[39m
+[2026-03-12 11:24:45.686 +0300] [32mINFO[39m: [36mWebhook service initialized[39m
     service: "webhook-service"
-[2026-03-12 10:11:16.440 +0300] [32mINFO[39m: [36mWebhook service listening[39m
-    service: "webhook-service"
-    port: 3003
-[2026-03-12 10:11:21.169 +0300] [32mINFO[39m: [36mRequest[39m
+node:events:486
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at app.listen (/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/node_modules/.pnpm/express@4.22.1/node_mo[2026-03-12 11:24:50.386 +0300] [32mINFO[39m: [36mRequest[39m
     service: "webhook-service"
     method: "GET"
     path: "/health"
 New database connection established
-[2026-03-12 10:15:00.689 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+[2026-03-12 11:25:00.138 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
     service: "webhook-service"
     count: 0
 New database connection established
-[2026-03-12 10:20:00.988 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+[2026-03-12 11:30:00.432 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
     service: "webhook-service"
     count: 0
 New database connection established
-[2026-03-12 10:25:00.290 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+[2026-03-12 11:35:00.748 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
     service: "webhook-service"
     count: 0
 New database connection established
-[2026-03-12 10:30:00.606 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+[2026-03-12 11:40:00.059 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
     service: "webhook-service"
     count: 0
 New database connection established
-[2026-03-12 10:35:00.887 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+[2026-03-12 11:45:00.364 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
     service: "webhook-service"
     count: 0
 New database connection established
-[2026-03-12 10:40:00.178 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+[2026-03-12 11:50:00.665 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
     service: "webhook-service"
     count: 0
-New database connection established
-[2026-03-12 10:45:00.504 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+[2026-03-12 11:54:03.777 +0300] [32mINFO[39m: [36mRequest[39m
     service: "webhook-service"
-    count: 0
+    method: "GET"
+    path: "/health"
 New database connection established
-[2026-03-12 10:50:00.831 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+[2026-03-12 11:55:01.012 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
     service: "webhook-service"
     count: 0

@@ -2,7 +2,7 @@
 > test-devnet
 > ts-mocha -t 300000 tests/devnet-test.ts
 
-(node:79811) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/alex/source/repos/solana-stablecoin-standard/sss-token/tests/devnet-test.ts is not specified and it doesn't parse as CommonJS.
+(node:77886) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/alex/source/repos/solana-stablecoin-standard/sss-token/tests/devnet-test.ts is not specified and it doesn't parse as CommonJS.
 Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
 To eliminate this warning, add "type": "module" to /home/alex/source/repos/solana-stablecoin-standard/sss-token/package.json.
 (Use `node --trace-warnings ...` to show where the warning was created)
@@ -13,90 +13,90 @@ To eliminate this warning, add "type": "module" to /home/alex/source/repos/solan
 🚀 Setting up Devnet Test Suite...
 
 Wallet: HhJFT5DBkwvdekU7uz1AqtrKeeFiApRWdbSQPzCrxhLD
-Balance: 12.24065044 SOL
+Balance: 12.16693948 SOL
 
 ✅ Setup complete!
 
     1. Initialize SSS-2 Stablecoin
 
-📝 Mint created: 9d4HuEe6TNjL1o4uKoNsBkx1ijBw7hNd56P9bAY9qkAa
-✅ Initialize tx: YGo5dFMCKM1ZFEDh76JRC6JczpKMZnyuYB34PPegwg5F9PWApaHspYCaQEgD2VrqwskGAJYjYbrCbs1AEUyGqyb
-   Explorer: https://explorer.solana.com/tx/YGo5dFMCKM1ZFEDh76JRC6JczpKMZnyuYB34PPegwg5F9PWApaHspYCaQEgD2VrqwskGAJYjYbrCbs1AEUyGqyb?cluster=devnet
-      ✔ should create a new SSS-2 compliant stablecoin (4082ms)
+📝 Mint created: Ah7tj725uKwMs1X7pVyKjBtDYQuzeAhLQmvtafZUt8W7
+✅ Initialize tx: 5yJMJ854j66TYME3KQp2zS82nYWuuPCjodxK71ZevexdZN21wWuJbmo3eiKzvW93Z2j2nfuDc4Ep1vUTVusn3ibq
+   Explorer: https://explorer.solana.com/tx/5yJMJ854j66TYME3KQp2zS82nYWuuPCjodxK71ZevexdZN21wWuJbmo3eiKzvW93Z2j2nfuDc4Ep1vUTVusn3ibq?cluster=devnet
+      ✔ should create a new SSS-2 compliant stablecoin (4279ms)
     2. Update Roles
-✅ Update roles tx: 4erycNGh8YeAYyhMeiF2zmR9RzUJH5ygbWk8Z5dCU1X8EYRx1k9jEpXLnEM1NmKz3zdjquCCjzzJQf585mR8i9A1
-   Explorer: https://explorer.solana.com/tx/4erycNGh8YeAYyhMeiF2zmR9RzUJH5ygbWk8Z5dCU1X8EYRx1k9jEpXLnEM1NmKz3zdjquCCjzzJQf585mR8i9A1?cluster=devnet
-      ✔ should assign blacklister, pauser, and seizer roles (1917ms)
+✅ Update roles tx: PXCchu3jSF2EYieVbRmPDkQAz9hmjykG8t3LqaQSuSfvWqJd4X3affijtmp46vVvvpP42TzqX6svaNHCiZLXpN5
+   Explorer: https://explorer.solana.com/tx/PXCchu3jSF2EYieVbRmPDkQAz9hmjykG8t3LqaQSuSfvWqJd4X3affijtmp46vVvvpP42TzqX6svaNHCiZLXpN5?cluster=devnet
+      ✔ should assign blacklister, pauser, and seizer roles (2454ms)
     3. Add Minter with Quota
-✅ Add minter tx: 5k3xwUYmdgkGfsJJWzfrLPDUemcP7kWRTjUUhu8zaPPsniSvgY6ouiuF7Ln23G86FSAFPKEZVtrXstByuJk1byWZ
-   Explorer: https://explorer.solana.com/tx/5k3xwUYmdgkGfsJJWzfrLPDUemcP7kWRTjUUhu8zaPPsniSvgY6ouiuF7Ln23G86FSAFPKEZVtrXstByuJk1byWZ?cluster=devnet
-      ✔ should add a minter with specified quota (1639ms)
+✅ Add minter tx: 2MUnouP1zmoc7QV3ptjkMLWUHcjfxY31Q7gHD8spv7kzvNCGGnmq8gGzd94Tdq6fD6Dji5FzbfTe5K4wXeqmwYAt
+   Explorer: https://explorer.solana.com/tx/2MUnouP1zmoc7QV3ptjkMLWUHcjfxY31Q7gHD8spv7kzvNCGGnmq8gGzd94Tdq6fD6Dji5FzbfTe5K4wXeqmwYAt?cluster=devnet
+      ✔ should add a minter with specified quota (2249ms)
     4. Update Minter Quota
-✅ Update quota tx: 5rempUxLWKzTVoFieP6BNxhw7Xo6nYsKGHPusrB44eR68fiVDf9eTdXX7r3zfZCcyACRQH91a7GPngRoc7PKr8eU
-   Explorer: https://explorer.solana.com/tx/5rempUxLWKzTVoFieP6BNxhw7Xo6nYsKGHPusrB44eR68fiVDf9eTdXX7r3zfZCcyACRQH91a7GPngRoc7PKr8eU?cluster=devnet
-      ✔ should update the minter's quota (3374ms)
+✅ Update quota tx: 2u2zV7Xq4Nu25qLVzFtt1MKdUaFKU9naz5KQLHDsxHE2a4vAiDBe13Ng8BCfcxybDFLiFLk8MEB2v772Y7izkEUg
+   Explorer: https://explorer.solana.com/tx/2u2zV7Xq4Nu25qLVzFtt1MKdUaFKU9naz5KQLHDsxHE2a4vAiDBe13Ng8BCfcxybDFLiFLk8MEB2v772Y7izkEUg?cluster=devnet
+      ✔ should update the minter's quota (2046ms)
     5. Mint Tokens
-✅ Mint tokens tx: 5EcQJb6KTeNnKEFKHuS7CjMDR1TF9u3Tyw8a3ahmVooZbDt3rbgm7vMzo94obWFjVv7t1AG6CT8A414fwPDgdHy4
-   Explorer: https://explorer.solana.com/tx/5EcQJb6KTeNnKEFKHuS7CjMDR1TF9u3Tyw8a3ahmVooZbDt3rbgm7vMzo94obWFjVv7t1AG6CT8A414fwPDgdHy4?cluster=devnet
-      ✔ should mint tokens to a user account (3177ms)
+✅ Mint tokens tx: 357HZJ4Udd3APxcWvN5Q4HD5RFBu3DjL2GK8XLUcqQ9Yv87ZRgW7SK5oL5D639M5m9ChA3KgKuDj5URBuURkyujB
+   Explorer: https://explorer.solana.com/tx/357HZJ4Udd3APxcWvN5Q4HD5RFBu3DjL2GK8XLUcqQ9Yv87ZRgW7SK5oL5D639M5m9ChA3KgKuDj5URBuURkyujB?cluster=devnet
+      ✔ should mint tokens to a user account (4301ms)
     6. Transfer Tokens
-✅ Transfer tx: 2QTiAgxxiv5YQTSwQzPpgx4spSvkyLQ8xnz3HvUPrvEQjtBdAhjTS2fAeCquC5tVJjakf6U57NnEeUe2GMDN33AR
-   Explorer: https://explorer.solana.com/tx/2QTiAgxxiv5YQTSwQzPpgx4spSvkyLQ8xnz3HvUPrvEQjtBdAhjTS2fAeCquC5tVJjakf6U57NnEeUe2GMDN33AR?cluster=devnet
-      ✔ should transfer tokens between accounts (3186ms)
+✅ Transfer tx: 4oT7jpyCsuiYRL9EF7h2rftdgZDMkxbagvAqxxoxErJHPeMvNZYR2Tri3sfbbbucUpJDEqLvPosaC9oMyJVr4qzS
+   Explorer: https://explorer.solana.com/tx/4oT7jpyCsuiYRL9EF7h2rftdgZDMkxbagvAqxxoxErJHPeMvNZYR2Tri3sfbbbucUpJDEqLvPosaC9oMyJVr4qzS?cluster=devnet
+      ✔ should transfer tokens between accounts (3485ms)
     7. Burn Tokens
-✅ Burn tokens tx: 2j4QTa1Q8asKKXEdNXdCKzdA3YJXX7B6wTyBsLwCmUzdgRE56evD89xqXgkWcrjSfWDwuk7hYwjqVQqdsNknwypb
-   Explorer: https://explorer.solana.com/tx/2j4QTa1Q8asKKXEdNXdCKzdA3YJXX7B6wTyBsLwCmUzdgRE56evD89xqXgkWcrjSfWDwuk7hYwjqVQqdsNknwypb?cluster=devnet
-      ✔ should burn tokens from payer's account (1456ms)
+✅ Burn tokens tx: 5iHoEvXTa2fmeSsWivr4Y3qB23aLsnXZqEwXZV9RaYXy5QGtjvETZbhSENovRMbjHtyycdmAvEui7D26UeS4AN1b
+   Explorer: https://explorer.solana.com/tx/5iHoEvXTa2fmeSsWivr4Y3qB23aLsnXZqEwXZV9RaYXy5QGtjvETZbhSENovRMbjHtyycdmAvEui7D26UeS4AN1b?cluster=devnet
+      ✔ should burn tokens from payer's account (1837ms)
     8. Add to Blacklist
-✅ Blacklist add tx: 2sodFothRsvxqusrYhUHECQ75AnHEg6fLYt2N7HLa1hkvrL2NZhJPiomuXzbTCGfJRwdRgefydVMTNVVsvi9oYa
-   Explorer: https://explorer.solana.com/tx/2sodFothRsvxqusrYhUHECQ75AnHEg6fLYt2N7HLa1hkvrL2NZhJPiomuXzbTCGfJRwdRgefydVMTNVVsvi9oYa?cluster=devnet
-      ✔ should add an address to the blacklist (1908ms)
+✅ Blacklist add tx: 42n8sSb2f22sC5unfF1MBjSm4jNahs8HkDVnQwRgdavKGarmjqQYBPRBwzD6utPq7m1XTYKWjqrgLRTPni3N1x9t
+   Explorer: https://explorer.solana.com/tx/42n8sSb2f22sC5unfF1MBjSm4jNahs8HkDVnQwRgdavKGarmjqQYBPRBwzD6utPq7m1XTYKWjqrgLRTPni3N1x9t?cluster=devnet
+      ✔ should add an address to the blacklist (1637ms)
     9. Remove from Blacklist
-✅ Blacklist remove tx: 2fwmYg4GNcgfqfi9ZRrjQJZ3QBPqHqMhiCTg27trNUnZrcVGPp7EwpGC9qiJVhDFtrn1zWvTMSnBo4DZgc9e49J7
-   Explorer: https://explorer.solana.com/tx/2fwmYg4GNcgfqfi9ZRrjQJZ3QBPqHqMhiCTg27trNUnZrcVGPp7EwpGC9qiJVhDFtrn1zWvTMSnBo4DZgc9e49J7?cluster=devnet
-      ✔ should remove an address from the blacklist (1841ms)
+✅ Blacklist remove tx: Movmwh5kZewVhL8bPYgRYMpqnbhHr1a1EotVBbAJ3YMjntoGH9Gnr8bygHX5N6Jg5UiktkRnQMb3fkxkJh8H3Jp
+   Explorer: https://explorer.solana.com/tx/Movmwh5kZewVhL8bPYgRYMpqnbhHr1a1EotVBbAJ3YMjntoGH9Gnr8bygHX5N6Jg5UiktkRnQMb3fkxkJh8H3Jp?cluster=devnet
+      ✔ should remove an address from the blacklist (2048ms)
     10. Freeze Token Account
-✅ Freeze tx: 2uGR1SZx8tUUnoEaFDfH3T4R6YG5TxatP8jnhQcpnMKNx4Z5zXWFDLpsDDNddTdiLHrAJALm14zBpTqr4wPMv28C
-   Explorer: https://explorer.solana.com/tx/2uGR1SZx8tUUnoEaFDfH3T4R6YG5TxatP8jnhQcpnMKNx4Z5zXWFDLpsDDNddTdiLHrAJALm14zBpTqr4wPMv28C?cluster=devnet
-      ✔ should freeze a token account (3276ms)
+✅ Freeze tx: 3NxXJ73F6QGFciQBtZRNg8qdSmBdVNJbgC6AY6jPzRvGbmCAMZrLktoawhe8cEFhWXowAbyCFP2UsorGrkZvKrHb
+   Explorer: https://explorer.solana.com/tx/3NxXJ73F6QGFciQBtZRNg8qdSmBdVNJbgC6AY6jPzRvGbmCAMZrLktoawhe8cEFhWXowAbyCFP2UsorGrkZvKrHb?cluster=devnet
+      ✔ should freeze a token account (4099ms)
     11. Thaw Token Account
-✅ Thaw tx: 2hnDtCHfztwbV4AGJvmjaz3T8mBXb2qDAXjmK4aviKW1KBenWwhQG27n2RpJ9FmPeDadmeyqUQSGLehrbTAWAR6m
-   Explorer: https://explorer.solana.com/tx/2hnDtCHfztwbV4AGJvmjaz3T8mBXb2qDAXjmK4aviKW1KBenWwhQG27n2RpJ9FmPeDadmeyqUQSGLehrbTAWAR6m?cluster=devnet
-      ✔ should thaw (unfreeze) a token account (5429ms)
+✅ Thaw tx: 62W9WGmhoSY2y5BcWbXDVvXwz6PuHJsrqgNVmWBN1HRQPBAj2d8f3xW6JRfwmUnRtZGGjoBqoc1FNVJqS8t3oEty
+   Explorer: https://explorer.solana.com/tx/62W9WGmhoSY2y5BcWbXDVvXwz6PuHJsrqgNVmWBN1HRQPBAj2d8f3xW6JRfwmUnRtZGGjoBqoc1FNVJqS8t3oEty?cluster=devnet
+      ✔ should thaw (unfreeze) a token account (5938ms)
     12. Seize Tokens
 
    Creating mint with permanent delegate extension...
-Created mint with permanent delegate: FfbdhtGDokvg1wHKb5sWPj9c7rp5zy7qCWMM54Ljrn9a
-  Permanent delegate PDA: 2CYCqnaytvKGbjrZi5DzfVcLvdKJpQXUDSg8bSXsByrT
-  Freeze authority PDA: Bak48rFdruNnEeEabRDU3ZHyxpXmtJb516Xw53agjUAV
-   Seize mint created: FfbdhtGDokvg1wHKb5sWPj9c7rp5zy7qCWMM54Ljrn9a
+Created mint with permanent delegate: 5W1YvuBM1ncjgk2XdDXfWKgRpUfE4pgn4XX5Czh3Bx3w
+  Permanent delegate PDA: Cr2pdtMVscpsrzkgTCsq6G7kgfr7tZ1jePqRE2JAKgu3
+  Freeze authority PDA: 2FMCSzTYvmwUkUWYEV4am8RRSNoLiC8EWGoewN42xvDe
+   Seize mint created: 5W1YvuBM1ncjgk2XdDXfWKgRpUfE4pgn4XX5Czh3Bx3w
    Seize mint initialized
    Roles configured
    Minted 1,000,000 tokens to user account
    Freezing user account with PDA authority...
    Account frozen for seizure
-✅ Seize tx: 2nBMmieFMQDhn7DCpBWxSjeoKp6uYsFQP71cT834K7oobn63QQSWLkV2riA2kLmDqtQGPXnhFBbcadfqB8Ut9UrK
-   Explorer: https://explorer.solana.com/tx/2nBMmieFMQDhn7DCpBWxSjeoKp6uYsFQP71cT834K7oobn63QQSWLkV2riA2kLmDqtQGPXnhFBbcadfqB8Ut9UrK?cluster=devnet
+✅ Seize tx: gYXebVN8Q8pioEX5bqMQmvBNRVGQ24Jw27BorFroWpKYb1AUp3aDDeS52wCAmEno3gJK1nVowU4h2ZGdNfTqTQD
+   Explorer: https://explorer.solana.com/tx/gYXebVN8Q8pioEX5bqMQmvBNRVGQ24Jw27BorFroWpKYb1AUp3aDDeS52wCAmEno3gJK1nVowU4h2ZGdNfTqTQD?cluster=devnet
    User final balance: 500000
    Treasury balance: 500000
-      ✔ should seize tokens from a frozen account (14537ms)
+      ✔ should seize tokens from a frozen account (12902ms)
     13. Pause Stablecoin
-✅ Pause tx: 3JEM1TVxKNz9gAzj32qeEe8wVRXe9aBNa95XM6ZdC6FCzbHp9HVU6ACKH9HGJK73WYVejFPiysi2XNxL1w1BHhpg
-   Explorer: https://explorer.solana.com/tx/3JEM1TVxKNz9gAzj32qeEe8wVRXe9aBNa95XM6ZdC6FCzbHp9HVU6ACKH9HGJK73WYVejFPiysi2XNxL1w1BHhpg?cluster=devnet
-      ✔ should pause all stablecoin operations (1741ms)
+✅ Pause tx: 38xGJvuEwZhNEtKv21jfNUwbqaRgNQHdB6Dui3uWxsyKwDT7gP4EgpakpENFZjSSVuRxffigzAwWriph1w3m8RA9
+   Explorer: https://explorer.solana.com/tx/38xGJvuEwZhNEtKv21jfNUwbqaRgNQHdB6Dui3uWxsyKwDT7gP4EgpakpENFZjSSVuRxffigzAwWriph1w3m8RA9?cluster=devnet
+      ✔ should pause all stablecoin operations (1840ms)
     14. Unpause Stablecoin
-✅ Unpause tx: XMrTnWgrDQwMfSqq7drNLotDdDXN7sHZ4UbQDUWNAkXsx4JF46gPNzzL9ydvqV9US7fviBvNGezYtQgorariDgn
-   Explorer: https://explorer.solana.com/tx/XMrTnWgrDQwMfSqq7drNLotDdDXN7sHZ4UbQDUWNAkXsx4JF46gPNzzL9ydvqV9US7fviBvNGezYtQgorariDgn?cluster=devnet
-      ✔ should unpause all stablecoin operations (2147ms)
+✅ Unpause tx: nmGj4BJwVSjy1dYLDexSD631MiBc7uRmwTADWMHH56qovHvXMPoP2jZ181LAmYN7E2j4o8L7nxrvLKzn53GobiT
+   Explorer: https://explorer.solana.com/tx/nmGj4BJwVSjy1dYLDexSD631MiBc7uRmwTADWMHH56qovHvXMPoP2jZ181LAmYN7E2j4o8L7nxrvLKzn53GobiT?cluster=devnet
+      ✔ should unpause all stablecoin operations (2050ms)
     15. Transfer Authority
-✅ Transfer authority tx: WV3hEqDF9JhhQHhGK5AtsiyjFsb2Xyg1oGhqYW6ZANK2jvDsqPGSU4QGzc9YPa3ZwCyP8MZ45n3B4Fi1NbXNgXH
-   Explorer: https://explorer.solana.com/tx/WV3hEqDF9JhhQHhGK5AtsiyjFsb2Xyg1oGhqYW6ZANK2jvDsqPGSU4QGzc9YPa3ZwCyP8MZ45n3B4Fi1NbXNgXH?cluster=devnet
+✅ Transfer authority tx: 3nmqfdbpPoiaucqAxiTHqaQn3EzPSPnnNEZg28pio4zzbxm2W6ymRawyLkVkLPL2hakckYEBgkeX5pWgwsfsQubC
+   Explorer: https://explorer.solana.com/tx/3nmqfdbpPoiaucqAxiTHqaQn3EzPSPnnNEZg28pio4zzbxm2W6ymRawyLkVkLPL2hakckYEBgkeX5pWgwsfsQubC?cluster=devnet
    Authority restored to original
-      ✔ should transfer master authority to new keypair (3477ms)
+      ✔ should transfer master authority to new keypair (3886ms)
     16. Remove Minter
-✅ Remove minter tx: 3sD6xve47VGCz9FiTiWhJcJnwEQ8hdLS1cizeCrkjXxp4P85xAz8dmC2hDXsnLvj4UbaYft6ap6FzgEHzqeVbYTU
-   Explorer: https://explorer.solana.com/tx/3sD6xve47VGCz9FiTiWhJcJnwEQ8hdLS1cizeCrkjXxp4P85xAz8dmC2hDXsnLvj4UbaYft6ap6FzgEHzqeVbYTU?cluster=devnet
-      ✔ should remove a minter by setting quota to 0 (1641ms)
+✅ Remove minter tx: 5mccFj8T8HvXg7xR65SB8qiZLPVzk2Y1WiLyqyetCFSKjpU1Q8EiYqDDAKEYJNRfcvkRVYKpfDtF2NWLZ38ooRWk
+   Explorer: https://explorer.solana.com/tx/5mccFj8T8HvXg7xR65SB8qiZLPVzk2Y1WiLyqyetCFSKjpU1Q8EiYqDDAKEYJNRfcvkRVYKpfDtF2NWLZ38ooRWk?cluster=devnet
+      ✔ should remove a minter by setting quota to 0 (1642ms)
     17. Full Workflow Integration
 
 🔄 Running full workflow integration test...
@@ -110,15 +110,15 @@ Created mint with permanent delegate: FfbdhtGDokvg1wHKb5sWPj9c7rp5zy7qCWMM54Ljrn
   8. ✅ Unblacklist
 
   📋 All workflow transactions:
-     1. https://explorer.solana.com/tx/4Jka3ufuN5RAejQ6ZyRn5JH2oqM8Uq9dww1owycjTsiWpz9Xs1hgGUyL5r2949U7LSzecnwXwanRjJPVFwn2EVFz?cluster=devnet
-     2. https://explorer.solana.com/tx/3Hs3Zk8dHX6ZhnXTMii8xGtZ6Y1uLygY49ZyamgQFAPM4yA85YKxJkBbhQqKCnnTVoTw5z9JviYqjEVTx6sYsX1B?cluster=devnet
-     3. https://explorer.solana.com/tx/4h6jngjaDh3GcRCKV5Lon2bo1C1dKBSeo9vAXTnmTueAbKawKBA5ykGKpNwsBbqyXYQUV1ue9oesQERwpfs8fcLo?cluster=devnet
-     4. https://explorer.solana.com/tx/59hAzd3V46n63cXoChtyzYERU59jJGLDR9NZ7BxnVmMCZMaoa4xM1AgZ6kGZXuN5A2NdcTjfJViG3AENjSBxjGVH?cluster=devnet
-     5. https://explorer.solana.com/tx/4Kq9gR6eNqYwCrRQuaEgHp7xHmapcanoUdR5D8D92d4cpGbN3C7GVGhbSasE1AoT9ioq53Ji3xqNqxmhCsWbakVx?cluster=devnet
-     6. https://explorer.solana.com/tx/4PWZWaFxHuaNRfxgTFzPxe6woTmSfPG3QxcYHniVL7HmWLgneF8rPLQonKazpAy6vxaMXkbL4v9Xj1T4WJ9uJzL8?cluster=devnet
-     7. https://explorer.solana.com/tx/4sHUbSfsWrYnRJ9FbeQTEComY6NEdY9UFyEr1m2G5A3y41PLztLszub4qmx5W3arwp2thbze7odi6S2e8qBBaREs?cluster=devnet
-     8. https://explorer.solana.com/tx/64cmLqQe2rxToaqETJZn8j4TGt688KZyPBY7FvHCKTftzuBwD1hDkxSe2MSHs5UnvEckeRFppkQeLNACBKHxUVTF?cluster=devnet
-      ✔ should execute complete stablecoin lifecycle (14170ms)
+     1. https://explorer.solana.com/tx/5Y6QDn3Z1Cux713Urt6iJZutf4YJM9d6d6W1b3dgjmDn2VpgJhZuhpEMjESUoWjJKmTqEtfm2HkSxcaBLCNQwQei?cluster=devnet
+     2. https://explorer.solana.com/tx/3Qy7kdxLsHUWdhhHbGZV6ASeX9fDsaBj3jqkxvc8GmBc4D4aZCWftSBFiqTghoi9jFYjujFL1GpiTVpuewbxifCW?cluster=devnet
+     3. https://explorer.solana.com/tx/4HwguEpnhTVHG8yLAu5931SMCtUuwvaWF3At4tfDzvVBNuTXBiEvsgpATAmpyne75JTkFyNbMtvay4NE1DMf9BRM?cluster=devnet
+     4. https://explorer.solana.com/tx/5mFCX6VTDC7EfCQN8uqXt4ABVSLseM1i7CnyPkkQCpCgUCCXtdmtqV2y3A4Uwsc2sN9EL5ztmaPQyxm3wX7FVibA?cluster=devnet
+     5. https://explorer.solana.com/tx/5jp98xM9cpiNxrkh1rJHMbjY6MZepzJkKMNYcRp6vnxpHXyhLPjshaGSmoS2c5ciCWziNZRRotpABVek5AEVg5w7?cluster=devnet
+     6. https://explorer.solana.com/tx/4ZataYn139sQsAeBuanb6ytDVCwJBz2BCbSj1LXPfDJogt4jsLzFg5vyAWkgDWi6bpHiYhMky51rcxKZpFz3drSa?cluster=devnet
+     7. https://explorer.solana.com/tx/gtKUxYsmfE3qSBgAakX7kaTQY28UqRKRCsiDSiq6M6KuAtP5EDmmvCXLcmsszTYimzHoMatBDoGpgaLZuDYnkiy?cluster=devnet
+     8. https://explorer.solana.com/tx/42VQcyDJUsw1FUniTD1DkxJA8GXpuxCaZTiufCp2UkL1QQKbYHzcBZuRVJxyvXcJVZUR9qE2JjHK8fAL7eBrDN8A?cluster=devnet
+      ✔ should execute complete stablecoin lifecycle (12898ms)
 
 📄 Proof documentation saved to: ./DEVNET_PROOF.md
 

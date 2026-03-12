@@ -2,6 +2,11 @@
  * SSS Token Indexer Service
  * 
  * Listens for on-chain events from the SSS Token program and stores them in PostgreSQL
+ * 
+ * Modes:
+ * - WebSocket-only (INDEXER_MODE=websocket): Only subscribes to real-time logs (good for rate-limited RPCs)
+ * - Polling-only (INDEXER_MODE=polling): Only polls for historical transactions
+ * - Hybrid (INDEXER_MODE=hybrid, default): Both WebSocket and polling
  */
 
 import 'dotenv/config';
@@ -24,8 +29,11 @@ const RPC_URL = process.env.SOLANA_RPC_URL || 'http://localhost:8899';
 const WS_URL = process.env.SOLANA_WS_URL || 'ws://localhost:8900';
 const PROGRAM_ID = process.env.SSS_PROGRAM_ID || SSS_TOKEN_PROGRAM_ID;
 const COMMITMENT: Commitment = (process.env.COMMITMENT as Commitment) || 'confirmed';
-const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL || '1000');
-const MAX_SLOT_RANGE = parseInt(process.env.MAX_SLOT_RANGE || '100');
+const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL || '5000'); // Increased default to 5s
+const MAX_SLOT_RANGE = parseInt(process.env.MAX_SLOT_RANGE || '50'); // Reduced to avoid rate limits
+const INDEXER_MODE = process.env.INDEXER_MODE || 'hybrid'; // 'websocket', 'polling', or 'hybrid'
+const RATE_LIMIT_RETRIES = parseInt(process.env.RATE_LIMIT_RETRIES || '5');
+const RATE_LIMIT_BASE_DELAY = parseInt(process.env.RATE_LIMIT_BASE_DELAY || '2000');
 
 // Create logger context
 const log = logger.child({ service: 'indexer' });
@@ -33,13 +41,20 @@ const log = logger.child({ service: 'indexer' });
 let isRunning = true;
 let connection: Connection;
 let programId: PublicKey;
+let rateLimitCount = 0;
+let lastRateLimitTime = 0;
 
 /**
  * Initialize connections
  */
 async function init() {
   log.info('Initializing indexer service...');
-  log.info({ rpcUrl: RPC_URL, programId: PROGRAM_ID }, 'Configuration');
+  log.info({ 
+    rpcUrl: RPC_URL, 
+    programId: PROGRAM_ID,
+    mode: INDEXER_MODE,
+    pollInterval: POLL_INTERVAL,
+  }, 'Configuration');
 
   // Initialize database
   initDatabase();
@@ -49,7 +64,7 @@ async function init() {
   initRedis();
   log.info('Redis initialized');
 
-  // Create Solana connection
+  // Create Solana connection with custom commitment
   connection = new Connection(RPC_URL, {
     commitment: COMMITMENT,
     wsEndpoint: WS_URL,
@@ -78,30 +93,87 @@ async function getStartSlot(): Promise<number> {
     return latestSlot + 1;
   }
 
-  // Start from current slot
+  // Start from current slot (don't go back for public RPC to avoid rate limits)
   const currentSlot = await connection.getSlot();
-  return Math.max(0, currentSlot - 100); // Start 100 slots back to catch recent events
+  
+  // For public RPC, start fresh to avoid rate limiting
+  if (RPC_URL.includes('api.devnet.solana.com') || RPC_URL.includes('api.mainnet-beta.solana.com')) {
+    log.warn('Using public RPC - starting from current slot to avoid rate limiting');
+    return currentSlot;
+  }
+  
+  return Math.max(0, currentSlot - 100);
 }
 
 /**
- * Fetch signatures for a slot range
- * Note: getSignaturesForAddress doesn't support endSlot filtering directly.
- * The 'until' param expects a signature string, not a slot number.
- * We filter by endSlot client-side after fetching.
+ * Sleep with exponential backoff for rate limiting
+ */
+async function sleepWithBackoff(baseMs: number, attempt: number): Promise<void> {
+  const delay = baseMs * Math.pow(2, Math.min(attempt, 6)); // Cap at 64x base
+  log.warn({ delay, attempt }, 'Rate limited - backing off');
+  await new Promise(resolve => setTimeout(resolve, delay));
+}
+
+/**
+ * Check if error is a rate limit error
+ */
+function isRateLimitError(error: any): boolean {
+  if (!error) return false;
+  const msg = error.message || error.toString();
+  return msg.includes('429') || msg.includes('Too Many Requests') || msg.includes('rate limit');
+}
+
+/**
+ * Execute a function with rate limit retry logic
+ */
+async function withRateLimitRetry<T>(
+  fn: () => Promise<T>,
+  operation: string
+): Promise<T | null> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 0; attempt < RATE_LIMIT_RETRIES; attempt++) {
+    try {
+      const result = await fn();
+      // Reset rate limit count on success
+      rateLimitCount = 0;
+      return result;
+    } catch (error: any) {
+      lastError = error;
+      
+      if (isRateLimitError(error)) {
+        rateLimitCount++;
+        lastRateLimitTime = Date.now();
+        
+        if (attempt < RATE_LIMIT_RETRIES - 1) {
+          await sleepWithBackoff(RATE_LIMIT_BASE_DELAY, attempt);
+        }
+      } else {
+        // Non-rate-limit error, don't retry
+        throw error;
+      }
+    }
+  }
+  
+  log.error({ error: lastError, operation }, 'Rate limit retries exhausted');
+  return null;
+}
+
+/**
+ * Fetch signatures for a slot range with rate limit handling
  */
 async function fetchSignatures(startSlot: number, endSlot: number) {
-  try {
+  const result = await withRateLimitRetry(async () => {
     const signatures = await connection.getSignaturesForAddress(programId, {
       minContextSlot: startSlot,
-      limit: 1000,
+      limit: 100,
     });
     
-    // Filter by endSlot client-side since 'until' expects a signature, not a slot
+    // Filter by endSlot client-side
     return signatures.filter(sig => sig.slot <= endSlot);
-  } catch (error) {
-    log.error({ error, startSlot, endSlot }, 'Failed to fetch signatures');
-    return [];
-  }
+  }, 'fetchSignatures');
+  
+  return result || [];
 }
 
 /**
@@ -109,9 +181,11 @@ async function fetchSignatures(startSlot: number, endSlot: number) {
  */
 async function processTransaction(signature: string) {
   try {
-    const tx = await connection.getParsedTransaction(signature, {
-      maxSupportedTransactionVersion: 0,
-    });
+    const tx = await withRateLimitRetry(async () => {
+      return await connection.getParsedTransaction(signature, {
+        maxSupportedTransactionVersion: 0,
+      });
+    }, 'getParsedTransaction');
 
     if (!tx) {
       log.warn({ signature }, 'Transaction not found');
@@ -197,20 +271,42 @@ function parseInstructionType(logs: string[]): string | null {
 }
 
 /**
- * Main indexing loop
+ * Main indexing loop (for polling mode)
  */
 async function startIndexing() {
+  // Skip polling in websocket-only mode
+  if (INDEXER_MODE === 'websocket') {
+    log.info('WebSocket-only mode - skipping polling loop');
+    return;
+  }
+
   let currentSlot = await getStartSlot();
   log.info({ startSlot: currentSlot }, 'Starting indexing');
 
   while (isRunning) {
     try {
+      // Check if we're being rate limited too much
+      if (rateLimitCount > 10 && Date.now() - lastRateLimitTime < 60000) {
+        log.warn('Too many rate limits - pausing polling for 60 seconds');
+        await new Promise(resolve => setTimeout(resolve, 60000));
+        rateLimitCount = 0;
+        continue;
+      }
+
       // Get current slot
-      const latestSlot = await connection.getSlot();
+      const latestSlot = await withRateLimitRetry(
+        () => connection.getSlot(),
+        'getSlot'
+      );
+      
+      if (latestSlot === null) {
+        await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL));
+        continue;
+      }
       
       if (currentSlot >= latestSlot) {
         // Wait for new slots
-        await sleep(POLL_INTERVAL);
+        await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL));
         continue;
       }
 
@@ -229,7 +325,7 @@ async function startIndexing() {
 
     } catch (error) {
       log.error({ error }, 'Error in indexing loop');
-      await sleep(5000); // Wait before retrying
+      await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL * 2));
     }
   }
 }
@@ -238,25 +334,36 @@ async function startIndexing() {
  * Subscribe to real-time logs (WebSocket)
  */
 async function subscribeToLogs() {
+  // Skip WebSocket in polling-only mode
+  if (INDEXER_MODE === 'polling') {
+    log.info('Polling-only mode - skipping WebSocket subscription');
+    return;
+  }
+
   log.info('Subscribing to real-time logs...');
 
-  connection.onLogs(
-    programId,
-    async (logs, context) => {
-      if (logs.err) {
-        log.warn({ err: logs.err }, 'Log error');
-        return;
-      }
+  try {
+    const subscriptionId = connection.onLogs(
+      programId,
+      async (logs, context) => {
+        if (logs.err) {
+          log.warn({ err: logs.err }, 'Log error');
+          return;
+        }
 
-      // Process the transaction
-      if (logs.signature) {
-        await processTransaction(logs.signature);
-      }
-    },
-    COMMITMENT
-  );
+        // Process the transaction
+        if (logs.signature) {
+          log.debug({ signature: logs.signature }, 'Received real-time log');
+          await processTransaction(logs.signature);
+        }
+      },
+      COMMITMENT
+    );
 
-  log.info('Subscribed to program logs');
+    log.info({ subscriptionId }, 'Subscribed to program logs via WebSocket');
+  } catch (error) {
+    log.error({ error }, 'Failed to subscribe to logs - will rely on polling');
+  }
 }
 
 /**
@@ -289,11 +396,19 @@ async function main() {
   try {
     await init();
     
-    // Subscribe to real-time logs first
+    // Subscribe to real-time logs first (works even with rate-limited HTTP)
     await subscribeToLogs();
     
-    // Then start polling loop (this runs forever)
+    // Then start polling loop (if enabled)
     await startIndexing();
+
+    // Keep process alive in websocket-only mode
+    if (INDEXER_MODE === 'websocket') {
+      log.info('Running in WebSocket-only mode - waiting for events...');
+      while (isRunning) {
+        await sleep(60000); // Just keep alive
+      }
+    }
 
   } catch (error) {
     log.error({ error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined }, 'Fatal error');

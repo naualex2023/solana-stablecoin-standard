@@ -1,0 +1,33 @@
+Redis config: { host: 'localhost', port: 6379, hasPassword: true }
+Redis connected
+Redis ready
+[2026-03-12 09:46:57.585 +0300] [32mINFO[39m: [36mInitializing webhook service...[39m
+    service: "webhook-service"
+[2026-03-12 09:46:57.585 +0300] [32mINFO[39m: [36mDatabase initialized[39m
+    service: "webhook-service"
+[2026-03-12 09:46:57.588 +0300] [32mINFO[39m: [36mRedis initialized[39m
+    service: "webhook-service"
+[2026-03-12 09:46:57.592 +0300] [32mINFO[39m: [36mBackground jobs started[39m
+    service: "webhook-service"
+    schedule: "*/5 * * * *"
+[2026-03-12 09:46:57.621 +0300] [32mINFO[39m: [36mEvent listener started[39m
+    service: "webhook-service"
+[2026-03-12 09:46:57.621 +0300] [32mINFO[39m: [36mWebhook service initialized[39m
+    service: "webhook-service"
+[2026-03-12 09:46:57.622 +0300] [32mINFO[39m: [36mWebhook service listening[39m
+    service: "webhook-service"
+    port: 3003
+[2026-03-12 09:47:02.352 +0300] [32mINFO[39m: [36mRequest[39m
+    service: "webhook-service"
+    method: "GET"
+    path: "/health"
+New database connection established
+[2026-03-12 09:50:00.794 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+    service: "webhook-service"
+    count: 0
+New database connection established
+[2026-03-12 09:55:00.087 +0300] [32mINFO[39m: [36mRetrying failed deliveries[39m
+    service: "webhook-service"
+    count: 0
+[2026-03-12 09:56:39.745 +0300] [32mINFO[39m: [36mShutting down webhook service...[39m
+    service: "webhook-service"

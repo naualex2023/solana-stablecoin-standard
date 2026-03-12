@@ -146,7 +146,7 @@ show_status() {
     fi
     
     # Backend Services
-    for service in indexer mint-burn compliance webhook; do
+    for service in indexer indexer-api mint-burn compliance webhook; do
         if is_running "$PID_DIR/$service.pid"; then
             echo -e "$(echo $service | sed 's/.*/\u&'):        ${GREEN}RUNNING${NC} (PID: $(cat $PID_DIR/$service.pid))"
         else
@@ -162,6 +162,7 @@ show_status() {
     echo "Ports:"
     echo "  - PostgreSQL:     5432"
     echo "  - Redis:          6379"
+    echo "  - Indexer API:    3004"
     echo "  - Mint/Burn API:  3001"
     echo "  - Compliance API: 3002"
     echo "  - Webhook API:    3003"
@@ -183,6 +184,7 @@ stop_all() {
     stop_process "$PID_DIR/webhook.pid" "Webhook Service"
     stop_process "$PID_DIR/compliance.pid" "Compliance Service"
     stop_process "$PID_DIR/mint-burn.pid" "Mint/Burn Service"
+    stop_process "$PID_DIR/indexer-api.pid" "Indexer API"
     stop_process "$PID_DIR/indexer.pid" "Indexer"
     
     # Stop Docker containers
@@ -341,8 +343,31 @@ start_backend_services() {
         DATABASE_URL="$DATABASE_URL" \
         REDIS_URL="$REDIS_URL" \
         LOG_LEVEL=debug \
+        INDEXER_MODE="${INDEXER_MODE:-websocket}" \
         node dist/index.js > "$LOG_DIR/indexer.log" 2>&1 &
         echo $! > "$PID_DIR/indexer.pid"
+        sleep 2
+    fi
+    
+    # Indexer API
+    if is_running "$PID_DIR/indexer-api.pid"; then
+        log_warning "Indexer API already running"
+    else
+        log_info "Starting Indexer API..."
+        cd "$BACKEND_DIR/packages/indexer-api"
+        NODE_ENV=development \
+        PORT=3004 \
+        SOLANA_RPC_URL="$SOLANA_RPC_URL" \
+        SSS_PROGRAM_ID="$SSS_PROGRAM_ID" \
+        DATABASE_URL="$DATABASE_URL" \
+        POSTGRES_HOST=localhost \
+        POSTGRES_PORT=5432 \
+        POSTGRES_USER=sss \
+        POSTGRES_PASSWORD=sss_secret \
+        POSTGRES_DB=sss_token \
+        LOG_LEVEL=debug \
+        node dist/index.js > "$LOG_DIR/indexer-api.log" 2>&1 &
+        echo $! > "$PID_DIR/indexer-api.pid"
         sleep 2
     fi
     
@@ -529,11 +554,14 @@ start_all() {
     echo "  - Program ID:     $SSS_PROGRAM_ID"
     echo ""
     echo "Services:"
+    echo "  - Indexer API:    http://localhost:3004"
     echo "  - Mint/Burn API:  http://localhost:3001"
     echo "  - Compliance API: http://localhost:3002"
     echo "  - Webhook API:    http://localhost:3003"
     echo ""
     echo "API Endpoints:"
+    echo "  - GET  http://localhost:3004/api/stablecoins        # List stablecoins"
+    echo "  - GET  http://localhost:3004/api/events             # List events"
     echo "  - POST http://localhost:3001/api/v1/mint-requests"
     echo "  - POST http://localhost:3001/api/v1/burn-requests"
     echo "  - GET  http://localhost:3002/api/v1/blacklist"

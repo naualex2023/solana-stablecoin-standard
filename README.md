@@ -173,6 +173,12 @@ For regulated stablecoins requiring full compliance controls.
 │  │  │             │    │     SDK     │    │  (Mint, Compliance,     │   │   │
 │  │  │  sss-token  │    │ @stbr/sss   │    │   Webhook, Indexer)     │   │   │
 │  │  └─────────────┘    └─────────────┘    └─────────────────────────┘   │   │
+│  │                                                                       │   │
+│  │  ┌───────────────────────────────────────────────────────────────┐   │   │
+│  │  │                     Web Frontend                               │   │   │
+│  │  │              (Next.js 14 + Solana Wallet Adapter)             │   │   │
+│  │  │   Dashboard • Create Stablecoin • Admin Ops • Holders        │   │   │
+│  │  └───────────────────────────────────────────────────────────────┘   │   │
 │  └──────────────────────────────────────────────────────────────────────┘   │
 │                                      │                                       │
 │                                      ▼                                       │
@@ -197,6 +203,12 @@ For regulated stablecoins requiring full compliance controls.
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+## Live Demo
+
+**🌐 Web Interface**: https://solana-stablecoin-standard-amber.vercel.app/
+
+The live demo showcases the SSS Token frontend deployed on Vercel, connected to Solana devnet.
+
 ## Documentation Index
 
 | Document | Description |
@@ -209,6 +221,7 @@ For regulated stablecoins requiring full compliance controls.
 | [docs/SSS-2.md](./sss-token/docs/SSS-2.md) | Compliant stablecoin specification |
 | [docs/COMPLIANCE.md](./sss-token/docs/COMPLIANCE.md) | Regulatory compliance guide |
 | [docs/API.md](./sss-token/docs/API.md) | Backend API reference |
+| [frontend/README.md](./sss-token/frontend/README.md) | Web UI documentation |
 
 ## Project Structure
 
@@ -222,6 +235,13 @@ sss-token/
 │   └── tests/           # SDK tests
 ├── cli/                  # Admin CLI tool
 │   └── src/             # CLI source code
+├── frontend/             # Web UI (Next.js 14)
+│   ├── src/             # Frontend source code
+│   │   ├── app/         # App Router pages
+│   │   ├── components/  # React components
+│   │   ├── hooks/       # React hooks
+│   │   └── lib/         # Utilities & API clients
+│   └── public/          # Static assets
 ├── backend/              # Backend microservices
 │   └── packages/
 │       ├── mint-burn-service/

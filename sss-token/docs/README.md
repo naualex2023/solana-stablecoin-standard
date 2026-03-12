@@ -179,6 +179,12 @@ For regulated stablecoins requiring full compliance controls.
 │  │  │             │    │     SDK     │    │  (Mint, Compliance,     │   │   │
 │  │  │  sss-token  │    │ @stbr/sss   │    │   Webhook, Indexer)     │   │   │
 │  │  └─────────────┘    └─────────────┘    └─────────────────────────┘   │   │
+│  │                                                                       │   │
+│  │  ┌───────────────────────────────────────────────────────────────┐   │   │
+│  │  │                     Web Frontend                               │   │   │
+│  │  │              (Next.js 14 + Solana Wallet Adapter)             │   │   │
+│  │  │   Dashboard • Create Stablecoin • Admin Ops • Holders        │   │   │
+│  │  └───────────────────────────────────────────────────────────────┘   │   │
 │  └──────────────────────────────────────────────────────────────────────┘   │
 │                                      │                                       │
 │                                      ▼                                       │
@@ -229,6 +235,13 @@ sss-token/
 │   └── tests/           # SDK tests
 ├── cli/                  # Admin CLI tool
 │   └── src/             # CLI source code
+├── frontend/             # Web UI (Next.js 14)
+│   ├── src/             # Frontend source code
+│   │   ├── app/         # App Router pages
+│   │   ├── components/  # React components
+│   │   ├── hooks/       # React hooks
+│   │   └── lib/         # Utilities & API clients
+│   └── public/          # Static assets
 ├── backend/              # Backend microservices
 │   └── packages/
 │       ├── mint-burn-service/

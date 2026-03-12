@@ -1,26 +1,24 @@
 Redis config: { host: 'localhost', port: 6379, hasPassword: true }
 Redis connected
 Redis ready
-[2026-03-12 09:46:53.639 +0300] [32mINFO[39m: [36mInitializing mint/burn service...[39m
+[2026-03-12 10:11:12.450 +0300] [32mINFO[39m: [36mInitializing mint/burn service...[39m
     service: "mint-burn-service"
-[2026-03-12 09:46:53.640 +0300] [32mINFO[39m: [36mDatabase initialized[39m
+[2026-03-12 10:11:12.450 +0300] [32mINFO[39m: [36mDatabase initialized[39m
     service: "mint-burn-service"
-[2026-03-12 09:46:53.642 +0300] [32mINFO[39m: [36mRedis initialized[39m
+[2026-03-12 10:11:12.452 +0300] [32mINFO[39m: [36mRedis initialized[39m
     service: "mint-burn-service"
-[2026-03-12 09:46:53.643 +0300] [32mINFO[39m: [36mSolana connection established[39m
+[2026-03-12 10:11:12.453 +0300] [32mINFO[39m: [36mSolana connection established[39m
     service: "mint-burn-service"
-    rpcUrl: "https://api.devnet.solana.com"
-[2026-03-12 09:46:53.643 +0300] [33mWARN[39m: [36mMinter keypair not found - transactions will be simulated[39m
+    rpcUrl: "https://devnet.helius-rpc.com/?api-key=df9a7fb3-af4e-4d32-9922-dc1d74034154"
+[2026-03-12 10:11:12.453 +0300] [33mWARN[39m: [36mMinter keypair not found - transactions will be simulated[39m
     service: "mint-burn-service"
     path: "/home/alex/source/repos/solana-stablecoin-standard/sss-token/backend/packages/mint-burn-service/secrets/minter.json"
-[2026-03-12 09:46:53.643 +0300] [32mINFO[39m: [36mMint/Burn service initialized[39m
+[2026-03-12 10:11:12.453 +0300] [32mINFO[39m: [36mMint/Burn service initialized[39m
     service: "mint-burn-service"
-[2026-03-12 09:46:53.654 +0300] [32mINFO[39m: [36mMint/Burn service listening[39m
+[2026-03-12 10:11:12.464 +0300] [32mINFO[39m: [36mMint/Burn service listening[39m
     service: "mint-burn-service"
     port: 3001
-[2026-03-12 09:47:02.326 +0300] [32mINFO[39m: [36mRequest[39m
+[2026-03-12 10:11:21.130 +0300] [32mINFO[39m: [36mRequest[39m
     service: "mint-burn-service"
     method: "GET"
     path: "/health"
-[2026-03-12 09:56:39.745 +0300] [32mINFO[39m: [36mShutting down mint/burn service...[39m
-    service: "mint-burn-service"

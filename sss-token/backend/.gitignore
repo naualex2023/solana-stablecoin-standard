@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# Package-specific dist folders
+packages/*/dist/
+packages/shared/dist/
+packages/indexer/dist/
+packages/indexer-api/dist/
+packages/mint-burn-service/dist/
+packages/compliance-service/dist/
+packages/webhook-service/dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.devnet
+!.env.example
+
+# Logs
+logs/
+*.log
+.logs/
+.logs-devnet/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+.pids/
+.pids-devnet/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+.cache/

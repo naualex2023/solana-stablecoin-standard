@@ -192,39 +192,74 @@ async function processTransaction(signature: string) {
       return;
     }
 
-    // Check if transaction involves our program
+    // Parse instruction type from logs first
+    const logs = tx.meta?.logMessages || [];
+    const instructionType = parseInstructionType(logs);
+    
+    if (!instructionType) {
+      log.debug({ signature }, 'No SSS instruction found in logs');
+      return;
+    }
+
+    // Get account keys from the message
     const message = tx.transaction.message;
     const accountKeys = 'accountKeys' in message 
       ? (message as any).accountKeys 
-      : (message as any).staticAccountKeys || [];
-    
+      : [];
+
+    // Find our program in account keys
     const programIndex = accountKeys.findIndex(
       (key: any) => key.pubkey?.toString() === PROGRAM_ID || 
                     (typeof key === 'string' ? key === PROGRAM_ID : key.toString() === PROGRAM_ID)
     );
 
     if (programIndex === -1) {
-      return; // Not our program
+      log.debug({ signature }, 'Program not in account keys');
+      return;
     }
 
-    // Extract instruction data
-    const instructions = tx.meta?.innerInstructions?.flat() || [];
-    
+    // Get main instructions (not inner instructions!)
+    const instructions = 'instructions' in message 
+      ? (message as any).instructions 
+      : [];
+
+    // Find instructions that call our program
     for (const ix of instructions) {
-      if (!('instructions' in tx.transaction.message)) continue;
+      // Check if this instruction is for our program
+      const ixProgramId = ix.programId || (typeof ix.programIdIndex === 'number' ? accountKeys[ix.programIdIndex] : null);
       
-      const parsed = ix as any;
-      if (parsed.programId?.toString() !== PROGRAM_ID) continue;
-
-      // Parse instruction type from logs
-      const logs = tx.meta?.logMessages || [];
-      const instructionType = parseInstructionType(logs);
+      if (!ixProgramId) continue;
       
-      if (!instructionType) continue;
+      const ixProgramStr = typeof ixProgramId === 'string' ? ixProgramId : ixProgramId.toString?.() || ixProgramId.pubkey?.toString?.();
+      
+      if (ixProgramStr !== PROGRAM_ID) {
+        continue;
+      }
 
-      // Extract mint address (first account in most instructions)
-      const accounts = parsed.accounts || [];
-      const mintAddress = accounts[0]?.toString() || '';
+      // Extract accounts from instruction
+      const accounts = (ix.accounts || []).map((idx: number) => {
+        const acc = accountKeys[idx];
+        return typeof acc === 'string' ? acc : acc?.pubkey?.toString?.() || acc?.toString?.() || '';
+      });
+
+      // Mint address is typically the first account
+      const mintAddress = accounts[0] || '';
+
+      // Parse instruction data if available
+      let instructionData: any = {};
+      if (ix.data) {
+        try {
+          // Try to decode base64 data
+          const dataBuffer = Buffer.from(ix.data, 'base64');
+          instructionData = {
+            raw: ix.data,
+            // First 8 bytes is Anchor discriminator
+            discriminator: dataBuffer.slice(0, 8).toString('hex'),
+          };
+        } catch (e) {
+          instructionData = { raw: ix.data };
+        }
+      }
 
       // Create event record
       const eventData = {
@@ -234,20 +269,25 @@ async function processTransaction(signature: string) {
         instructionType,
         mintAddress,
         data: {
-          accounts: accounts.map((a: any) => a.toString()),
-          data: parsed.data,
-          logs: logs,
+          accounts,
+          instruction: instructionData,
+          logs: logs.slice(0, 20), // Limit log size
+          fee: tx.meta?.fee,
+          success: !tx.meta?.err,
         },
       };
 
       const eventId = await createEvent(eventData);
-      log.info({ eventId, signature, instructionType }, 'Event stored');
+      log.info({ eventId, signature, instructionType, mintAddress }, 'Event stored');
 
       // Publish to Redis for other services
       await publish(REDIS_CHANNELS.EVENTS, JSON.stringify({
         id: eventId,
         ...eventData,
       }));
+      
+      // Only process first matching instruction per transaction
+      break;
     }
 
   } catch (error) {

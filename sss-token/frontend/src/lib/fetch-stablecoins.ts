@@ -64,15 +64,20 @@ export async function fetchStablecoins(config?: Partial<FetchConfig>): Promise<F
       // Use indexer backend for metadata
       stablecoins = await fetchStablecoinsFromIndexer(indexerUrl);
       
+      console.log(`[fetch-stablecoins] Using RPC URL: ${connection.rpcEndpoint}`);
+      console.log(`[fetch-stablecoins] Fetched ${stablecoins.length} stablecoins from indexer`);
+      
       // Fetch supply from RPC for each stablecoin (indexer doesn't track live supply)
       stablecoins = await Promise.all(
         stablecoins.map(async (coin) => {
           try {
+            console.log(`[fetch-stablecoins] Fetching supply for mint: ${coin.mint}`);
             const mintPubkey = new PublicKey(coin.mint);
             const mintInfo = await connection.getTokenSupply(mintPubkey);
+            console.log(`[fetch-stablecoins] Supply for ${coin.symbol} (${coin.mint}): ${mintInfo.value.amount}`);
             return { ...coin, supply: BigInt(mintInfo.value.amount) };
           } catch (error) {
-            console.warn(`Failed to fetch supply for ${coin.mint}:`, error);
+            console.error(`[fetch-stablecoins] Failed to fetch supply for ${coin.mint}:`, error);
             return coin; // Keep default supply (0)
           }
         })

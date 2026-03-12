@@ -32,7 +32,8 @@ export default function HoldersPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
   useEffect(() => {
-    const saved = localStorage.getItem('sss_mint_address');
+    // Check the new key first (from dashboard selection), then fallback to old key (from create page)
+    const saved = localStorage.getItem('selectedStablecoinMint') || localStorage.getItem('sss_mint_address');
     if (saved) {
       setMintAddress(saved);
       // In production, fetch actual holders from chain/indexer

@@ -83,8 +83,9 @@ export default function CreatePage() {
         signature: mockSignature,
       });
 
-      // Save to localStorage for demo
-      localStorage.setItem('sss_mint_address', mockMintAddress);
+      // Save to localStorage for demo - use the standard key for dashboard/admin compatibility
+      localStorage.setItem('selectedStablecoinMint', mockMintAddress);
+      localStorage.setItem('sss_mint_address', mockMintAddress); // Keep for backward compatibility
       localStorage.setItem('sss_config', JSON.stringify(formData));
     } catch (error: any) {
       console.error('Failed to create stablecoin:', error);

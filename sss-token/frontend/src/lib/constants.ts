@@ -19,3 +19,23 @@ export type FetchMode = 'rpc' | 'indexer';
 
 // Default RPC URL
 export const DEFAULT_RPC_URL = 'https://api.devnet.solana.com';
+
+// Get the current RPC URL from environment
+export const getRpcUrl = (): string => {
+  return process.env.NEXT_PUBLIC_RPC_URL || DEFAULT_RPC_URL;
+};
+
+// Detect network from RPC URL
+export const getCurrentNetwork = (): string => {
+  const rpcUrl = getRpcUrl().toLowerCase();
+  if (rpcUrl.includes('mainnet')) {
+    return 'mainnet-beta';
+  } else if (rpcUrl.includes('devnet')) {
+    return 'devnet';
+  } else if (rpcUrl.includes('testnet')) {
+    return 'testnet';
+  } else if (rpcUrl.includes('localhost') || rpcUrl.includes('127.0.0.1')) {
+    return 'localnet';
+  }
+  return 'custom';
+};

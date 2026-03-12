@@ -112,7 +112,8 @@ export default function AdminPage() {
   const [result, setResult] = useState<{ success: boolean; signature?: string; error?: string } | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('sss_mint_address');
+    // Check the new key first (from dashboard selection), then fallback to old key (from create page)
+    const saved = localStorage.getItem('selectedStablecoinMint') || localStorage.getItem('sss_mint_address');
     if (saved) setMintAddress(saved);
   }, []);
 

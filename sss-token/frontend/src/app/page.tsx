@@ -5,6 +5,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useStablecoins, useSelectedStablecoin } from '@/hooks/useStablecoins';
 import { formatSupply } from '@/lib/fetch-stablecoins';
 import { StablecoinWithSupply } from '@/lib/types';
+import { getCurrentNetwork } from '@/lib/constants';
 
 // Stats Card Component
 const StatsCard: FC<{
@@ -181,7 +182,7 @@ export default function DashboardPage() {
       {loading && (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin text-4xl">⏳</div>
-          <p className="ml-4 text-gray-400">Loading stablecoins from devnet...</p>
+          <p className="ml-4 text-gray-400">Loading stablecoins from {getCurrentNetwork()}...</p>
         </div>
       )}
 

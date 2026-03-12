@@ -150,6 +150,26 @@ app.get('/api/events/:signature', async (req: Request, res: Response) => {
 // Stablecoins API (Aggregated from events)
 // ============================================
 
+// Helper: Extract symbol from logs array
+// Logs contain: "Program log: Stablecoin initialized: WFLE"
+function extractSymbolFromLogs(logs: string[] | null): string | null {
+  if (!logs || !Array.isArray(logs)) return null;
+  for (const log of logs) {
+    if (log.includes('Stablecoin initialized:')) {
+      const match = log.match(/Stablecoin initialized:\s*(\w+)/);
+      if (match) return match[1];
+    }
+  }
+  return null;
+}
+
+// Helper: Strip extra quotes from addresses
+function stripQuotes(str: string | null): string {
+  if (!str) return '';
+  // Remove surrounding quotes if present (handles "value" and \"value\")
+  return str.replace(/^["\s]+|["\s]+$/g, '');
+}
+
 // List all stablecoins (aggregated from Initialize events)
 app.get('/api/stablecoins', async (req: Request, res: Response) => {
   try {
@@ -159,8 +179,7 @@ app.get('/api/stablecoins', async (req: Request, res: Response) => {
       SELECT DISTINCT ON (mint_address)
         mint_address as address,
         mint_address as mint,
-        data->>'name' as name,
-        data->>'symbol' as symbol,
+        data->'logs' as logs,
         data->'features'->>'permanentDelegate' as "enablePermanentDelegate",
         data->'features'->>'transferHook' as "enableTransferHook",
         data->'features'->>'defaultAccountFrozen' as "defaultAccountFrozen",
@@ -190,23 +209,26 @@ app.get('/api/stablecoins', async (req: Request, res: Response) => {
     `);
 
     // Transform to frontend format
-    const stablecoins = result.rows.map(row => ({
-      address: row.address,
-      mint: row.mint,
-      name: row.name || 'SSS Stablecoin',
-      symbol: row.symbol || 'SSS',
-      decimals: 6,
-      paused: false, // Would need to track from Pause events
-      features: {
-        permanentDelegate: row.enablePermanentDelegate === 'true',
-        transferHook: row.enableTransferHook === 'true',
-        defaultAccountFrozen: row.defaultAccountFrozen === 'true',
-      },
-      mintCount: parseInt(row.mintCount) || 0,
-      burnCount: parseInt(row.burnCount) || 0,
-      holderCount: parseInt(row.holderCount) || 0,
-      createdAt: row.created_at,
-    }));
+    const stablecoins = result.rows.map(row => {
+      const symbol = extractSymbolFromLogs(row.logs) || 'SSS';
+      return {
+        address: stripQuotes(row.address),
+        mint: stripQuotes(row.mint),
+        name: `${symbol} Stablecoin`,
+        symbol: symbol,
+        decimals: 6,
+        paused: false, // Would need to track from Pause events
+        features: {
+          permanentDelegate: row.enablePermanentDelegate === 'true',
+          transferHook: row.enableTransferHook === 'true',
+          defaultAccountFrozen: row.defaultAccountFrozen === 'true',
+        },
+        mintCount: parseInt(row.mintCount) || 0,
+        burnCount: parseInt(row.burnCount) || 0,
+        holderCount: parseInt(row.holderCount) || 0,
+        createdAt: row.created_at,
+      };
+    });
 
     res.json(stablecoins);
   } catch (error) {
@@ -265,23 +287,27 @@ app.get('/api/stablecoins/:mint', async (req: Request, res: Response) => {
     const isPaused = pauseResult.rows.length > 0 && 
                      pauseResult.rows[0].instruction_type === 'Pause';
 
+    // Extract symbol from logs
+    const logs = row.data?.logs || null;
+    const symbol = extractSymbolFromLogs(logs) || 'SSS';
+    
     const stablecoin = {
-      address: mint,
-      mint: mint,
-      name: row.data?.name || 'SSS Stablecoin',
-      symbol: row.data?.symbol || 'SSS',
+      address: stripQuotes(mint),
+      mint: stripQuotes(mint),
+      name: `${symbol} Stablecoin`,
+      symbol: symbol,
       decimals: 6,
       paused: isPaused,
       features: {
-        permanentDelegate: row.data?.features?.permanentDelegate || false,
-        transferHook: row.data?.features?.transferHook || false,
-        defaultAccountFrozen: row.data?.features?.defaultAccountFrozen || false,
+        permanentDelegate: row.data?.features?.permanentDelegate === true || row.data?.features?.permanentDelegate === 'true',
+        transferHook: row.data?.features?.transferHook === true || row.data?.features?.transferHook === 'true',
+        defaultAccountFrozen: row.data?.features?.defaultAccountFrozen === true || row.data?.features?.defaultAccountFrozen === 'true',
       },
       mintCount: parseInt(mintBurnResult.rows[0]?.mint_count) || 0,
       burnCount: parseInt(mintBurnResult.rows[0]?.burn_count) || 0,
       holderCount: parseInt(holderResult.rows[0]?.count) || 0,
       createdAt: row.created_at,
-      createdBy: row.data?.accounts?.[0],
+      createdBy: stripQuotes(row.data?.accounts?.[0]),
     };
 
     res.json(stablecoin);

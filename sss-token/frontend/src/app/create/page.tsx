@@ -70,23 +70,31 @@ export default function CreatePage() {
     
     setLoading(true);
     try {
-      // In production, this would call the SDK
-      // For demo, we'll simulate the transaction
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Generate a mock mint address for demo
-      const mockMintAddress = Keypair.generate().publicKey.toString();
-      const mockSignature = '5' + Array(86).fill(0).map(() => 'abcdef1234567890'[Math.floor(Math.random() * 16)]).join('');
-      
-      setResult({
-        mintAddress: mockMintAddress,
-        signature: mockSignature,
+      // Call the real API to create stablecoin
+      const response = await fetch('/api/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setResult({
+          mintAddress: data.mintAddress,
+          signature: data.signature,
+        });
 
-      // Save to localStorage for demo - use the standard key for dashboard/admin compatibility
-      localStorage.setItem('selectedStablecoinMint', mockMintAddress);
-      localStorage.setItem('sss_mint_address', mockMintAddress); // Keep for backward compatibility
-      localStorage.setItem('sss_config', JSON.stringify(formData));
+        // Save to localStorage for dashboard/admin compatibility
+        localStorage.setItem('selectedStablecoinMint', data.mintAddress);
+        localStorage.setItem('sss_mint_address', data.mintAddress);
+        localStorage.setItem('sss_config', JSON.stringify({
+          ...formData,
+          ...data.config,
+        }));
+      } else {
+        throw new Error(data.error || 'Failed to create stablecoin');
+      }
     } catch (error: any) {
       console.error('Failed to create stablecoin:', error);
       alert(`Failed to create stablecoin: ${error.message}`);

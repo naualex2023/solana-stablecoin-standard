@@ -662,7 +662,7 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
 
       // Initialize using low-level API (create() requires mint keypair signing)
       const client = new SSSTokenClient({ provider });
-      await client.initialize(mint, authority, {
+      const initTx = await client.initialize(mint, authority, {
         name: "Workflow Enhanced",
         symbol: "WFLE",
         uri: "https://example.com/workflow.json",
@@ -671,6 +671,7 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
         enableTransferHook: true,
         defaultAccountFrozen: false,
       });
+      await connection.confirmTransaction(initTx, "confirmed");
 
       // Connect using enhanced SDK
       const stable = await SolanaStablecoin.connect(provider, { mint });
@@ -748,6 +749,83 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
       expect(Number(finalBalance.amount)).to.equal(500_000);
 
       console.log("Enhanced SDK workflow test completed successfully!");
+    });
+  });
+
+  describe("Freeze/Thaw with PDA Authority", () => {
+    it("should freeze and thaw token account using PDA-based freeze authority", async () => {
+      console.log("Starting freeze/thaw PDA test...");
+
+      // 1. Create mint with PDA freeze authority (no permanent delegate needed for just freeze/thaw)
+      console.log("Step 1: Creating mint with PDA freeze authority...");
+      const programId = new PublicKey(SSS_TOKEN_PROGRAM_ID);
+      const freezeMint = await createMintWithPermanentDelegate(
+        connection,
+        payer,
+        authority.publicKey,
+        6,
+        programId
+      );
+      console.log("Mint with PDA freeze authority created:", freezeMint.toString());
+
+      // 2. Initialize the stablecoin config
+      console.log("Step 2: Initializing stablecoin config...");
+      const client = new SSSTokenClient({ provider });
+      const initTx = await client.initialize(freezeMint, authority, {
+        name: "Freeze Thaw Test",
+        symbol: "FRTH",
+        uri: "https://example.com/freezethaw.json",
+        decimals: 6,
+        enablePermanentDelegate: true,
+        enableTransferHook: true,
+        defaultAccountFrozen: false,
+      });
+      await connection.confirmTransaction(initTx, "confirmed");
+
+      // 3. Set up roles (seizer role required for PDA freeze/thaw)
+      console.log("Step 3: Setting up roles...");
+      const rolesTx = await client.updateRoles(freezeMint, authority, {
+        newBlacklister: blacklister.publicKey,
+        newPauser: pauser.publicKey,
+        newSeizer: seizer.publicKey,
+      });
+      await connection.confirmTransaction(rolesTx, "confirmed");
+
+      // 4. Create token account for user
+      const freezeUser = Keypair.generate();
+      const userTokenAccount = await getOrCreateAssociatedTokenAccount(
+        connection,
+        payer,
+        freezeMint,
+        freezeUser.publicKey,
+        undefined,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
+      );
+      console.log("User token account created:", userTokenAccount.address.toString());
+
+      // 5. Freeze using PDA method
+      console.log("Step 4: Freezing account with PDA authority...");
+      const freezeTx = await client.freezeTokenAccountPda(freezeMint, userTokenAccount.address, seizer);
+      await connection.confirmTransaction(freezeTx, "confirmed");
+      console.log("Freeze tx:", freezeTx);
+
+      const frozenAccount = await getAccount(connection, userTokenAccount.address, undefined, TOKEN_2022_PROGRAM_ID);
+      expect(frozenAccount.isFrozen).to.be.true;
+      console.log("Account successfully frozen");
+
+      // 6. Thaw using PDA method
+      console.log("Step 5: Thawing account with PDA authority...");
+      const thawTx = await client.thawTokenAccountPda(freezeMint, userTokenAccount.address, seizer);
+      await connection.confirmTransaction(thawTx, "confirmed");
+      console.log("Thaw tx:", thawTx);
+
+      const thawedAccount = await getAccount(connection, userTokenAccount.address, undefined, TOKEN_2022_PROGRAM_ID);
+      expect(thawedAccount.isFrozen).to.be.false;
+      console.log("Account successfully thawed");
+
+      console.log("Freeze/Thaw PDA test completed successfully!");
     });
   });
 

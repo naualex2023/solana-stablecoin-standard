@@ -1,0 +1,23 @@
+{
+  "mint": "J9esMCCfBzskFCwTaq9biatihVZ5ow9iKrCTPrpPkGTg",
+  "network": "http://localhost:8899",
+  "createdAt": "2026-03-13T11:23:09.623Z",
+  "keypairs": {
+    "authority": "HJAz2pQMzmMkTWNgQNac5zFcNj626mFqNxZVFf8tciBh",
+    "blacklister": "4S9uZHVVJfkg7niCiDkduVUNPpTRi4DyLdw2xy3DMaeL",
+    "pauser": "GtRoGMSM5vkb3oSpPuMKrkig2f4XaTTRcwL19Th5A6fZ",
+    "seizer": "7MsPstKcmTYEQ9QYd2T3fo8Bn3NJRzRmtBYUMF9PWDKe",
+    "minter": "8qFmG7yHbmmEQmwFRKoRFmPPVgsUKMyZ7jbbDaFjZoFV",
+    "user": "3SE3wzQojvUSwME9FKnEfNHheDFcTV351fVFkFSuQhe4",
+    "treasury": "FzKTBx7AkZHr1qsRenxx1qc1Bqm95FWbrrYybzzy3VUC"
+  },
+  "tokenAccount": {
+    "user": "Bds4LnmYuVikACMhZxc4YTtCH4hBCykbZB95LmezNUGm",
+    "treasury": "9X3m6xhHcPJZjzNg5e8mU42RUi1sLiL458ah9nmE7p4H"
+  },
+  "stablecoin": {
+    "name": "Test Stablecoin",
+    "symbol": "TST",
+    "decimals": 6
+  }
+}

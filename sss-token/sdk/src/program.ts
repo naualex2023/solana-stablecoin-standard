@@ -546,4 +546,35 @@ export class SSSTokenClient {
 
     return tx;
   }
+
+  /**
+   * Thaw a token account using PDA-based freeze authority (for mints with PDA freeze authority)
+   * This is used for mints created with the freeze authority set to the program's PDA
+   * @param mint - The mint public key
+   * @param tokenAccount - The token account to thaw
+   * @param seizer - The seizer signer (must be authorized in config.seizer role)
+   */
+  async thawTokenAccountPda(
+    mint: PublicKey,
+    tokenAccount: PublicKey,
+    seizer: Signer
+  ): Promise<string> {
+    const { pda: configPda } = findConfigPDA(mint, this.programId);
+    const { pda: freezeAuthorityPda } = findFreezeAuthorityPDA(mint, this.programId);
+
+    const tx = await this.program.methods
+      .thawTokenAccountPda()
+      .accounts({
+        config: configPda,
+        mint: mint,
+        tokenAccount: tokenAccount,
+        seizer: seizer.publicKey,
+        freezeAuthority: freezeAuthorityPda,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([seizer])
+      .rpc();
+
+    return tx;
+  }
 }

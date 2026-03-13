@@ -3,6 +3,13 @@
 import { FC, useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
+import {
+  AdminOperation,
+  AdminApiResponse,
+  TestConfig,
+  executeAdminOperation,
+  getTestConfig,
+} from '@/lib/admin-api';
 
 type Operation = 'mint' | 'burn' | 'freeze' | 'thaw' | 'blacklist-add' | 'blacklist-remove' | 'seize' | 'pause' | 'unpause';
 
@@ -14,6 +21,7 @@ interface OperationConfig {
   requiresAddress: boolean;
   requiresDestination: boolean;
   color: string;
+  authorityType: string;
 }
 
 const operations: Record<Operation, OperationConfig> = {
@@ -25,6 +33,7 @@ const operations: Record<Operation, OperationConfig> = {
     requiresAddress: true,
     requiresDestination: false,
     color: 'success',
+    authorityType: 'authority',
   },
   burn: {
     name: 'Burn Tokens',
@@ -34,6 +43,7 @@ const operations: Record<Operation, OperationConfig> = {
     requiresAddress: true,
     requiresDestination: false,
     color: 'error',
+    authorityType: 'user',
   },
   freeze: {
     name: 'Freeze Account',
@@ -43,6 +53,7 @@ const operations: Record<Operation, OperationConfig> = {
     requiresAddress: true,
     requiresDestination: false,
     color: 'warning',
+    authorityType: 'authority',
   },
   thaw: {
     name: 'Thaw Account',
@@ -52,6 +63,7 @@ const operations: Record<Operation, OperationConfig> = {
     requiresAddress: true,
     requiresDestination: false,
     color: 'success',
+    authorityType: 'authority',
   },
   'blacklist-add': {
     name: 'Add to Blacklist',
@@ -61,6 +73,7 @@ const operations: Record<Operation, OperationConfig> = {
     requiresAddress: true,
     requiresDestination: false,
     color: 'error',
+    authorityType: 'blacklister',
   },
   'blacklist-remove': {
     name: 'Remove from Blacklist',
@@ -70,6 +83,7 @@ const operations: Record<Operation, OperationConfig> = {
     requiresAddress: true,
     requiresDestination: false,
     color: 'success',
+    authorityType: 'blacklister',
   },
   seize: {
     name: 'Seize Tokens',
@@ -79,6 +93,7 @@ const operations: Record<Operation, OperationConfig> = {
     requiresAddress: true,
     requiresDestination: true,
     color: 'error',
+    authorityType: 'seizer',
   },
   pause: {
     name: 'Pause Token',
@@ -88,6 +103,7 @@ const operations: Record<Operation, OperationConfig> = {
     requiresAddress: false,
     requiresDestination: false,
     color: 'warning',
+    authorityType: 'pauser',
   },
   unpause: {
     name: 'Unpause Token',
@@ -97,6 +113,7 @@ const operations: Record<Operation, OperationConfig> = {
     requiresAddress: false,
     requiresDestination: false,
     color: 'success',
+    authorityType: 'pauser',
   },
 };
 
@@ -109,7 +126,9 @@ export default function AdminPage() {
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ success: boolean; signature?: string; error?: string } | null>(null);
+  const [result, setResult] = useState<{ success: boolean; signature?: string; error?: string; explorerUrl?: string } | null>(null);
+  const [testConfig, setTestConfig] = useState<TestConfig | null>(null);
+  const [configLoading, setConfigLoading] = useState(true);
 
   useEffect(() => {
     // Check the new key first (from dashboard selection), then fallback to old key (from create page)
@@ -117,23 +136,91 @@ export default function AdminPage() {
     if (saved) setMintAddress(saved);
   }, []);
 
+  // Load test configuration
+  useEffect(() => {
+    async function loadConfig() {
+      try {
+        const response = await getTestConfig();
+        if (response.success && response.config) {
+          setTestConfig(response.config);
+          // Auto-fill mint address if not set
+          if (!mintAddress && response.config.mint) {
+            setMintAddress(response.config.mint);
+          }
+        }
+      } catch (error) {
+        console.log('Test config not available (this is OK for production use)');
+      } finally {
+        setConfigLoading(false);
+      }
+    }
+    loadConfig();
+  }, [mintAddress]);
+
   const handleSubmit = async () => {
-    if (!selectedOp || !publicKey) return;
+    if (!selectedOp) return;
     
     setLoading(true);
     setResult(null);
     
     try {
-      // Simulate transaction
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const params: any = {
+        operation: selectedOp as AdminOperation,
+        mint: mintAddress,
+      };
+
+      // Add operation-specific parameters
+      if (operations[selectedOp].requiresAddress) {
+        params.targetAddress = targetAddress;
+      }
+      if (operations[selectedOp].requiresDestination) {
+        params.destinationAddress = destinationAddress;
+      }
+      if (operations[selectedOp].requiresAmount) {
+        // Convert human-readable amount to raw amount (6 decimals)
+        const rawAmount = amount.includes('.') 
+          ? parseFloat(amount) * 1_000_000 
+          : parseInt(amount);
+        params.amount = rawAmount.toString();
+      }
+      if (selectedOp === 'blacklist-add') {
+        params.reason = reason || 'Compliance violation';
+      }
+
+      const response = await executeAdminOperation(params);
       
-      const mockSignature = '5' + Array(86).fill(0).map(() => 'abcdef1234567890'[Math.floor(Math.random() * 16)]).join('');
-      
-      setResult({ success: true, signature: mockSignature });
+      if (response.success) {
+        setResult({ 
+          success: true, 
+          signature: response.signature,
+          explorerUrl: response.explorerUrl,
+        });
+      } else {
+        setResult({ 
+          success: false, 
+          error: response.error || 'Unknown error',
+        });
+      }
     } catch (error: any) {
       setResult({ success: false, error: error.message });
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Helper to fill test addresses
+  const fillTestAddress = (type: 'user' | 'treasury' | 'authority' | 'blacklister' | 'pauser' | 'seizer') => {
+    if (testConfig?.keypairs?.[type]) {
+      setTargetAddress(testConfig.keypairs[type]);
+    } else if (testConfig?.tokenAccounts?.[type as 'user' | 'treasury']) {
+      setTargetAddress(testConfig.tokenAccounts[type as 'user' | 'treasury']);
+    }
+  };
+
+  const fillTreasuryAddress = () => {
+    // Use treasury wallet address (API derives ATA from wallet address)
+    if (testConfig?.keypairs?.treasury) {
+      setDestinationAddress(testConfig.keypairs.treasury);
     }
   };
 
@@ -176,6 +263,27 @@ export default function AdminPage() {
         </h1>
         <p className="text-gray-400">Manage your stablecoin with administrative actions</p>
       </div>
+
+      {/* Test Config Info */}
+      {testConfig && (
+        <div className="mb-6 bg-primary-600/10 border border-primary-600/20 rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xl">🧪</span>
+            <span className="font-medium text-primary-400">Test Environment Detected</span>
+          </div>
+          <p className="text-gray-400 text-sm mb-3">
+            Test wallets are available. Use the "Fill" buttons to auto-populate addresses.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            {Object.entries(testConfig.keypairs || {}).slice(0, 4).map(([name, address]) => (
+              <div key={name} className="bg-dark-300 rounded-lg p-2">
+                <span className="text-gray-500 capitalize">{name}:</span>
+                <p className="text-gray-300 font-mono truncate">{address}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Operations Grid */}
@@ -222,6 +330,14 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              {/* Authority Info */}
+              <div className="mb-4 bg-dark-300 rounded-lg p-3 flex items-center gap-2">
+                <span className="text-gray-400 text-sm">Required Authority:</span>
+                <span className="px-2 py-1 bg-primary-600/20 rounded text-primary-400 text-sm font-medium capitalize">
+                  {operations[selectedOp].authorityType}
+                </span>
+              </div>
+
               <div className="space-y-4">
                 {/* Mint Address (readonly) */}
                 <div>
@@ -238,15 +354,26 @@ export default function AdminPage() {
                 {operations[selectedOp].requiresAddress && (
                   <div>
                     <label className="block text-sm text-gray-400 mb-2">
-                      {selectedOp.includes('blacklist') ? 'Address to Blacklist' : 'Token Account Address'}
+                      {selectedOp.includes('blacklist') ? 'Wallet Address to Blacklist' : 'Wallet Address (ATA will be derived)'}
                     </label>
-                    <input
-                      type="text"
-                      value={targetAddress}
-                      onChange={(e) => setTargetAddress(e.target.value)}
-                      placeholder="Enter address..."
-                      className="w-full px-4 py-3 bg-dark-300 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-600 font-mono text-sm"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={targetAddress}
+                        onChange={(e) => setTargetAddress(e.target.value)}
+                        placeholder="Enter address..."
+                        className="flex-1 px-4 py-3 bg-dark-300 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-600 font-mono text-sm"
+                      />
+                      {testConfig && (
+                        <button
+                          onClick={() => fillTestAddress('user')}
+                          className="px-3 py-2 bg-primary-600/20 hover:bg-primary-600/30 rounded-xl text-primary-400 text-sm transition-colors"
+                          title="Fill with test user address"
+                        >
+                          Fill User
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -254,13 +381,24 @@ export default function AdminPage() {
                 {operations[selectedOp].requiresDestination && (
                   <div>
                     <label className="block text-sm text-gray-400 mb-2">Destination Account</label>
-                    <input
-                      type="text"
-                      value={destinationAddress}
-                      onChange={(e) => setDestinationAddress(e.target.value)}
-                      placeholder="Treasury account address..."
-                      className="w-full px-4 py-3 bg-dark-300 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-600 font-mono text-sm"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={destinationAddress}
+                        onChange={(e) => setDestinationAddress(e.target.value)}
+                        placeholder="Treasury account address..."
+                        className="flex-1 px-4 py-3 bg-dark-300 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-600 font-mono text-sm"
+                      />
+                      {testConfig && (
+                        <button
+                          onClick={fillTreasuryAddress}
+                          className="px-3 py-2 bg-primary-600/20 hover:bg-primary-600/30 rounded-xl text-primary-400 text-sm transition-colors"
+                          title="Fill with treasury address"
+                        >
+                          Fill Treasury
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -272,9 +410,10 @@ export default function AdminPage() {
                       type="text"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      placeholder="Enter amount..."
+                      placeholder="Enter amount (e.g., 10.5)..."
                       className="w-full px-4 py-3 bg-dark-300 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-600"
                     />
+                    <p className="text-gray-500 text-xs mt-1">Amount is in token units (6 decimals)</p>
                   </div>
                 )}
 
@@ -318,9 +457,22 @@ export default function AdminPage() {
                         <p className="text-gray-400 text-xs mt-2 font-mono break-all">
                           Signature: {result.signature}
                         </p>
+                        {result.explorerUrl && (
+                          <a
+                            href={result.explorerUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block mt-2 text-primary-400 hover:text-primary-300 text-sm"
+                          >
+                            View in Explorer →
+                          </a>
+                        )}
                       </div>
                     ) : (
-                      <p className="text-error font-medium">Error: {result.error}</p>
+                      <div>
+                        <p className="text-error font-medium">Error</p>
+                        <p className="text-gray-400 text-xs mt-1">{result.error}</p>
+                      </div>
                     )}
                   </div>
                 )}

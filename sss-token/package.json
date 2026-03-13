@@ -3,7 +3,9 @@
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
-    "test-devnet": "ts-mocha -t 300000 tests/devnet-test.ts"
+    "test-devnet": "ts-mocha -t 300000 tests/devnet-test.ts",
+    "setup:test-wallets": "npx ts-node scripts/setup-test-wallets.ts",
+    "setup:test-env": "./scripts/setup-test-env.sh"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",

@@ -15,11 +15,12 @@ packages/mint-burn-service/dist/
 packages/compliance-service/dist/
 packages/webhook-service/dist/
 
-# Environment files
+# Environment files - NEVER COMMIT
 .env
 .env.local
 .env.*.local
 .env.devnet
+.env.localnet
 !.env.example
 
 # Logs

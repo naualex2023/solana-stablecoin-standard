@@ -1,7 +1,56 @@
+# Anchor/Solana
 .anchor
-.DS_Store
-target
+target/
 **/*.rs.bk
-node_modules
-test-ledger
-.yarn
+*.so
+
+# Node/JS
+node_modules/
+.npm
+.yarn/
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# Environment files - NEVER COMMIT
+.env
+.env.local
+.env.*.local
+.env.devnet
+.env.localnet
+!.env.example
+
+# Test wallets and keypairs - NEVER COMMIT
+**/test-wallets/
+**/*-keypair.json
+**/keypair.json
+**/*.key
+**/admin*.json
+**/phantom*.json
+
+# Test ledger - NEVER COMMIT
+test-ledger/
+**/test-ledger/
+
+# IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo
+.next/
+out/
+
+# Logs
+*.log
+logs/
+test-logs/
+
+# Cache
+.cache/

@@ -37,3 +37,8 @@ coverage/
 # Temporary files
 *.tmp
 .cache/
+
+# Test ledger and keypairs - NEVER COMMIT
+test-ledger/
+*-keypair.json
+keypair.json

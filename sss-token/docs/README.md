@@ -59,6 +59,68 @@ anchor build
 ./test.sh
 ```
 
+## Testing
+
+The project has a comprehensive test suite with **152 tests** covering both positive and negative scenarios.
+
+### Test Summary
+
+| Test Suite | Positive | Negative | Total |
+|------------|----------|----------|-------|
+| sss-token Rust | 14 | 30 | 44 |
+| transfer-hook Rust | 8 | 18 | 26 |
+| SDK Basic (sdk.test.ts) | 15 | 23 | 38 |
+| SDK Enhanced (sdk-enhanced.test.ts) | 23 | 21 | 44 |
+| **TOTAL** | **60** | **92** | **152** |
+
+### Test Commands
+
+#### Rust Unit Tests (via Cargo)
+
+```bash
+# Run all sss-token program tests (44 tests)
+cargo test --package sss-token --test sss_token
+
+# Run all transfer-hook program tests (26 tests)
+cargo test --package transfer-hook --test transfer_hook
+
+# Run all Rust tests (70 tests)
+cargo test --package sss-token --package transfer-hook
+```
+
+#### SDK Integration Tests (via test scripts)
+
+```bash
+# Basic SDK tests (38 tests)
+./test.sh
+
+# Enhanced SDK tests (44 tests)
+./test-enhanced.sh
+
+# Run both SDK test suites
+./test.sh && ./test-enhanced.sh
+```
+
+### Test Script Options
+
+| Option | Description |
+|--------|-------------|
+| `--clean` | Clean ledger and start fresh validator |
+| `--skip-deploy` | Skip program deployment (reuse existing) |
+| `--no-stop` | Keep validator running after tests |
+| `--help` | Show help message |
+
+**Examples:**
+```bash
+# Fresh start with clean ledger
+./test.sh --clean
+
+# Reuse deployment, keep validator running
+./test-enhanced.sh --skip-deploy --no-stop
+```
+
+For complete test documentation, see [TESTS.md](../TESTS.md).
+
 ### Create Your First Stablecoin
 
 #### Using CLI
@@ -221,6 +283,7 @@ For regulated stablecoins requiring full compliance controls.
 | [docs/SSS-2.md](./sss-token/docs/SSS-2.md) | Compliant stablecoin specification |
 | [docs/COMPLIANCE.md](./sss-token/docs/COMPLIANCE.md) | Regulatory compliance guide |
 | [docs/API.md](./sss-token/docs/API.md) | Backend API reference |
+| [TESTS.md](../TESTS.md) | Comprehensive test documentation |
 | [frontend/README.md](../frontend/README.md) | Frontend web UI guide |
 
 ## Project Structure

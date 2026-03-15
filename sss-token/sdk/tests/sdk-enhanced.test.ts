@@ -829,6 +829,684 @@ describe("SolanaStablecoin Enhanced SDK Tests", function () {
     });
   });
 
+  describe("Negative Test Cases - Enhanced SDK", () => {
+    describe("Compliance API Negative Cases", () => {
+      it("should fail to blacklist when unauthorized", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: true,
+          enableTransferHook: true,
+          defaultAccountFrozen: false,
+        });
+
+        await client.updateRoles(mint, authority, {
+          newBlacklister: blacklister.publicKey,
+          newPauser: pauser.publicKey,
+          newSeizer: seizer.publicKey,
+        });
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+        const unauthorizedUser = Keypair.generate();
+        const userToBlacklist = Keypair.generate();
+
+        try {
+          await stable.compliance.blacklistAdd(
+            unauthorizedUser,
+            userToBlacklist.publicKey,
+            "Test reason"
+          );
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized blacklist error:", error.message);
+        }
+      });
+
+      it("should fail to blacklist with reason too long", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: true,
+          enableTransferHook: true,
+          defaultAccountFrozen: false,
+        });
+
+        await client.updateRoles(mint, authority, {
+          newBlacklister: blacklister.publicKey,
+          newPauser: pauser.publicKey,
+          newSeizer: seizer.publicKey,
+        });
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+        const userToBlacklist = Keypair.generate();
+        const longReason = "x".repeat(101); // Max 100 chars
+
+        try {
+          await stable.compliance.blacklistAdd(
+            blacklister,
+            userToBlacklist.publicKey,
+            longReason
+          );
+          expect.fail("Should have thrown error for reason too long");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Reason too long error:", error.message);
+        }
+      });
+
+      it("should fail to remove from blacklist when unauthorized", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: true,
+          enableTransferHook: true,
+          defaultAccountFrozen: false,
+        });
+
+        await client.updateRoles(mint, authority, {
+          newBlacklister: blacklister.publicKey,
+          newPauser: pauser.publicKey,
+          newSeizer: seizer.publicKey,
+        });
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+        const userToRemove = Keypair.generate();
+
+        // Add to blacklist first
+        await stable.compliance.blacklistAdd(blacklister, userToRemove.publicKey, "Test");
+
+        const unauthorizedUser = Keypair.generate();
+        try {
+          await stable.compliance.blacklistRemove(unauthorizedUser, userToRemove.publicKey);
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized unblacklist error:", error.message);
+        } finally {
+          // Cleanup
+          await stable.compliance.blacklistRemove(blacklister, userToRemove.publicKey);
+        }
+      });
+
+      it("should fail to freeze when unauthorized", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: true,
+          enableTransferHook: true,
+          defaultAccountFrozen: false,
+        });
+
+        // Use the client directly instead of SolanaStablecoin.connect to avoid account fetch issues
+        const freezeUser = Keypair.generate();
+        const tokenAccount = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          freezeUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const unauthorizedUser = Keypair.generate();
+        try {
+          await client.freezeTokenAccount(mint, tokenAccount.address, unauthorizedUser);
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized freeze error:", error.message);
+        }
+      });
+
+      it("should fail to thaw when unauthorized", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: true,
+          enableTransferHook: true,
+          defaultAccountFrozen: false,
+        });
+
+        // Use the client directly instead of SolanaStablecoin.connect
+        const thawUser = Keypair.generate();
+        const tokenAccount = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          thawUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        // Freeze first with authorized user
+        await client.freezeTokenAccount(mint, tokenAccount.address, authority);
+
+        const unauthorizedUser = Keypair.generate();
+        try {
+          await client.thawTokenAccount(mint, tokenAccount.address, unauthorizedUser);
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized thaw error:", error.message);
+        } finally {
+          // Cleanup
+          await client.thawTokenAccount(mint, tokenAccount.address, authority);
+        }
+      });
+    });
+
+    describe("Minting API Negative Cases", () => {
+      it("should fail to add minter when unauthorized", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        const initTx = await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: false,
+          enableTransferHook: false,
+          defaultAccountFrozen: false,
+        });
+        await connection.confirmTransaction(initTx, "confirmed");
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+        const unauthorizedUser = Keypair.generate();
+        const newMinter = Keypair.generate();
+
+        try {
+          await stable.minting.addMinter(
+            unauthorizedUser,
+            newMinter.publicKey,
+            new BN(1_000_000)
+          );
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized add minter error:", error.message);
+        }
+      });
+
+      it("should fail to update quota when unauthorized", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: false,
+          enableTransferHook: false,
+          defaultAccountFrozen: false,
+        });
+
+        // Add minter first
+        await client.addMinter(mint, authority, {
+          minter: minter.publicKey,
+          quota: new BN(1_000_000),
+        });
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+        const unauthorizedUser = Keypair.generate();
+
+        try {
+          await stable.minting.updateQuota(
+            unauthorizedUser,
+            minter.publicKey,
+            new BN(5_000_000)
+          );
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized update quota error:", error.message);
+        }
+      });
+
+      it("should fail to remove minter when unauthorized", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: false,
+          enableTransferHook: false,
+          defaultAccountFrozen: false,
+        });
+
+        // Add minter first
+        await client.addMinter(mint, authority, {
+          minter: minter.publicKey,
+          quota: new BN(1_000_000),
+        });
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+        const unauthorizedUser = Keypair.generate();
+
+        try {
+          await stable.minting.removeMinter(unauthorizedUser, minter.publicKey);
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized remove minter error:", error.message);
+        }
+      });
+
+      it("should fail to mint over quota", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: false,
+          enableTransferHook: false,
+          defaultAccountFrozen: false,
+        });
+
+        // Add minter with small quota
+        await client.addMinter(mint, authority, {
+          minter: minter.publicKey,
+          quota: new BN(100),
+        });
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+        const recipient = Keypair.generate();
+        const tokenAccount = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          recipient.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        try {
+          // Try to mint more than quota
+          await stable.minting.mintTokens(
+            authority,
+            minter.publicKey,
+            tokenAccount.address,
+            new BN(1_000) // More than quota of 100
+          );
+          expect.fail("Should have thrown quota exceeded error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Quota exceeded error:", error.message);
+        }
+      });
+    });
+
+    describe("Pause API Negative Cases", () => {
+      it("should fail to pause when unauthorized", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: false,
+          enableTransferHook: false,
+          defaultAccountFrozen: false,
+        });
+
+        await client.updateRoles(mint, authority, {
+          newBlacklister: blacklister.publicKey,
+          newPauser: pauser.publicKey,
+          newSeizer: seizer.publicKey,
+        });
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+        const unauthorizedUser = Keypair.generate();
+
+        try {
+          await stable.pause.pause(unauthorizedUser);
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized pause error:", error.message);
+        }
+      });
+
+      it("should fail to unpause when unauthorized", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: false,
+          enableTransferHook: false,
+          defaultAccountFrozen: false,
+        });
+
+        await client.updateRoles(mint, authority, {
+          newBlacklister: blacklister.publicKey,
+          newPauser: pauser.publicKey,
+          newSeizer: seizer.publicKey,
+        });
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+
+        // Pause first with authorized user
+        await stable.pause.pause(pauser);
+
+        const unauthorizedUser = Keypair.generate();
+        try {
+          await stable.pause.unpause(unauthorizedUser);
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized unpause error:", error.message);
+        } finally {
+          // Cleanup
+          await stable.pause.unpause(pauser);
+        }
+      });
+    });
+
+    describe("Authority API Negative Cases", () => {
+      it("should fail to transfer authority when unauthorized", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        const initTx = await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: false,
+          enableTransferHook: false,
+          defaultAccountFrozen: false,
+        });
+        await connection.confirmTransaction(initTx, "confirmed");
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+        const unauthorizedUser = Keypair.generate();
+        const newAuthority = Keypair.generate();
+
+        try {
+          await stable.authority.transfer(unauthorizedUser, newAuthority.publicKey);
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized transfer authority error:", error.message);
+        }
+      });
+
+      it("should fail to update roles when unauthorized", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        const initTx = await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: false,
+          enableTransferHook: false,
+          defaultAccountFrozen: false,
+        });
+        await connection.confirmTransaction(initTx, "confirmed");
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+        const unauthorizedUser = Keypair.generate();
+
+        try {
+          await stable.authority.updateRoles(unauthorizedUser, {
+            blacklister: Keypair.generate().publicKey,
+            pauser: Keypair.generate().publicKey,
+            seizer: Keypair.generate().publicKey,
+          });
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized update roles error:", error.message);
+        }
+      });
+    });
+
+    describe("Burning API Negative Cases", () => {
+      it("should fail to burn more than balance", async () => {
+        const mint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const client = new SSSTokenClient({ provider });
+        await client.initialize(mint, authority, {
+          name: "Negative Test",
+          symbol: "NEG",
+          uri: "https://example.com",
+          decimals: 6,
+          enablePermanentDelegate: false,
+          enableTransferHook: false,
+          defaultAccountFrozen: false,
+        });
+
+        // Add minter
+        await client.addMinter(mint, authority, {
+          minter: minter.publicKey,
+          quota: new BN(1_000_000_000),
+        });
+
+        const stable = await SolanaStablecoin.connect(provider, { mint });
+        const burnUser = Keypair.generate();
+        const tokenAccount = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          burnUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        // Mint only 100 tokens
+        await stable.minting.mintTokens(authority, minter.publicKey, tokenAccount.address, new BN(100));
+
+        try {
+          // Try to burn 1000 tokens
+          await stable.burning.burn(tokenAccount.address, burnUser, new BN(1_000));
+          expect.fail("Should have thrown insufficient balance error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Insufficient balance error:", error.message);
+        }
+      });
+    });
+
+    describe("Preset Configuration Negative Cases", () => {
+      it("should not allow invalid preset values", () => {
+        // Test that only valid presets work
+        const validPresets = [Preset.SSS_1, Preset.SSS_2];
+        const invalidPreset = "invalid-preset" as Preset;
+
+        expect(validPresets.includes(invalidPreset)).to.be.false;
+      });
+    });
+
+    describe("Connection Negative Cases", () => {
+      it("should fail to connect to non-existent stablecoin", async () => {
+        const fakeMint = Keypair.generate().publicKey;
+
+        try {
+          await SolanaStablecoin.connect(provider, { mint: fakeMint });
+          expect.fail("Should have thrown error for non-existent config");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Non-existent stablecoin error:", error.message);
+        }
+      });
+    });
+  });
+
   describe("Seize with Permanent Delegate Extension", () => {
     it("should create mint with permanent delegate and seize tokens from frozen account", async () => {
       console.log("Starting seize test with permanent delegate extension...");

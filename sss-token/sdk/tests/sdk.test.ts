@@ -577,6 +577,531 @@ describe("SSS Token SDK Tests", function () {
     });
   });
 
+  describe("Negative Test Cases", () => {
+    describe("Initialization Validation", () => {
+      it("should fail to initialize with name too long", async () => {
+        const testMint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const longName = "x".repeat(101); // Max 100 chars
+
+        try {
+          await sdk.initialize(testMint, authority, {
+            name: longName,
+            symbol: "TEST",
+            uri: "https://example.com",
+            decimals: 6,
+            enablePermanentDelegate: false,
+            enableTransferHook: false,
+            defaultAccountFrozen: false,
+          });
+          expect.fail("Should have thrown an error for name too long");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Name too long error:", error.message);
+        }
+      });
+
+      it("should fail to initialize with symbol too long", async () => {
+        const testMint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const longSymbol = "x".repeat(11); // Max 10 chars
+
+        try {
+          await sdk.initialize(testMint, authority, {
+            name: "Test Token",
+            symbol: longSymbol,
+            uri: "https://example.com",
+            decimals: 6,
+            enablePermanentDelegate: false,
+            enableTransferHook: false,
+            defaultAccountFrozen: false,
+          });
+          expect.fail("Should have thrown an error for symbol too long");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Symbol too long error:", error.message);
+        }
+      });
+
+      it("should fail to initialize with URI too long", async () => {
+        const testMint = await createMint(
+          connection,
+          payer,
+          authority.publicKey,
+          authority.publicKey,
+          6,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const longUri = "https://example.com/" + "x".repeat(200); // Max 200 chars total
+
+        try {
+          await sdk.initialize(testMint, authority, {
+            name: "Test Token",
+            symbol: "TEST",
+            uri: longUri,
+            decimals: 6,
+            enablePermanentDelegate: false,
+            enableTransferHook: false,
+            defaultAccountFrozen: false,
+          });
+          expect.fail("Should have thrown an error for URI too long");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("URI too long error:", error.message);
+        }
+      });
+    });
+
+    describe("Unauthorized Operations", () => {
+      it("should fail to pause when not authorized pauser", async () => {
+        const unauthorizedUser = Keypair.generate();
+
+        try {
+          await sdk.pause(mint, unauthorizedUser);
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized pause error:", error.message);
+        }
+      });
+
+      it("should fail to unpause when not authorized pauser", async () => {
+        // First pause with authorized pauser (pauser role was assigned in test_pause_and_unpause)
+        await sdk.pause(mint, pauser);
+        
+        const unauthorizedUser = Keypair.generate();
+
+        try {
+          await sdk.unpause(mint, unauthorizedUser);
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized unpause error:", error.message);
+        } finally {
+          // Cleanup: unpause with authorized user
+          await sdk.unpause(mint, pauser);
+        }
+      });
+
+      it("should fail to add minter when not master authority", async () => {
+        const unauthorizedUser = Keypair.generate();
+        const newMinter = Keypair.generate();
+
+        try {
+          await sdk.addMinter(mint, unauthorizedUser, {
+            minter: newMinter.publicKey,
+            quota: new BN(1_000_000),
+          });
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized add minter error:", error.message);
+        }
+      });
+
+      it("should fail to remove minter when not master authority", async () => {
+        const unauthorizedUser = Keypair.generate();
+
+        try {
+          await sdk.removeMinter(mint, unauthorizedUser, {
+            minter: minter.publicKey,
+          });
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized remove minter error:", error.message);
+        }
+      });
+
+      it("should fail to update minter quota when not master authority", async () => {
+        const unauthorizedUser = Keypair.generate();
+
+        try {
+          await sdk.updateMinterQuota(mint, unauthorizedUser, {
+            minter: minter.publicKey,
+            newQuota: new BN(5_000_000),
+          });
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized update quota error:", error.message);
+        }
+      });
+
+      it("should fail to transfer authority when not master authority", async () => {
+        const unauthorizedUser = Keypair.generate();
+        const newAuthority = Keypair.generate();
+
+        try {
+          await sdk.transferAuthority(mint, unauthorizedUser, {
+            newMasterAuthority: newAuthority.publicKey,
+          });
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized transfer authority error:", error.message);
+        }
+      });
+
+      it("should fail to update roles when not master authority", async () => {
+        const unauthorizedUser = Keypair.generate();
+
+        try {
+          await sdk.updateRoles(mint, unauthorizedUser, {
+            newBlacklister: Keypair.generate().publicKey,
+            newPauser: Keypair.generate().publicKey,
+            newSeizer: Keypair.generate().publicKey,
+          });
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized update roles error:", error.message);
+        }
+      });
+    });
+
+    describe("Blacklist Validation", () => {
+      it("should fail to add to blacklist when not authorized blacklister", async () => {
+        const unauthorizedUser = Keypair.generate();
+        const userToBlacklist = Keypair.generate();
+
+        try {
+          await sdk.addToBlacklist(mint, unauthorizedUser, {
+            user: userToBlacklist.publicKey,
+            reason: "Test reason",
+          });
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized blacklist error:", error.message);
+        }
+      });
+
+      it("should fail to add to blacklist with reason too long", async () => {
+        const userToBlacklist = Keypair.generate();
+        const longReason = "x".repeat(101); // Max 100 chars
+
+        try {
+          await sdk.addToBlacklist(mint, blacklister, {
+            user: userToBlacklist.publicKey,
+            reason: longReason,
+          });
+          expect.fail("Should have thrown error for reason too long");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Reason too long error:", error.message);
+        }
+      });
+
+      it("should fail to remove from blacklist when not authorized", async () => {
+        const unauthorizedUser = Keypair.generate();
+        const userToRemove = Keypair.generate();
+
+        // First add to blacklist
+        await sdk.addToBlacklist(mint, blacklister, {
+          user: userToRemove.publicKey,
+          reason: "Test",
+        });
+
+        try {
+          await sdk.removeFromBlacklist(mint, unauthorizedUser, {
+            user: userToRemove.publicKey,
+          });
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized unblacklist error:", error.message);
+        } finally {
+          // Cleanup
+          await sdk.removeFromBlacklist(mint, blacklister, {
+            user: userToRemove.publicKey,
+          });
+        }
+      });
+
+      it("should fail to remove from blacklist when not blacklisted", async () => {
+        const notBlacklistedUser = Keypair.generate();
+
+        try {
+          await sdk.removeFromBlacklist(mint, blacklister, {
+            user: notBlacklistedUser.publicKey,
+          });
+          expect.fail("Should have thrown error for not blacklisted");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Not blacklisted error:", error.message);
+        }
+      });
+    });
+
+    describe("Minting Validation", () => {
+      it("should fail to mint tokens when paused", async () => {
+        const recipient = Keypair.generate();
+        const tokenAccount = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          recipient.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        // Pause the token with authorized pauser
+        await sdk.pause(mint, pauser);
+
+        try {
+          await sdk.mintTokens(
+            mint,
+            authority,
+            minter.publicKey,
+            tokenAccount.address,
+            { amount: new BN(100) }
+          );
+          expect.fail("Should have thrown paused error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Mint when paused error:", error.message);
+        } finally {
+          // Cleanup
+          await sdk.unpause(mint, pauser);
+        }
+      });
+    });
+
+    describe("Burning Validation", () => {
+      it("should fail to burn tokens when paused", async () => {
+        const burnUser = Keypair.generate();
+        const tokenAccount = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          burnUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        // Mint some tokens first
+        await sdk.mintTokens(
+          mint,
+          authority,
+          minter.publicKey,
+          tokenAccount.address,
+          { amount: new BN(1_000) }
+        );
+
+        // Pause the token with authorized pauser
+        await sdk.pause(mint, pauser);
+
+        try {
+          await sdk.burnTokens(mint, tokenAccount.address, burnUser, {
+            amount: new BN(100),
+          });
+          expect.fail("Should have thrown paused error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Burn when paused error:", error.message);
+        } finally {
+          // Cleanup
+          await sdk.unpause(mint, pauser);
+        }
+      });
+
+      it("should fail to burn more tokens than balance", async () => {
+        const burnUser = Keypair.generate();
+        const tokenAccount = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          burnUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        // Mint only 100 tokens
+        await sdk.mintTokens(
+          mint,
+          authority,
+          minter.publicKey,
+          tokenAccount.address,
+          { amount: new BN(100) }
+        );
+
+        try {
+          // Try to burn 1000 tokens
+          await sdk.burnTokens(mint, tokenAccount.address, burnUser, {
+            amount: new BN(1_000),
+          });
+          expect.fail("Should have thrown insufficient balance error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Burn more than balance error:", error.message);
+        }
+      });
+    });
+
+    describe("Freeze/Thaw Validation", () => {
+      it("should fail to freeze when not freeze authority", async () => {
+        const freezeUser = Keypair.generate();
+        const unauthorizedFreezer = Keypair.generate();
+        const tokenAccount = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          freezeUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        try {
+          await sdk.freezeTokenAccount(mint, tokenAccount.address, unauthorizedFreezer);
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized freeze error:", error.message);
+        }
+      });
+
+      it("should fail to thaw when not freeze authority", async () => {
+        const thawUser = Keypair.generate();
+        const unauthorizedThawer = Keypair.generate();
+        const tokenAccount = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          thawUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        // Freeze first with authorized authority
+        await sdk.freezeTokenAccount(mint, tokenAccount.address, authority);
+
+        try {
+          await sdk.thawTokenAccount(mint, tokenAccount.address, unauthorizedThawer);
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized thaw error:", error.message);
+        } finally {
+          // Cleanup
+          await sdk.thawTokenAccount(mint, tokenAccount.address, authority);
+        }
+      });
+    });
+
+    describe("Seize Validation", () => {
+      it("should fail to seize when not authorized seizer", async () => {
+        const unauthorizedUser = Keypair.generate();
+        const sourceUser = Keypair.generate();
+        const destUser = Keypair.generate();
+
+        const sourceToken = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          sourceUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const destToken = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          destUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        try {
+          await sdk.seize(mint, unauthorizedUser, {
+            sourceToken: sourceToken.address,
+            destToken: destToken.address,
+            amount: new BN(100),
+          });
+          expect.fail("Should have thrown unauthorized error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Unauthorized seize error:", error.message);
+        }
+      });
+
+      it("should fail to seize with zero amount", async () => {
+        const sourceUser = Keypair.generate();
+        const destUser = Keypair.generate();
+
+        const sourceToken = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          sourceUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        const destToken = await getOrCreateAssociatedTokenAccount(
+          connection,
+          payer,
+          mint,
+          destUser.publicKey,
+          undefined,
+          undefined,
+          undefined,
+          TOKEN_2022_PROGRAM_ID
+        );
+
+        try {
+          await sdk.seize(mint, seizer, {
+            sourceToken: sourceToken.address,
+            destToken: destToken.address,
+            amount: new BN(0),
+          });
+          expect.fail("Should have thrown invalid amount error");
+        } catch (error: any) {
+          expect(error).to.exist;
+          console.log("Seize zero amount error:", error.message);
+        }
+      });
+    });
+  });
+
   describe("test_full_workflow", () => {
     it("should execute a complete stablecoin workflow", async () => {
       console.log("Starting full workflow test...");

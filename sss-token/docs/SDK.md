@@ -428,63 +428,128 @@ await stable.compliance.blacklistAdd(...);
 
 ## Testing
 
-### Test Files
+### Test Commands
 
-| File | Description |
-|------|-------------|
-| `sdk.test.ts` | Core SSSTokenClient tests |
-| `sdk-enhanced.test.ts` | SolanaStablecoin namespaced API tests |
+The project provides multiple ways to run tests:
 
-### Running Tests
+#### Rust Unit Tests (via Cargo)
 
 ```bash
-# Run all SDK tests
-cd sss-token/sdk && pnpm test
+# Run all sss-token program tests (44 tests)
+cd sss-token
+cargo test --package sss-token --test sss_token
 
-# Run enhanced SDK tests only
-cd sss-token && ./test-enhanced.sh
+# Run all transfer-hook program tests (26 tests)
+cargo test --package transfer-hook --test transfer_hook
 
-# Run with fresh validator
-./test-enhanced.sh --clean
+# Run all Rust tests for both programs (70 tests total)
+cargo test --package sss-token --package transfer-hook
 ```
 
-### Test Coverage
+#### SDK Integration Tests (via test scripts)
 
-The enhanced SDK tests cover:
+```bash
+# Basic SDK tests - validates core SDK functionality (38 tests)
+./test.sh
 
-1. **Preset Configuration Tests**
-   - SSS_1 preset verification
-   - SSS_2 preset verification
-   - Enum string values
+# Enhanced SDK tests - validates namespaced API and presets (44 tests)
+./test-enhanced.sh
 
-2. **Connection Tests**
-   - Connect to existing stablecoin
-   - Namespaced API availability
-   - Config fetching
+# Run both SDK test suites
+./test.sh && ./test-enhanced.sh
+```
 
-3. **Compliance API Tests**
-   - Blacklist add/remove
-   - Freeze/thaw operations
-   - Seizure operations
+#### Test Script Options
 
-4. **Minting API Tests**
-   - Add/remove minters
-   - Quota management
-   - Token minting
+Both `test.sh` and `test-enhanced.sh` support the following options:
 
-5. **Burning API Tests**
-   - Token burning
+| Option | Description |
+|--------|-------------|
+| `--clean` | Clean ledger and start fresh validator |
+| `--skip-deploy` | Skip program deployment (reuse existing) |
+| `--no-stop` | Keep validator running after tests |
+| `--help` | Show help message |
 
-6. **Pause API Tests**
-   - Pause/unpause
-   - Status checking
+**Examples:**
+```bash
+# Fresh start with clean ledger
+./test.sh --clean
 
-7. **Authority API Tests**
-   - Authority transfer
-   - Role updates
+# Reuse existing deployment, keep validator running
+./test-enhanced.sh --skip-deploy --no-stop
 
-8. **Full Workflow Test**
-   - End-to-end operations
+# Run specific test file (enhanced script only)
+./test-enhanced.sh --file tests/sdk-enhanced.test.ts
+```
+
+### Test Files
+
+| File | Tests | Description |
+|------|-------|-------------|
+| `sdk.test.ts` | 38 | Core SSSTokenClient tests (15 positive, 23 negative) |
+| `sdk-enhanced.test.ts` | 44 | SolanaStablecoin namespaced API tests (23 positive, 21 negative) |
+| `programs/sss-token/tests/sss_token.rs` | 44 | Rust unit tests (14 positive, 30 negative) |
+| `programs/transfer-hook/tests/transfer_hook.rs` | 26 | Rust unit tests (8 positive, 18 negative) |
+
+**Total: 152 tests (60 positive, 92 negative)**
+
+### Test Coverage Summary
+
+#### SDK Basic Tests (sdk.test.ts)
+
+**Positive Tests (15):**
+- Initialization, minter management, pause/unpause
+- Authority management, token operations
+- Compliance (blacklist, freeze/thaw, seize)
+- Full workflow
+
+**Negative Tests (23):**
+- Initialization validation (name, symbol, URI length)
+- Unauthorized operations (pause, minter management, authority)
+- Blacklist validation (unauthorized, reason length)
+- Minting/burning validation (paused, quota, balance)
+- Freeze/thaw/seize authorization
+
+#### SDK Enhanced Tests (sdk-enhanced.test.ts)
+
+**Positive Tests (23):**
+- Preset configuration (SSS_1, SSS_2)
+- SolanaStablecoin.connect() and namespaced APIs
+- Compliance API (blacklist, freeze, thaw)
+- Minting API (add/remove minters, quota, mint)
+- Burning API, Pause API, Authority API
+- Full workflow with PDA authority
+
+**Negative Tests (21):**
+- Compliance API (unauthorized, reason too long)
+- Minting API (unauthorized, quota exceeded)
+- Pause/Authority API (unauthorized)
+- Burning API (insufficient balance)
+- Connection (non-existent stablecoin)
+
+### Debugging Failed Tests
+
+```bash
+# Check validator logs
+cat test-logs/validator.log
+
+# Run tests verbose (Rust)
+cargo test --package sss-token -- --nocapture
+
+# Run tests verbose (SDK)
+npx ts-mocha tests/sdk.test.ts --timeout 100000 --reporter spec
+```
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| Validator won't start | Kill existing: `pkill -f solana-test-validator` |
+| Insufficient balance | Run with `--clean` to get fresh airdrop |
+| Program not found | Remove `--skip-deploy` to rebuild |
+| Timeout errors | Increase mocha timeout: `--timeout 200000` |
+
+For complete test documentation, see [TESTS.md](../TESTS.md).
 
 ## Error Handling
 

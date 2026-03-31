@@ -61,17 +61,19 @@ anchor build
 
 ## Testing
 
-The project has a comprehensive test suite with **152 tests** covering both positive and negative scenarios.
+The project has a comprehensive test suite with **331 tests** covering both positive and negative scenarios.
 
 ### Test Summary
 
 | Test Suite | Positive | Negative | Total |
 |------------|----------|----------|-------|
-| sss-token Rust | 14 | 30 | 44 |
+| sss-token Rust | 70 | 98 | 168 |
 | transfer-hook Rust | 8 | 18 | 26 |
+| **Transfer Hook Integration** | **24** | - | **24** |
+| **Trident Fuzz Tests** | **16** | - | **16** |
 | SDK Basic (sdk.test.ts) | 15 | 23 | 38 |
 | SDK Enhanced (sdk-enhanced.test.ts) | 23 | 21 | 44 |
-| **TOTAL** | **60** | **92** | **152** |
+| **TOTAL** | **171** | **160** | **331** |
 
 ### Test Commands
 

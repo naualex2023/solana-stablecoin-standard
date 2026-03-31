@@ -62,11 +62,101 @@ Both `test.sh` and `test-enhanced.sh` support the following options:
 
 | Test Suite | Positive Tests | Negative Tests | Total |
 |------------|----------------|----------------|-------|
-| **sss-token Rust** | 14 | 30 | 44 |
+| **sss-token Rust** | 70 | 98 | 168 |
 | **transfer-hook Rust** | 8 | 18 | 26 |
+| **transfer-hook Integration** | 24 | - | 24 |
+| **Trident Fuzz Invariants** | 18 | - | 18 |
+| **Trident Fuzz Tests** | 13 | - | 13 |
 | **SDK Basic (sdk.test.ts)** | 15 | 23 | 38 |
 | **SDK Enhanced (sdk-enhanced.test.ts)** | 23 | 21 | 44 |
-| **TOTAL** | **60** | **92** | **152** |
+| **TOTAL** | **171** | **160** | **331** |
+
+---
+
+## 🧪 Trident Fuzz Tests
+
+### Fuzz Invariants (18 invariants)
+
+Fuzz testing invariants define properties that must always hold true regardless of operations:
+
+| Invariant | Description |
+|-----------|-------------|
+| `MintingQuotaInvariant` | Total minted cannot exceed total quotas |
+| `PauseStateInvariant` | Paused tokens cannot be minted/burned |
+| `BlacklistInvariant` | Blacklisted addresses cannot transfer |
+| `MinterQuotaInvariant` | Individual minter quota enforcement |
+| `RoleSeparationInvariant` | Role address separation (optional) |
+| `SupplyConsistencyInvariant` | Supply equals sum of balances |
+| `ConfigStateInvariant` | Config account validity |
+| `FreezeAuthorityInvariant` | Only freeze authority can freeze/thaw |
+| `SeizureInvariant` | Seizure requires permanent delegate |
+| `BlacklistFeatureInvariant` | Blacklist requires transfer hook |
+| `AuthorityTransferInvariant` | Only current authority can transfer |
+| `QuotaMonotonicityInvariant` | Minted amount only increases |
+| `BlacklistConsistencyInvariant` | Blacklist state matches transfer hook |
+| `FrozenAccountInvariant` | Frozen accounts cannot transfer |
+| `DecimalPrecisionInvariant` | Amounts respect decimal precision |
+| `ReentrancyProtectionInvariant` | No reentrancy in transfers |
+| `RoleUniquenessInvariant` | Critical roles can be unique |
+| `PauseStateConsistencyInvariant` | Pause blocks all state changes |
+
+### Running Fuzz Tests
+
+```bash
+cd sss-token/trident-tests
+cargo test
+```
+
+### Fuzz Test Files
+
+```
+sss-token/trident-tests/
+├── Cargo.toml
+└── src/
+    ├── lib.rs           # Module exports
+    ├── invariants.rs    # 18 invariant definitions + 13 unit tests
+    └── test_builder.rs  # Fuzz test builder utilities
+```
+
+---
+
+## 🔗 Transfer Hook Integration Tests
+
+### Integration Tests (24 tests)
+
+| Test | Description |
+|------|-------------|
+| `test_config_pda_derivation` | Config PDA derivation verification |
+| `test_blacklist_pda_derivation` | Blacklist PDA derivation verification |
+| `test_transfer_hook_pda_derivation` | Transfer hook PDA derivation verification |
+| `test_keypair_generation` | Keypair generation and uniqueness |
+| `test_pubkey_uniqueness` | 100 unique pubkeys verification |
+| `test_authority_roles` | All authority roles have unique keys |
+| `test_initialize_transfer_hook_structure` | Transfer hook initialization structure |
+| `test_pause_unpause_structure` | Pause/unpause structure verification |
+| `test_blacklist_structure` | Blacklist operations structure |
+| `test_transfer_hook_validation_structure` | Transfer hook validation structure |
+| `test_unauthorized_pause_structure` | Unauthorized pause attempt structure |
+| `test_blacklisted_transfer_structure` | Blacklisted transfer structure |
+| `test_paused_transfer_structure` | Paused transfer structure |
+| `test_multi_transfer_sequence` | Multiple sequential transfers validation |
+| `test_large_amount_transfer` | Max u64 amount handling |
+| `test_concurrent_transfer_validation` | Concurrent transfer scenarios |
+| `test_blacklist_add_remove_cycle` | Full blacklist lifecycle |
+| `test_transfer_hook_with_frozen_account` | Frozen account interaction |
+| `test_authority_transfer_workflow` | Authority transfer validation |
+| `test_decimal_precision_transfer` | Various decimal precision amounts |
+| `test_hook_initialization_with_custom_params` | Custom parameter initialization |
+| `test_transfer_to_self` | Self-transfer edge case |
+| `test_zero_amount_transfer` | Zero amount edge case |
+| `test_multiple_blacklist_entries` | Multiple blacklist PDAs |
+
+### Running Integration Tests
+
+```bash
+cd sss-token
+cargo test --package transfer-hook --test transfer_hook_integration
+```
 
 ---
 

@@ -53,6 +53,42 @@ anchor build
 ./test.sh
 ```
 
+## Testing
+
+The project has a comprehensive test suite with **331 tests** covering both positive and negative scenarios.
+
+### Test Summary
+
+| Test Suite | Positive | Negative | Total |
+|------------|----------|----------|-------|
+| sss-token Rust | 70 | 98 | 168 |
+| transfer-hook Rust | 8 | 18 | 26 |
+| **Transfer Hook Integration** | **24** | - | **24** |
+| **Trident Fuzz Tests** | **16** | - | **16** |
+| SDK Basic (sdk.test.ts) | 15 | 23 | 38 |
+| SDK Enhanced (sdk-enhanced.test.ts) | 23 | 21 | 44 |
+| **TOTAL** | **171** | **160** | **331** |
+
+### Test Commands
+
+```bash
+# Rust unit tests
+cargo test --package sss-token --test sss_token
+cargo test --package transfer-hook --test transfer_hook
+
+# Transfer hook integration tests (24 tests)
+cargo test --package transfer-hook --test transfer_hook_integration
+
+# Trident fuzz tests (16 tests)
+cd trident-tests && cargo test
+
+# SDK integration tests
+./test.sh           # Basic SDK tests (38 tests)
+./test-enhanced.sh  # Enhanced SDK tests (44 tests)
+```
+
+For complete test documentation, see [TESTS.md](./sss-token/TESTS.md).
+
 ### Create Your First Stablecoin
 
 #### Using CLI

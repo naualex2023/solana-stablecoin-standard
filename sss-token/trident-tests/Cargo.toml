@@ -1,0 +1,30 @@
+[package]
+name = "trident-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Solana dependencies
+solana-sdk = "2.3.0"
+solana-program-test = "2.3.0"
+solana-banks-client = "2.3.0"
+
+# Anchor dependencies
+anchor-lang = "0.32.1"
+anchor-client = "0.32.1"
+
+# Program dependencies (local)
+sss-token = { path = "../programs/sss-token", features = ["no-entrypoint"] }
+transfer-hook = { path = "../programs/transfer-hook", features = ["no-entrypoint"] }
+
+# Utilities
+tokio = { version = "1.42.0", features = ["full"] }
+arbitrary = "1.4"
+rand = "0.8"
+
+[features]
+default = []
+fuzzing = []
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }
